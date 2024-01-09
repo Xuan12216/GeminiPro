@@ -31,13 +31,15 @@
     <!-- 消息容器 -->
     <LinearLayout
         android:id="@+id/messageContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         android:layout_toEndOf="@id/avatarCardView"
         android:layout_toRightOf="@id/avatarCardView"
         android:orientation="vertical"
         android:paddingLeft="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/avatarCardView"
         app:layout_constraintTop_toTopOf="@+id/avatarCardView">
 

@@ -39,7 +39,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         String text = StringUris.get(position);
         holder.messageTextView.setText(text);
         holder.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.black,null));
-        holder.usernameTextView.setText(("User").equals(who) ? "Xuan" : "Gemini Pro");
+        holder.usernameTextView.setText(("User").equals(who) ? "You" : "Gemini Pro");
         holder.avatarImageView.setImageResource(("User").equals(who) ? R.drawable.baseline_person_24 : R.drawable.baseline_person_robot_24);
 
         if (position != StringUris.size() - 1)holder.view.setVisibility(View.VISIBLE);
