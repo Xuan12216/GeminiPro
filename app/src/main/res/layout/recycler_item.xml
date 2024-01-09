@@ -47,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Gemini Pro"
+            android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold" />
 
@@ -56,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hello, how are you?"
+            android:textColor="@color/black"
             android:textSize="17dp" />
 
     </LinearLayout>
@@ -67,8 +69,8 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
-        android:background="@color/black"
+        android:layout_marginTop="15dp"
+        android:background="@color/gray"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
