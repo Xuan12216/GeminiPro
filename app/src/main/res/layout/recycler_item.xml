@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:text="Gemini Pro"
             android:textColor="@color/black"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <!-- 聊天消息内容 -->
@@ -61,8 +61,20 @@
             android:text="Hello, how are you?"
             android:textColor="@color/black"
             android:textIsSelectable="true"
-            android:textSize="17sp"
+            android:textSize="16sp"
+            android:paddingTop="5dp"
             android:paddingBottom="10dp"/>
-
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_model"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-5dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/messageContainer"
+        app:layout_constraintTop_toBottomOf="@+id/messageContainer"></androidx.recyclerview.widget.RecyclerView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

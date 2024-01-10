@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GeminiPro</string>
+    <string name="EditText_hint">Enter a prompt here</string>
 </resources>

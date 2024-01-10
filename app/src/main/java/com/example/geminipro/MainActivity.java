@@ -162,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         setImageAdapter(null, true);
         progressBar.setVisibility(View.VISIBLE);
         textInputEditText.setText("");
+        textInputEditText.clearFocus();
 
         isWait = true;
         textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_stop_circle_24));
@@ -209,9 +210,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                modelAdapter.addData(resultText, who);
-                progressBar.setVisibility(View.GONE);
                 index++;
+                modelAdapter.addData(resultText,imageUris, who, index);
+                progressBar.setVisibility(View.GONE);
                 recyclerView.smoothScrollToPosition(index);
                 if ("Gemini".equals(who)){
                     isWait = false;

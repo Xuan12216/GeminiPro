@@ -54,11 +54,11 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/imageCardView"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="15dp"
         app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="28dp"
         app:cardElevation="0dp"
@@ -82,15 +82,20 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
+        app:boxBackgroundColor="@color/gray1"
         app:boxCornerRadiusBottomEnd="25dp"
         app:boxCornerRadiusBottomStart="25dp"
         app:boxCornerRadiusTopEnd="25dp"
         app:boxCornerRadiusTopStart="25dp"
+        app:boxStrokeColor="@color/gray"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="1dp"
         app:endIconDrawable="@drawable/baseline_keyboard_voice_24"
-        app:endIconTint="@color/black"
         app:endIconMode="custom"
+        app:endIconTint="@color/black"
+        app:hintTextColor="@color/gray"
         app:layout_constraintBottom_toTopOf="@+id/recyclerViewDown"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageCardView">
@@ -99,8 +104,10 @@
             android:id="@+id/textInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/EditText_hint"
+            android:maxLines="10"
             android:textColor="@color/black"
-            android:maxLines="10"/>
+            android:textColorHint="@color/gray" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
