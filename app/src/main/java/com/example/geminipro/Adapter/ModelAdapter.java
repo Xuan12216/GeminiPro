@@ -66,7 +66,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         StringUris.add(resultText);
         userOrGemini.add(who);
         List<Uri> newImageUris = new ArrayList<>(imageUris);
-        if (newImageUris.size() > 0) imageHashMap.put(index,newImageUris);
+        if (newImageUris.size() > 0 && !"Gemini".equals(who)) imageHashMap.put(index,newImageUris);
         notifyDataSetChanged();
     }
 

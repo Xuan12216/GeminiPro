@@ -4,17 +4,27 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
@@ -31,16 +41,24 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -61,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
     private ChatFutures chatNormal;
     private int index = -1;
     private boolean isWait = false;
+    //======
+    private static final int REQUEST_CODE_SPEECH_INPUT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         recyclerView.setAdapter(modelAdapter);
-
+        //===============
         recyclerViewDown.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         adapterDown = new ImageAdapter(context);
         recyclerViewDown.setAdapter(adapterDown);
-
+        //===============
         Content.Builder userContentBuilder = new Content.Builder();
         userContentBuilder.setRole("user");
         userContentBuilder.addText("Hello.");
@@ -121,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
         Content modelContent = modelContentBuilder.build();
 
         historyNormal = Arrays.asList(userContent,modelContent);
+        //===============
     }
 
     private void setListener(){
@@ -145,13 +166,41 @@ public class MainActivity extends AppCompatActivity {
         textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isWait) handleEndIconClick();
+                String text = textInputEditText.getText().toString();
+                if (!isWait && !text.isEmpty()) handleEndIconClick(text);
+                else if (!isWait && text.isEmpty()) gotoRecordFunc();
             }
         });
     }
 
-    private void handleEndIconClick() {
-        String text = textInputEditText.getText().toString();
+    private void gotoRecordFunc() {
+        try {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak something...");
+            speechInputLauncher.launch(intent);
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, " " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private final ActivityResultLauncher<Intent> speechInputLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        ArrayList<String> resultArray = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        if (resultArray != null && !resultArray.isEmpty()) {
+                            String recognizedText = resultArray.get(0);
+                            textInputEditText.setText(recognizedText);
+                        }
+                    }
+                }
+            }
+    );
+
+    private void handleEndIconClick(String text) {
 
         if (imageUris.size() == 0 && text.isEmpty()) return;
 
