@@ -9,8 +9,8 @@
     <!-- 左侧头像 -->
     <androidx.cardview.widget.CardView
         android:id="@+id/avatarCardView"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         app:cardCornerRadius="28dp"
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:text="Gemini Pro"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <!-- 聊天消息内容 -->
@@ -60,21 +60,9 @@
             android:layout_height="wrap_content"
             android:text="Hello, how are you?"
             android:textColor="@color/black"
-            android:textSize="17dp" />
+            android:textIsSelectable="true"
+            android:textSize="17sp"
+            android:paddingBottom="10dp"/>
 
     </LinearLayout>
-
-    <!-- 右侧时间戳 -->
-
-    <View
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="15dp"
-        android:background="@color/gray"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/messageContainer" />
 </androidx.constraintlayout.widget.ConstraintLayout>

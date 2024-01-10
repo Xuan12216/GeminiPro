@@ -32,7 +32,7 @@ public class ImageResize {
             Glide.with(context)
                     .asBitmap()
                     .load(imageUri)
-                    .override(768, 768)
+                    .override(500, 500)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {

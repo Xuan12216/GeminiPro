@@ -11,6 +11,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -18,6 +20,7 @@ import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
 import com.example.geminipro.Model.GenerativeModelManager;
 import com.example.geminipro.Util.ImageResize;
+import com.example.geminipro.Util.SendToServer;
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.Content;
@@ -27,6 +30,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -50,8 +57,10 @@ public class MainActivity extends AppCompatActivity {
     private TextInputLayout textInputLayout;
     private TextInputEditText textInputEditText;
     private ProgressBar progressBar;
-    private List<Content> history = new ArrayList<>();
-    private ChatFutures chat;
+    private List<Content> historyNormal = new ArrayList<>();
+    private ChatFutures chatNormal;
+    private int index = -1;
+    private boolean isWait = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private void init(){
         imageResize = new ImageResize(context);
         GenerativeModelManager.initializeGenerativeModel();
-        pickMedia = registerForActivityResult(
-                new ActivityResultContracts.PickVisualMedia(),
-                this::saveImage
-        );
+        pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), this::saveImage);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         recyclerView.setAdapter(modelAdapter);
@@ -103,91 +109,100 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewDown.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         adapterDown = new ImageAdapter(context);
         recyclerViewDown.setAdapter(adapterDown);
+
+        Content.Builder userContentBuilder = new Content.Builder();
+        userContentBuilder.setRole("user");
+        userContentBuilder.addText("Hello.");
+        Content userContent = userContentBuilder.build();
+
+        Content.Builder modelContentBuilder = new Content.Builder();
+        modelContentBuilder.setRole("model");
+        modelContentBuilder.addText("Great to meet you.");
+        Content modelContent = modelContentBuilder.build();
+
+        historyNormal = Arrays.asList(userContent,modelContent);
     }
 
     private void setListener(){
+        textInputEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!isWait){
+                    if (s.length() > 0) textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_send_24));
+                    else textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_keyboard_voice_24));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        //======================================
 
         textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("TestXuan: "+history.size());
-                String text = textInputEditText.getText().toString();
-                Content contentUser = null;
-
-                if (imageUris.size() == 0 && text.isEmpty()) return;
-
-                if(imageUris.size() != 0 && !text.isEmpty()){
-                    model = GenerativeModelManager.getGenerativeModelVision();
-
-                    Content.Builder builder = new Content.Builder();
-                    builder.setRole("user");
-                    builder.addText(text);
-
-                    for (Uri uri : imageUris) {
-                        try {
-                            InputStream inputStream = getContentResolver().openInputStream(uri);
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            inputStream.close();
-                            builder.addImage(bitmap);
-                        }
-                        catch (FileNotFoundException e) {throw new RuntimeException(e);}
-                        catch (IOException e) {throw new RuntimeException(e);}
-                    }
-                    contentUser = builder.build();
-                }
-                else if (!text.isEmpty()){
-                    model = GenerativeModelManager.getGenerativeModel();
-                    Content.Builder builder = new Content.Builder();
-                    builder.setRole("user");
-                    builder.addText(text);
-
-                    contentUser = builder.build();
-                }
-
-                if (null == contentUser) return;
-
-                setModelAdapter(text, "User");
-                setImageAdapter(null, true);
-                progressBar.setVisibility(View.VISIBLE);
-                textInputEditText.setText("");
-
-                Executor executor = Executors.newSingleThreadExecutor();
-
-                if (null == chat){
-                    System.out.println("TestXuan: ChatNull");
-                    chat = model.startChat(history);
-                }
-
-                ListenableFuture<GenerateContentResponse> response = chat.sendMessage(contentUser);
-                Content finalContentUser = contentUser;
-                Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
-                    @Override
-                    public void onSuccess(GenerateContentResponse result) {
-                        String resultText = result.getText();
-                        setModelAdapter(resultText, "Gemini");
-
-                        Content.Builder builder = new Content.Builder();
-                        builder.setRole("model");
-                        builder.addText(resultText);
-                        Content contentModel = builder.build();
-                        history = Arrays.asList(finalContentUser, contentModel);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
-                        setModelAdapter(t.toString(), "Gemini");
-                        System.out.println("TestXuan: "+t.toString());
-
-                        Content.Builder builder = new Content.Builder();
-                        builder.setRole("model");
-                        builder.addText(t.toString());
-                        Content contentModel = builder.build();
-                        history = Arrays.asList(finalContentUser, contentModel);
-                    }
-                }, executor);
+                if (!isWait) handleEndIconClick();
             }
         });
     }
+
+    private void handleEndIconClick() {
+        String text = textInputEditText.getText().toString();
+
+        if (imageUris.size() == 0 && text.isEmpty()) return;
+
+        if(imageUris.size() != 0 && !text.isEmpty()) gotoGeminiBuilder(text, true);
+        else if (!text.isEmpty()) gotoGeminiBuilder(text, false);
+
+        setModelAdapter(text, "User");
+        setImageAdapter(null, true);
+        progressBar.setVisibility(View.VISIBLE);
+        textInputEditText.setText("");
+
+        isWait = true;
+        textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_stop_circle_24));
+    }
+
+    //====================================================
+
+    private void gotoGeminiBuilder(String text, boolean isVision){
+        model = isVision ? GenerativeModelManager.getGenerativeModelVision()
+                : GenerativeModelManager.getGenerativeModel();
+
+        Content.Builder builder = new Content.Builder();
+        builder.setRole("user");
+        builder.addText(text);
+
+        if (isVision){
+            for (Uri uri : imageUris) {
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(uri);
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    inputStream.close();
+                    builder.addImage(bitmap);
+                }
+                catch (FileNotFoundException e) {throw new RuntimeException(e);}
+                catch (IOException e) {throw new RuntimeException(e);}
+            }
+        }
+        else if (!isVision && null == chatNormal) chatNormal = model.startChat(historyNormal);
+
+        Content contentUser = builder.build();
+
+        SendToServer sendToServer = isVision ? new SendToServer(model) : new SendToServer(chatNormal);
+        sendToServer.sendToServerFunc(isVision ? true : false, contentUser, new SendToServer.ResultCallback() {
+            @Override
+            public void onResult(String result) {
+                setModelAdapter(result, "Gemini");
+            }
+        });
+    }
+
+    //==========================================
 
     public void setModelAdapter(String resultText, String who){
         runOnUiThread(new Runnable() {
@@ -196,6 +211,14 @@ public class MainActivity extends AppCompatActivity {
 
                 modelAdapter.addData(resultText, who);
                 progressBar.setVisibility(View.GONE);
+                index++;
+                recyclerView.smoothScrollToPosition(index);
+                if ("Gemini".equals(who)){
+                    isWait = false;
+                    int size = textInputEditText.getText().toString().length();
+                    textInputLayout.setEndIconDrawable(size > 0 ? getDrawable(R.drawable.baseline_send_24)
+                            : getDrawable(R.drawable.baseline_keyboard_voice_24));
+                }
             }
         });
     }

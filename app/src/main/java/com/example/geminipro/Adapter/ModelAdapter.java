@@ -42,8 +42,6 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.usernameTextView.setText(("User").equals(who) ? "You" : "Gemini Pro");
         holder.avatarImageView.setImageResource(("User").equals(who) ? R.drawable.baseline_person_24 : R.drawable.baseline_person_robot_24);
 
-        if (position != StringUris.size() - 1)holder.view.setVisibility(View.VISIBLE);
-
     }
 
     @Override
@@ -57,9 +55,13 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         notifyDataSetChanged();
     }
 
+    public void refreshData(String text, int index){
+        StringUris.set(index, text);
+        notifyDataSetChanged();
+    }
+
     public static class ModelViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView,usernameTextView;
-        public View view;
         public ImageView avatarImageView;
         public CardView avatarCardView;
 
@@ -67,7 +69,6 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
             messageTextView = itemView.findViewById(R.id.messageTextView);
-            view = itemView.findViewById(R.id.view);
             avatarImageView = itemView.findViewById(R.id.avatarImageView);
             avatarCardView = itemView.findViewById(R.id.avatarCardView);
         }
