@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak something...");
             speechInputLauncher.launch(intent);
         } catch (Exception e) {
@@ -200,6 +201,11 @@ public class MainActivity extends AppCompatActivity {
             }
     );
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
     private void handleEndIconClick(String text) {
 
         if (imageUris.size() == 0 && text.isEmpty()) return;
