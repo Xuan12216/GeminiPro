@@ -40,6 +40,8 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     @Override
     public void onBindViewHolder(@NonNull ModelViewHolder holder, int position) {
 
+        holder.recyclerView.setAdapter(null);
+
         if (imageHashMap.containsKey(position)){
             holder.recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
             ImageAdapter adapterDown = new ImageAdapter(context);

@@ -33,6 +33,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
+        Glide.with(context).clear(holder.imageView);
         Uri imageUri = imageUris.get(position);
         Glide.with(context)
                 .load(imageUri)
