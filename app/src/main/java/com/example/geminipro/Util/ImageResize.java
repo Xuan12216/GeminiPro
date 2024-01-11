@@ -28,7 +28,6 @@ public class ImageResize {
 
     public void imgResize(Uri imageUri, ImageResizeCallback callback){
         if (null != imageUri && null != context){
-
             Glide.with(context)
                     .asBitmap()
                     .load(imageUri)

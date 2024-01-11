@@ -9,4 +9,10 @@
     </style>
 
     <style name="Theme.GeminiPro" parent="Base.Theme.GeminiPro" />
+
+    <style name="MyPopupMenuStyle" parent="@style/Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/custom_popup_background</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>

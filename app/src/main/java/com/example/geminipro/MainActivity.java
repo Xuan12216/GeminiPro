@@ -1,159 +1,123 @@
 package com.example.geminipro;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
-
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
 import com.example.geminipro.Model.GenerativeModelManager;
-import com.example.geminipro.Util.ImageResize;
+import com.example.geminipro.Util.PickImageFunc;
+import com.example.geminipro.Util.RecordFunc;
 import com.example.geminipro.Util.SendToServer;
+import com.example.geminipro.databinding.ActivityMainBinding;
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.Content;
-import com.google.ai.client.generativeai.type.GenerateContentResponse;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener{
 
+    private ActivityMainBinding binding;
     private GenerativeModelFutures model;
-    private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
-    private final List<Uri> imageUris = new ArrayList<>();
+    private List<Uri> imageUris = new ArrayList<>();
     private Context context;
-    private ImageResize imageResize;
-    private RecyclerView recyclerView,recyclerViewDown;
     private ImageAdapter adapterDown;
     private ModelAdapter modelAdapter;
-    private TextInputLayout textInputLayout;
-    private TextInputEditText textInputEditText;
-    private ProgressBar progressBar;
     private List<Content> historyNormal = new ArrayList<>();
     private ChatFutures chatNormal;
     private int index = -1;
     private boolean isWait = false;
     //======
-    private static final int REQUEST_CODE_SPEECH_INPUT = 1;
+    private RecordFunc recordFunc;
+    //======
+    private PickImageFunc pickImageFunc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         context = getApplicationContext();
-
-        progressBar = findViewById(R.id.progressBar);
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerViewDown = findViewById(R.id.recyclerViewDown);
-        textInputLayout = findViewById(R.id.textInputLayout);
-        textInputEditText = findViewById(R.id.textInputEditText);
 
         init();
         setListener();
     }
 
-    public void AddImage(View view) {
-        ActivityResultContracts.PickVisualMedia.VisualMediaType mediaType = (ActivityResultContracts.PickVisualMedia.VisualMediaType) ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE;
-        PickVisualMediaRequest request = new PickVisualMediaRequest.Builder()
-                .setMediaType(mediaType)
-                .build();
-        pickMedia.launch(request);
-    }
-
-    private void saveImage(Uri imageUri){
-        if (imageUri != null) {
-            imageResize.imgResize(imageUri, new ImageResize.ImageResizeCallback() {
-                @Override
-                public void onImageResized(Uri compressedUri) {
-                    setImageAdapter(compressedUri, false);
-                }
-            });
-        }
-    }
-
     private void init(){
-        imageResize = new ImageResize(context);
         GenerativeModelManager.initializeGenerativeModel();
-        pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), this::saveImage);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
-        recyclerView.setAdapter(modelAdapter);
+        binding.recyclerView.setAdapter(modelAdapter);
         //===============
-        recyclerViewDown.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        adapterDown = new ImageAdapter(context);
-        recyclerViewDown.setAdapter(adapterDown);
+        binding.recyclerViewDown.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        adapterDown = new ImageAdapter(context, this);
+        binding.recyclerViewDown.setAdapter(adapterDown);
         //===============
-        Content.Builder userContentBuilder = new Content.Builder();
-        userContentBuilder.setRole("user");
-        userContentBuilder.addText("Hello.");
-        Content userContent = userContentBuilder.build();
+        historyNormal = Arrays.asList(GenerativeModelManager.getUserContent(),GenerativeModelManager.getModelContent());
+        //===============
+        recordFunc = new RecordFunc(this,context);
+        //===============
+        pickImageFunc = new PickImageFunc(this, context);
+    }
 
-        Content.Builder modelContentBuilder = new Content.Builder();
-        modelContentBuilder.setRole("model");
-        modelContentBuilder.addText("Great to meet you.");
-        Content modelContent = modelContentBuilder.build();
+    public void showPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view, Gravity.END, 0, R.style.MyPopupMenuStyle);
+        popupMenu.setForceShowIcon(true);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.menu_item, popupMenu.getMenu());
 
-        historyNormal = Arrays.asList(userContent,modelContent);
-        //===============
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() == R.id.howToUse){
+                    return true;
+                }
+                else if (item.getItemId() == R.id.settings){
+                    return true;
+                }
+                else return false;
+            }
+        });
+
+        popupMenu.show();
+    }
+
+    public void AddImage(View view) {
+        pickImageFunc.startPickImage(new PickImageFunc.onImageResultCallback() {
+            @Override
+            public void onResult(Uri compressedUri) {
+                setImageAdapter(compressedUri, false);
+            }
+        });
     }
 
     private void setListener(){
-        textInputEditText.addTextChangedListener(new TextWatcher() {
+        binding.textInputEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!isWait){
-                    if (s.length() > 0) textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_send_24));
-                    else textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_keyboard_voice_24));
+                    if (s.length() > 0) binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_send_24));
+                    else binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_keyboard_voice_24));
                 }
             }
 
@@ -163,49 +127,16 @@ public class MainActivity extends AppCompatActivity {
 
         //======================================
 
-        textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
+        binding.textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = textInputEditText.getText().toString();
+                String text = binding.textInputEditText.getText().toString();
                 if (!isWait && !text.isEmpty()) handleEndIconClick(text);
                 else if (!isWait && text.isEmpty()) gotoRecordFunc();
             }
         });
     }
 
-    private void gotoRecordFunc() {
-        try {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak something...");
-            speechInputLauncher.launch(intent);
-        } catch (Exception e) {
-            Toast.makeText(MainActivity.this, " " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private final ActivityResultLauncher<Intent> speechInputLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null) {
-                        ArrayList<String> resultArray = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        if (resultArray != null && !resultArray.isEmpty()) {
-                            String recognizedText = resultArray.get(0);
-                            textInputEditText.setText(recognizedText);
-                        }
-                    }
-                }
-            }
-    );
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
     private void handleEndIconClick(String text) {
 
         if (imageUris.size() == 0 && text.isEmpty()) return;
@@ -215,14 +146,22 @@ public class MainActivity extends AppCompatActivity {
 
         setModelAdapter(text, "User");
         setImageAdapter(null, true);
-        progressBar.setVisibility(View.VISIBLE);
-        textInputEditText.setText("");
-        textInputEditText.clearFocus();
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.textInputEditText.setText("");
+        binding.textInputEditText.clearFocus();
 
         isWait = true;
-        textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_stop_circle_24));
+        binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_stop_circle_24));
     }
 
+    private void gotoRecordFunc() {
+        recordFunc.startRecordFunc(new RecordFunc.RecordResultCallback() {
+            @Override
+            public void onResult(String result) {
+                binding.textInputEditText.setText(result);
+            }
+        });
+    }
     //====================================================
 
     private void gotoGeminiBuilder(String text, boolean isVision){
@@ -267,12 +206,12 @@ public class MainActivity extends AppCompatActivity {
 
                 index++;
                 modelAdapter.addData(resultText,imageUris, who, index);
-                progressBar.setVisibility(View.GONE);
-                recyclerView.smoothScrollToPosition(index);
+                binding.progressBar.setVisibility(View.GONE);
+                binding.recyclerView.smoothScrollToPosition(index);
                 if ("Gemini".equals(who)){
                     isWait = false;
-                    int size = textInputEditText.getText().toString().length();
-                    textInputLayout.setEndIconDrawable(size > 0 ? getDrawable(R.drawable.baseline_send_24)
+                    int size = binding.textInputEditText.getText().toString().length();
+                    binding.textInputLayout.setEndIconDrawable(size > 0 ? getDrawable(R.drawable.baseline_send_24)
                             : getDrawable(R.drawable.baseline_keyboard_voice_24));
                 }
             }
@@ -283,6 +222,16 @@ public class MainActivity extends AppCompatActivity {
         if (isClearList) imageUris.clear();
         else if (null != compressedUri) imageUris.add(compressedUri);
 
-        adapterDown.setNewImage(imageUris);
+        adapterDown.setNewImage(imageUris, true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onImageListUpdated(List<Uri> updatedImageUris) {
+        this.imageUris = updatedImageUris;
     }
 }

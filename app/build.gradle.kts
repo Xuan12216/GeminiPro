@@ -8,6 +8,9 @@ android {
     compileSdk = 34
 
     buildFeatures.buildConfig = true
+    buildFeatures {
+        viewBinding = true
+    }
 
     defaultConfig {
         applicationId = "com.example.geminipro"

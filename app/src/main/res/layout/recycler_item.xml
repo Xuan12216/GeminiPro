@@ -63,7 +63,7 @@
             android:textIsSelectable="true"
             android:textSize="16sp"
             android:paddingTop="5dp"
-            android:paddingBottom="10dp"/>
+            android:paddingBottom="5dp"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

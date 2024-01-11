@@ -13,13 +13,14 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.geminipro.R;
+import com.example.geminipro.databinding.RecyclerItemBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> {
+public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements ImageAdapter.ImageAdapterListener {
 
     private List<String> StringUris = new ArrayList<>();
     private List<String> userOrGemini = new ArrayList<>();
@@ -33,28 +34,28 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     @NonNull
     @Override
     public ModelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item, parent, false);
-        return new ModelViewHolder(view);
+        RecyclerItemBinding binding = RecyclerItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ModelViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ModelViewHolder holder, int position) {
 
-        holder.recyclerView.setAdapter(null);
+        holder.binding.recyclerViewModel.setAdapter(null);
 
         if (imageHashMap.containsKey(position)){
-            holder.recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-            ImageAdapter adapterDown = new ImageAdapter(context);
-            holder.recyclerView.setAdapter(adapterDown);
-            adapterDown.setNewImage(imageHashMap.get(position));
+            holder.binding.recyclerViewModel.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            ImageAdapter adapterDown = new ImageAdapter(context, this);
+            holder.binding.recyclerViewModel.setAdapter(adapterDown);
+            adapterDown.setNewImage(imageHashMap.get(position), false);
         }
 
         String who = userOrGemini.get(position);
         String text = StringUris.get(position);
-        holder.messageTextView.setText(text);
-        holder.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.black,null));
-        holder.usernameTextView.setText(("User").equals(who) ? "You" : "Gemini");
-        holder.avatarImageView.setImageResource(("User").equals(who) ? R.drawable.baseline_person_24 : R.drawable.baseline_person_robot_24);
+        holder.binding.messageTextView.setText(text);
+        holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.black,null));
+        holder.binding.usernameTextView.setText(("User").equals(who) ? "You" : "Gemini");
+        holder.binding.avatarImageView.setImageResource(("User").equals(who) ? R.drawable.baseline_person_24 : R.drawable.baseline_person_robot_24);
     }
 
     @Override
@@ -75,19 +76,15 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         notifyDataSetChanged();
     }
 
-    public static class ModelViewHolder extends RecyclerView.ViewHolder {
-        public TextView messageTextView,usernameTextView;
-        public ImageView avatarImageView;
-        public CardView avatarCardView;
-        public RecyclerView recyclerView;
+    @Override
+    public void onImageListUpdated(List<Uri> updatedImageUris) {}
 
-        public ModelViewHolder(@NonNull View itemView) {
-            super(itemView);
-            usernameTextView = itemView.findViewById(R.id.usernameTextView);
-            messageTextView = itemView.findViewById(R.id.messageTextView);
-            avatarImageView = itemView.findViewById(R.id.avatarImageView);
-            avatarCardView = itemView.findViewById(R.id.avatarCardView);
-            recyclerView = itemView.findViewById(R.id.recyclerView_model);
+    public static class ModelViewHolder extends RecyclerView.ViewHolder {
+        public final RecyclerItemBinding binding;
+
+        public ModelViewHolder(@NonNull RecyclerItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }
