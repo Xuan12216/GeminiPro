@@ -53,7 +53,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         String who = userOrGemini.get(position);
         String text = StringUris.get(position);
         holder.binding.messageTextView.setText(text);
-        holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.black,null));
+        holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.SageGreen,null));
         holder.binding.usernameTextView.setText(("User").equals(who) ? "You" : "Gemini");
         holder.binding.avatarImageView.setImageResource(("User").equals(who) ? R.drawable.baseline_person_24 : R.drawable.baseline_person_robot_24);
     }

@@ -27,7 +27,6 @@
             android:scaleType="centerCrop" />
     </androidx.cardview.widget.CardView>
 
-
     <!-- 消息容器 -->
     <LinearLayout
         android:id="@+id/messageContainer"
@@ -49,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Gemini Pro"
-            android:textColor="@color/black"
+            android:textColor="?colorPrimary"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -59,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hello, how are you?"
-            android:textColor="@color/black"
+            android:textColor="?colorPrimary"
             android:textIsSelectable="true"
             android:textSize="16sp"
             android:paddingTop="5dp"

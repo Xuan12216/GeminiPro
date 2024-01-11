@@ -1,11 +1,12 @@
 package com.example.geminipro;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,30 +18,20 @@ import android.view.View;
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
 import com.example.geminipro.Model.GenerativeModelManager;
+import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.RecordFunc;
-import com.example.geminipro.Util.SendToServer;
 import com.example.geminipro.databinding.ActivityMainBinding;
-import com.google.ai.client.generativeai.java.ChatFutures;
-import com.google.ai.client.generativeai.java.GenerativeModelFutures;
-import com.google.ai.client.generativeai.type.Content;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener{
 
     private ActivityMainBinding binding;
-    private GenerativeModelFutures model;
     private List<Uri> imageUris = new ArrayList<>();
     private Context context;
     private ImageAdapter adapterDown;
     private ModelAdapter modelAdapter;
-    private List<Content> historyNormal = new ArrayList<>();
-    private ChatFutures chatNormal;
     private int index = -1;
     private boolean isWait = false;
     //======
@@ -53,13 +44,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         context = getApplicationContext();
 
         init();
         setListener();
     }
-
+    //===init=====================================================
     private void init(){
         GenerativeModelManager.initializeGenerativeModel();
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -70,11 +60,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         adapterDown = new ImageAdapter(context, this);
         binding.recyclerViewDown.setAdapter(adapterDown);
         //===============
-        historyNormal = Arrays.asList(GenerativeModelManager.getUserContent(),GenerativeModelManager.getModelContent());
-        //===============
         recordFunc = new RecordFunc(this,context);
         //===============
         pickImageFunc = new PickImageFunc(this, context);
+    }
+    //===listener=====================================================
+    public void openNavigationDrawer(View view) {
+        binding.drawerLayout.openDrawer(GravityCompat.START);
     }
 
     public void showPopupMenu(View view) {
@@ -86,12 +78,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.howToUse){
-                    return true;
-                }
-                else if (item.getItemId() == R.id.settings){
-                    return true;
-                }
+                if (item.getItemId() == R.id.howToUse) return true;
+                else if (item.getItemId() == R.id.settings) return true;
                 else return false;
             }
         });
@@ -109,10 +97,26 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
 
     private void setListener(){
+        binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy >= 0) binding.fabScrollToBottom.hide();
+                else binding.fabScrollToBottom.show();
+            }
+        });
+        //===============================================
+        binding.fabScrollToBottom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int i = modelAdapter.getItemCount() - 1;
+                if (i >= 0) binding.recyclerView.smoothScrollToPosition(i);
+            }
+        });
+        //===============================================
         binding.textInputEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!isWait){
@@ -120,13 +124,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     else binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_keyboard_voice_24));
                 }
             }
-
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
         //======================================
-
         binding.textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,13 +137,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             }
         });
     }
-
+    //===prepare=====================================================
     private void handleEndIconClick(String text) {
 
         if (imageUris.size() == 0 && text.isEmpty()) return;
 
-        if(imageUris.size() != 0 && !text.isEmpty()) gotoGeminiBuilder(text, true);
-        else if (!text.isEmpty()) gotoGeminiBuilder(text, false);
+        gotoGeminiBuilder(text, imageUris.size() != 0 && !text.isEmpty());
 
         setModelAdapter(text, "User");
         setImageAdapter(null, true);
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         isWait = true;
         binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_stop_circle_24));
     }
-
+    //=====
     private void gotoRecordFunc() {
         recordFunc.startRecordFunc(new RecordFunc.RecordResultCallback() {
             @Override
@@ -162,57 +162,28 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             }
         });
     }
-    //====================================================
-
+    //===build and send=====================================================
     private void gotoGeminiBuilder(String text, boolean isVision){
-        model = isVision ? GenerativeModelManager.getGenerativeModelVision()
-                : GenerativeModelManager.getGenerativeModel();
-
-        Content.Builder builder = new Content.Builder();
-        builder.setRole("user");
-        builder.addText(text);
-
-        if (isVision){
-            for (Uri uri : imageUris) {
-                try {
-                    InputStream inputStream = getContentResolver().openInputStream(uri);
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    inputStream.close();
-                    builder.addImage(bitmap);
-                }
-                catch (FileNotFoundException e) {throw new RuntimeException(e);}
-                catch (IOException e) {throw new RuntimeException(e);}
-            }
-        }
-        else if (!isVision && null == chatNormal) chatNormal = model.startChat(historyNormal);
-
-        Content contentUser = builder.build();
-
-        SendToServer sendToServer = isVision ? new SendToServer(model) : new SendToServer(chatNormal);
-        sendToServer.sendToServerFunc(isVision ? true : false, contentUser, new SendToServer.ResultCallback() {
+        GeminiContentBuilder builder = new GeminiContentBuilder(imageUris,context);
+        builder.startGeminiBuilder(text, isVision, new GeminiContentBuilder.GeminiBuilderCallback() {
             @Override
-            public void onResult(String result) {
+            public void callBackResult(String result) {
                 setModelAdapter(result, "Gemini");
             }
         });
     }
-
-    //==========================================
-
+    //===adapter for update data=====================================================
     public void setModelAdapter(String resultText, String who){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
-                index++;
-                modelAdapter.addData(resultText,imageUris, who, index);
+                modelAdapter.addData(resultText,imageUris, who, ++index);
                 binding.progressBar.setVisibility(View.GONE);
                 binding.recyclerView.smoothScrollToPosition(index);
                 if ("Gemini".equals(who)){
                     isWait = false;
                     int size = binding.textInputEditText.getText().toString().length();
-                    binding.textInputLayout.setEndIconDrawable(size > 0 ? getDrawable(R.drawable.baseline_send_24)
-                            : getDrawable(R.drawable.baseline_keyboard_voice_24));
+                    binding.textInputLayout.setEndIconDrawable(size > 0 ? getDrawable(R.drawable.baseline_send_24) : getDrawable(R.drawable.baseline_keyboard_voice_24));
                 }
             }
         });
@@ -224,12 +195,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
         adapterDown.setNewImage(imageUris, true);
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
+    //===build and send=====================================================
     @Override
     public void onImageListUpdated(List<Uri> updatedImageUris) {
         this.imageUris = updatedImageUris;
