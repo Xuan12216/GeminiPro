@@ -1,27 +1,34 @@
 package com.example.geminipro.Adapter;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.geminipro.R;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.databinding.ItemImageBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
 
     private List<Uri> imageUris = new ArrayList<>();
     private final Context context;
     private boolean isShowCloseBtn = false;
-    private ImageAdapterListener listener;
+    private final ImageAdapterListener listener;
 
     public ImageAdapter(Context context, ImageAdapterListener listener) {
         this.context = context;
@@ -38,15 +45,31 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         Glide.with(context).clear(holder.binding.imageView);
-        Uri imageUri = imageUris.get(position);
+        Uri imageUri = imageUris.get(holder.getAdapterPosition());
         Glide.with(context)
                 .load(imageUri)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.binding.imageView.setOnLongClickListener(view -> {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                            showImageDialog(imageUris.get(holder.getAdapterPosition()), holder);
+                            return true;
+                        });
+                        return false;
+                    }
+                })
                 .into(holder.binding.imageView);
 
         holder.binding.closeImageView.setVisibility(isShowCloseBtn ? View.VISIBLE : View.GONE);
 
         holder.binding.closeImageView.setOnClickListener(v -> {
-            removeImage(position);
+            removeImage(holder.getAdapterPosition());
         });
     }
 
@@ -58,6 +81,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
             if (listener != null) listener.onImageListUpdated(imageUris);
         }
+    }
+
+    private void showImageDialog(Uri imageUri, @NonNull ImageViewHolder holder) {
+        ImageDialog dialog = new ImageDialog(holder.itemView.getContext(), imageUri);
+        dialog.show();
     }
 
     @Override

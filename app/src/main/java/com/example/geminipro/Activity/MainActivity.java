@@ -1,4 +1,4 @@
-package com.example.geminipro;
+package com.example.geminipro.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,7 +6,10 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,27 +20,32 @@ import android.view.MenuItem;
 import android.view.View;
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
+import com.example.geminipro.Database.AppDatabase;
+import com.example.geminipro.Database.User;
 import com.example.geminipro.Model.GenerativeModelManager;
+import com.example.geminipro.R;
 import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.RecordFunc;
 import com.example.geminipro.databinding.ActivityMainBinding;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener{
 
     private ActivityMainBinding binding;
     private List<Uri> imageUris = new ArrayList<>();
     private Context context;
-    private ImageAdapter adapterDown;
     private ModelAdapter modelAdapter;
     private int index = -1;
     private boolean isWait = false;
-    //======
     private RecordFunc recordFunc;
-    //======
     private PickImageFunc pickImageFunc;
+    private ImageAdapter imageAdapter;
+    public static AppDatabase appDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +59,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //===init=====================================================
     private void init(){
+        appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "my-database").build();
+        //==============
         GenerativeModelManager.initializeGenerativeModel();
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         binding.recyclerView.setAdapter(modelAdapter);
         //===============
         binding.recyclerViewDown.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        adapterDown = new ImageAdapter(context, this);
-        binding.recyclerViewDown.setAdapter(adapterDown);
+        imageAdapter = new ImageAdapter(context, this);
+        binding.recyclerViewDown.setAdapter(imageAdapter);
         //===============
         recordFunc = new RecordFunc(this,context);
         //===============
@@ -68,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     public void openNavigationDrawer(View view) {
         binding.drawerLayout.openDrawer(GravityCompat.START);
     }
-
+    //=====
     public void showPopupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(this, view, Gravity.END, 0, R.style.MyPopupMenuStyle);
         popupMenu.setForceShowIcon(true);
@@ -78,15 +88,17 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.howToUse) return true;
-                else if (item.getItemId() == R.id.settings) return true;
+                if (item.getItemId() == R.id.Info) return true;
+                else if (item.getItemId() == R.id.settings){
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                    return true;
+                }
                 else return false;
             }
         });
-
         popupMenu.show();
     }
-
+    //=====
     public void AddImage(View view) {
         pickImageFunc.startPickImage(new PickImageFunc.onImageResultCallback() {
             @Override
@@ -95,13 +107,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             }
         });
     }
-
+    //=====
     private void setListener(){
         binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (dy >= 0) binding.fabScrollToBottom.hide();
+
+                boolean canScrollDown = recyclerView.canScrollVertically(1);
+
+                if (!canScrollDown) binding.fabScrollToBottom.hide();
                 else binding.fabScrollToBottom.show();
             }
         });
@@ -188,16 +203,21 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             }
         });
     }
-
+    //=====
     private void setImageAdapter(Uri compressedUri, boolean isClearList) {
         if (isClearList) imageUris.clear();
         else if (null != compressedUri) imageUris.add(compressedUri);
 
-        adapterDown.setNewImage(imageUris, true);
+        imageAdapter.setNewImage(imageUris, true);
     }
     //===build and send=====================================================
     @Override
     public void onImageListUpdated(List<Uri> updatedImageUris) {
         this.imageUris = updatedImageUris;
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (null != modelAdapter) modelAdapter.checkSharedPreferences();
     }
 }

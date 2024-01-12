@@ -28,7 +28,7 @@
     </androidx.cardview.widget.CardView>
 
     <!-- 消息容器 -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/messageContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -50,20 +50,47 @@
             android:text="Gemini Pro"
             android:textColor="?colorPrimary"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageViewSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tint="?colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/messageTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/messageTextView"
+            android:paddingRight="15dp"
+            android:visibility="gone"/>
 
         <!-- 聊天消息内容 -->
         <TextView
             android:id="@+id/messageTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
             android:text="Hello, how are you?"
             android:textColor="?colorPrimary"
             android:textIsSelectable="true"
             android:textSize="16sp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"/>
-    </LinearLayout>
+            app:layout_constraintStart_toEndOf="@+id/imageViewSetting"
+            app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
+
+        <ImageView
+            android:id="@+id/image_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/baseline_navigate_next_24"
+            android:visibility="gone"
+            app:tint="?colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_model"

@@ -10,7 +10,6 @@
         <item name="background">@color/gray1</item>
         <item name="colorAccent">@color/Pewter</item>
 
-
     </style>
 
     <style name="Theme.GeminiPro" parent="Base.Theme.GeminiPro" />

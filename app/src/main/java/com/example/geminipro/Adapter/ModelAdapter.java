@@ -1,6 +1,7 @@
 package com.example.geminipro.Adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.geminipro.R;
 import com.example.geminipro.databinding.RecyclerItemBinding;
 
@@ -26,9 +29,12 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     private List<String> userOrGemini = new ArrayList<>();
     private HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
     private final Context context;
+    private SharedPreferences preferences;
+    private String geminiName, userName, storedImagePath;
 
     public ModelAdapter(Context context) {
         this.context = context;
+        checkSharedPreferences();
     }
 
     @NonNull
@@ -53,9 +59,19 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         String who = userOrGemini.get(position);
         String text = StringUris.get(position);
         holder.binding.messageTextView.setText(text);
-        holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.SageGreen,null));
-        holder.binding.usernameTextView.setText(("User").equals(who) ? "You" : "Gemini");
-        holder.binding.avatarImageView.setImageResource(("User").equals(who) ? R.drawable.baseline_person_24 : R.drawable.baseline_person_robot_24);
+        holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
+        holder.binding.usernameTextView.setText(("User").equals(who) ? userName : geminiName);
+
+        if (storedImagePath.isEmpty()){
+            Glide.with(context)
+                    .load(("User").equals(who) ? R.drawable.baseline_person_24 : R.mipmap.gemini)
+                    .into(holder.binding.avatarImageView);
+        }
+        else {
+            Glide.with(context)
+                    .load(("User").equals(who) ? storedImagePath : R.mipmap.gemini)
+                    .into(holder.binding.avatarImageView);
+        }
     }
 
     @Override
@@ -74,6 +90,17 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     public void refreshData(String text, int index){
         StringUris.set(index, text);
         notifyDataSetChanged();
+    }
+
+    public void checkSharedPreferences() {
+        if (context != null){
+            preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
+            geminiName = preferences.getString("geminiName", "");
+            userName = preferences.getString("userName", "");
+            storedImagePath = preferences.getString("userImage", "");
+            if (geminiName.isEmpty()) geminiName = "Gemini";
+            if (userName.isEmpty()) userName  = "You";
+        }
     }
 
     @Override

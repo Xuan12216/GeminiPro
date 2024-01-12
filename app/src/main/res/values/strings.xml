@@ -1,4 +1,18 @@
 <resources>
     <string name="app_name">GeminiPro</string>
     <string name="EditText_hint">Enter a prompt here</string>
+
+    <string-array name="settingsItem">
+        <item>設定名字，圖片</item>
+        <item>設定模型參數</item>
+        <item>設定安全參數</item>
+        <item>設定apiKey</item>
+    </string-array>
+
+    <string-array name="settingsIcon">
+        <item>setting_name</item>
+        <item>setting_parameter</item>
+        <item>setting_safe</item>
+        <item>setting_api</item>
+    </string-array>
 </resources>
