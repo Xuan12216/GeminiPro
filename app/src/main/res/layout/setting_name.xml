@@ -27,46 +27,58 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.30">
+        app:layout_constraintVertical_bias="0.20">
 
         <ImageView
             android:id="@+id/imageView_setting"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/baseline_person_24"/>
+            android:src="@drawable/baseline_person_24" />
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/addImageBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:text="Edit"
+        app:layout_constraintEnd_toEndOf="@+id/cardView"
+        app:layout_constraintStart_toStartOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     <TextView
         android:id="@+id/textViewName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginBottom="10dp"
+        android:maxLines="2"
         android:text="Your Name : User"
         android:textColor="?colorPrimary"
         android:textSize="21sp"
         android:textStyle="bold"
-        android:maxLines="2"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout"
-        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+        app:layout_constraintBottom_toTopOf="@+id/textInputLayout"
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout" />
 
     <TextView
         android:id="@+id/textViewGemini"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Gemini Name : Gemini"
+        android:layout_marginBottom="10dp"
         android:maxLines="2"
+        android:text="Gemini Name : Gemini"
         android:textColor="?colorPrimary"
         android:textSize="21sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+        app:layout_constraintBottom_toTopOf="@+id/textInputLayout_gemini"
+        app:layout_constraintEnd_toEndOf="@+id/textInputLayout_gemini"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout_gemini"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="35dp"
         app:boxBackgroundColor="?background"
         app:boxCornerRadiusBottomEnd="25dp"
         app:boxCornerRadiusBottomStart="25dp"
@@ -75,13 +87,10 @@
         app:boxStrokeColor="?colorPrimary"
         app:boxStrokeWidth="0dp"
         app:boxStrokeWidthFocused="1dp"
-        app:endIconDrawable="@drawable/baseline_send_24"
-        app:endIconMode="custom"
-        app:endIconTint="?colorPrimary"
         app:hintTextColor="?colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/acceptBtn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewGemini">
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditText_gemini"
@@ -97,7 +106,7 @@
         android:id="@+id/textInputLayout"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         app:boxBackgroundColor="?background"
         app:boxCornerRadiusBottomEnd="25dp"
         app:boxCornerRadiusBottomStart="25dp"
@@ -106,13 +115,10 @@
         app:boxStrokeColor="?colorPrimary"
         app:boxStrokeWidth="0dp"
         app:boxStrokeWidthFocused="1dp"
-        app:endIconDrawable="@drawable/baseline_send_24"
-        app:endIconMode="custom"
-        app:endIconTint="?colorPrimary"
         app:hintTextColor="?colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/textViewGemini"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewName">
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditText"
@@ -125,15 +131,15 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addImageBtn"
+        android:id="@+id/acceptBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
         android:backgroundTint="?colorPrimary"
-        app:tint="?colorSecondary"
+        android:src="@drawable/baseline_done_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/baseline_image_24"/>
+        app:tint="?colorSecondary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.widget.Toast;
+
 import androidx.activity.ComponentActivity;
 import com.bumptech.glide.Glide;
+import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.databinding.SettingNameBinding;
 
@@ -15,6 +19,7 @@ public class SettingName {
     private PickImageFunc pickImageFunc;
     private Context context;
     private SharedPreferences preferences;
+    private String pictureSave = "";
 
     public SettingName(Activity activity, Context context){
         this.context = context;
@@ -38,6 +43,7 @@ public class SettingName {
         String userName = preferences.getString("userName", "");
 
         if (!storedImagePath.isEmpty()){
+            pictureSave = storedImagePath;
             Glide.with(context)
                     .load(storedImagePath)
                     .into(binding.imageViewSetting);
@@ -63,39 +69,42 @@ public class SettingName {
                                 .load(compressedUri)
                                 .into(binding.imageViewSetting);
 
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("userImage", compressedUri.toString());
-                        editor.apply();
+                        pictureSave = compressedUri.toString();
                     }
                 });
             }
         });
 
-        binding.textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = binding.textInputEditText.getText().toString();
-                binding.textInputEditText.setText("");
-                if (text.length() > 0){
-                    binding.textViewName.setText("Your Name : "+ text);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("userName", text);
-                    editor.apply();
-                }
+        binding.imageViewSetting.setOnLongClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            if (!pictureSave.isEmpty()){
+                Uri uri = Uri.parse(pictureSave);
+                ImageDialog dialog = new ImageDialog(activity, uri);
+                dialog.show();
             }
+            return true;
         });
 
-        binding.textInputLayoutGemini.setEndIconOnClickListener(new View.OnClickListener() {
+        binding.acceptBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = binding.textInputEditTextGemini.getText().toString();
+
+                String textUser = binding.textInputEditText.getText().toString();
+                String textGemini = binding.textInputEditTextGemini.getText().toString();
+
+                binding.textInputEditText.setText("");
                 binding.textInputEditTextGemini.setText("");
-                if (text.length() > 0){
-                    binding.textViewGemini.setText("Gemini Name : "+ text);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("geminiName", text);
-                    editor.apply();
-                }
+
+                SharedPreferences.Editor editor = preferences.edit();
+
+                if (!textUser.isEmpty()) editor.putString("userName", textUser);
+                if (!textGemini.isEmpty()) editor.putString("geminiName", textGemini);
+                if (!pictureSave.isEmpty()) editor.putString("userImage", pictureSave);
+
+                editor.apply();
+
+                Toast.makeText(context,"修改成功！",Toast.LENGTH_SHORT).show();
+                activity.finish();
             }
         });
     }

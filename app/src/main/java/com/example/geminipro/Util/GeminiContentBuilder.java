@@ -61,6 +61,10 @@ public class GeminiContentBuilder {
         });
     }
 
+    public static void resetChatNormal() {
+        GeminiContentBuilder.chatNormal = null;
+    }
+
     public interface GeminiBuilderCallback{
         void callBackResult(String text);
     }

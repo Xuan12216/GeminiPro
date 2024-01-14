@@ -14,9 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.example.geminipro.Page.SettingPage.SettingName;
+import com.example.geminipro.Page.SettingPage.SettingParameter;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.SettingNameBinding;
+import com.example.geminipro.databinding.SettingParameterBinding;
 
 public class SettingMainActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
@@ -50,6 +52,9 @@ public class SettingMainActivity extends AppCompatActivity {
     }
 
     private void initParameter() {
+        SettingParameter parameter = new SettingParameter(this, context);
+        SettingParameterBinding binding = parameter.startRunPage();
+        setContentView(binding.getRoot());
     }
 
     private void initName() {
