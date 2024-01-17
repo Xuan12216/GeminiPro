@@ -1,6 +1,7 @@
 package com.example.geminipro.Model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.geminipro.BuildConfig;
 import com.example.geminipro.R;
@@ -14,6 +15,7 @@ import com.google.ai.client.generativeai.type.SafetySetting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GenerativeModelManager {
@@ -28,10 +30,14 @@ public class GenerativeModelManager {
     private static Integer topK = 3;
     private static Integer maxOutputToken = 2048;
     private static Integer candidateCount = 1;
-    private static List<String> stopSequences = Arrays.asList("");
+    private static List<String> stopSequences = new ArrayList<>();
+    private static SharedPreferences preferences;
+    private static String[] safeList = new String[4];
 
-    public static void initializeGenerativeModel() {
+    public static void initializeGenerativeModel(Context context) {
 
+        preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
+        resetModel();
         generateConfig();
         setSafetySetting();
         // 初始化 Generative Model
@@ -46,14 +52,45 @@ public class GenerativeModelManager {
     }
 
     private static void setSafetySetting() {
-        SafetySetting harassmentSafety = new SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.NONE);
-        SafetySetting hateSpeechSafety = new SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.NONE);
-        SafetySetting sexuallyExplicitSafety = new SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, BlockThreshold.NONE);
-        SafetySetting dangerousContentSafety = new SafetySetting(HarmCategory.DANGEROUS_CONTENT, BlockThreshold.NONE);
+        safeList[0] = preferences.getString("harassment", "0");
+        safeList[1] = preferences.getString("hate_speech", "0");
+        safeList[2] = preferences.getString("sexually_explicit", "0");
+        safeList[3] = preferences.getString("dangerous_content", "0");
+
+        SafetySetting harassmentSafety = new SafetySetting(HarmCategory.HARASSMENT, getBlockThreshold(safeList[0]));
+        SafetySetting hateSpeechSafety = new SafetySetting(HarmCategory.HATE_SPEECH, getBlockThreshold(safeList[1]));
+        SafetySetting sexuallyExplicitSafety = new SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, getBlockThreshold(safeList[2]));
+        SafetySetting dangerousContentSafety = new SafetySetting(HarmCategory.DANGEROUS_CONTENT, getBlockThreshold(safeList[3]));
         safetyList = Arrays.asList(harassmentSafety, hateSpeechSafety, sexuallyExplicitSafety, dangerousContentSafety);
     }
 
+    private static BlockThreshold getBlockThreshold(String s) {
+        switch (s){
+            case "0":
+                return BlockThreshold.NONE;
+            case "1":
+                return BlockThreshold.ONLY_HIGH;
+            case "2":
+                return BlockThreshold.MEDIUM_AND_ABOVE;
+            case "3":
+                return BlockThreshold.LOW_AND_ABOVE;
+            default:
+                return BlockThreshold.UNSPECIFIED;
+        }
+    }
+
     private static void generateConfig() {
+
+        temperature = preferences.getFloat("temperature", temperature);
+        topP = preferences.getFloat("topP", topP);
+        topK = preferences.getInt("topK", topK);
+        maxOutputToken = preferences.getInt("maxOutputToken", maxOutputToken);
+        String stp = preferences.getString("stop", "");
+        candidateCount = preferences.getInt("candidateCount", candidateCount);
+
+        stopSequences.clear();
+        stopSequences.add(stp);
+
         GenerationConfig.Builder configBuilder = new GenerationConfig.Builder();
         configBuilder.temperature = temperature;
         configBuilder.topK = topK;
@@ -76,6 +113,14 @@ public class GenerativeModelManager {
         modelContent = modelContentBuilder.build();
     }
 
+    private static void resetModel(){
+        model = null;
+        modelVision = null;
+        userContent = null;
+        modelContent = null;
+        generationConfig = null;
+        safetyList = null;
+    }
     //===============================================
     
     public static Content getUserContent() {
@@ -94,59 +139,30 @@ public class GenerativeModelManager {
         return modelVision;
     }
 
-    public static List<SafetySetting> getSafetyList() {
-        return safetyList;
-    }
-
-    public static void setSafetyList(List<SafetySetting> safetyList) {
-        GenerativeModelManager.safetyList = safetyList;
+    public static String[] getSafetyList() {
+        return safeList;
     }
 
     public static Float getTemperature() {
         return temperature;
     }
 
-    public static void setTemperature(Float temperature) {
-        GenerativeModelManager.temperature = temperature;
-    }
-
     public static Float getTopP() {
         return topP;
-    }
-
-    public static void setTopP(Float topP) {
-        GenerativeModelManager.topP = topP;
     }
 
     public static Integer getTopK() {
         return topK;
     }
 
-    public static void setTopK(Integer topK) {
-        GenerativeModelManager.topK = topK;
-    }
-
     public static Integer getMaxOutputToken() {
         return maxOutputToken;
-    }
-
-    public static void setMaxOutputToken(Integer maxOutputToken) {
-        GenerativeModelManager.maxOutputToken = maxOutputToken;
     }
 
     public static Integer getCandidateCount() {
         return candidateCount;
     }
-
-    public static void setCandidateCount(Integer candidateCount) {
-        GenerativeModelManager.candidateCount = candidateCount;
-    }
-
     public static List<String> getStopSequences() {
         return stopSequences;
-    }
-
-    public static void setStopSequences(List<String> stopSequences) {
-        GenerativeModelManager.stopSequences = stopSequences;
     }
 }

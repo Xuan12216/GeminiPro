@@ -15,6 +15,7 @@ import androidx.cardview.widget.CardView;
 
 import com.example.geminipro.Page.SettingPage.SettingName;
 import com.example.geminipro.Page.SettingPage.SettingParameter;
+import com.example.geminipro.Page.SettingPage.SettingSafe;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.SettingNameBinding;
@@ -40,7 +41,7 @@ public class SettingMainActivity extends AppCompatActivity {
 
             if ("設定名字，圖片".equals(text)) initName();
             else if ("設定模型參數".equals(text)) initParameter();
-            else if ("使用安全設定".equals(text)) initSafe();
+            else if ("設定安全參數".equals(text)) initSafe();
             else if ("設定api".equals(text)) initSetApi();
         }
     }
@@ -49,6 +50,9 @@ public class SettingMainActivity extends AppCompatActivity {
     }
 
     private void initSafe() {
+        SettingSafe safe = new SettingSafe(this, context);
+        SettingParameterBinding binding = safe.startRunPage();
+        setContentView(binding.getRoot());
     }
 
     private void initParameter() {

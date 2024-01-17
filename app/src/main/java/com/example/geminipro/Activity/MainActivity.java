@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void init(){
         appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "my-database").build();
         //==============
-        GenerativeModelManager.initializeGenerativeModel();
+        GenerativeModelManager.initializeGenerativeModel(context);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         binding.recyclerView.setAdapter(modelAdapter);

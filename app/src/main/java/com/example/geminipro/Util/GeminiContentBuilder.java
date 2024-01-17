@@ -52,7 +52,7 @@ public class GeminiContentBuilder {
 
         Content contentUser = builder.build();
 
-        SendToServer sendToServer = isVision ? new SendToServer(model) : new SendToServer(chatNormal);
+        SendToServer sendToServer = isVision ? new SendToServer(model, context) : new SendToServer(chatNormal, context);
         sendToServer.sendToServerFunc(isVision, contentUser, new SendToServer.ResultCallback() {
             @Override
             public void onResult(String result) {
@@ -63,6 +63,7 @@ public class GeminiContentBuilder {
 
     public static void resetChatNormal() {
         GeminiContentBuilder.chatNormal = null;
+
     }
 
     public interface GeminiBuilderCallback{

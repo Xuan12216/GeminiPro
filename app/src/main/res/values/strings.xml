@@ -26,5 +26,15 @@
     <string name="candidate_count_content">candidateCount：要傳回的回應數量。預設 1，可設定 1~8，但目前好像限制只能用 1。</string>
     <string name="accept_btn_content">!!! 點擊後，模型會進行參數調整，所以之前的聊天記憶功能會重置。</string>
 
+    //safe
+    <string name="harassment_content">HARASSMENT(騷擾)：涉及身分和/或受保護屬性的負面或有害留言。</string>
+    <string name="hate_speech_content">HATE_SPEECH(仇恨言論)：粗俗、無禮或不雅內容。</string>
+    <string name="sexually_explicit_content">SEXUALLY_EXPLICIT(煽情露骨內容)：含有性行為或其他猥褻內容。</string>
+    <string name="dangerous_content">DANGEROUS_CONTENT(危險)：宣傳、鼓吹或助長有害舉動。</string>
 
+    <string name="block_none">BLOCK_NONE(不封鎖任何項目)：無論內容是否可能不安全，一律顯示</string>
+    <string name="block_only_hig">BLOCK_ONLY_HIGH(封鎖少數)：出現極可能不安全的內容時封鎖</string>
+    <string name="block_medium_and_above">BLOCK_MEDIUM_AND_ABOVE(封鎖一些)：針對中度或極高的不安全內容一律封鎖</string>
+    <string name="block_low_and_above">BLOCK_LOW_AND_ABOVE(封鎖多數)：針對低、中或高可能不安全的內容封鎖</string>
+    <string name="harm_block_threshold_unspecified">HARM_BLOCK_THRESHOLD_UNSPECIFIED(預設)：未指定門檻，使用預設閾值封鎖</string>
 </resources>

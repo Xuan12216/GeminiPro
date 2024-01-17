@@ -2,6 +2,7 @@ package com.example.geminipro.Page.SettingPage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.DragEvent;
@@ -30,10 +31,12 @@ public class SettingParameter {
     private float temperature, topP;
     private int topK, maxOutputToken, candidateCount;
     private List<String> stop = new ArrayList<>();
+    private SharedPreferences preferences;
 
     public SettingParameter(Activity activity, Context context){
         this.activity = activity;
         this.context = context;
+        preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
     }
 
     public SettingParameterBinding startRunPage(){
@@ -82,35 +85,36 @@ public class SettingParameter {
         binding.sliderTemperature.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.temperature.setText("Temperature : " + String.valueOf(temperature) + " -> " + value);
+                binding.temperature.setText("Temperature : " + String.valueOf(temperature) + " \u2192 " + value);
+
             }
         });
 
         binding.sliderCandidateCOunt.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.candidateCount.setText("Candidate Count : " + String.valueOf(candidateCount) + " -> " + (int)value);
+                binding.candidateCount.setText("Candidate Count : " + String.valueOf(candidateCount) + " \u2192 " + (int)value);
             }
         });
 
         binding.sliderTopP.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.topP.setText("TopP : " + String.valueOf(topP) + " -> " + value);
+                binding.topP.setText("TopP : " + String.valueOf(topP) + " \u2192 " + value);
             }
         });
 
         binding.sliderTopK.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.topK.setText("TopK : " + String.valueOf(topK) + " -> " + (int)value);
+                binding.topK.setText("TopK : " + String.valueOf(topK) + " \u2192 " + (int)value);
             }
         });
 
         binding.sliderMaxOutTokken.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.maxOutToken.setText("Max Output Tokens : " + String.valueOf(maxOutputToken) + " -> " + (int)value);
+                binding.maxOutToken.setText("Max Output Tokens : " + String.valueOf(maxOutputToken) + " \u2192 " + (int)value);
             }
         });
 
@@ -122,7 +126,7 @@ public class SettingParameter {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                binding.stopSequences.setText("Stop Sequences : " + (!stop.isEmpty() ? stop.get(0) : "") + " -> " + charSequence.toString());
+                binding.stopSequences.setText("Stop Sequences : " + (!stop.isEmpty() ? stop.get(0) : "") + " \u2192 " + charSequence.toString());
             }
 
             @Override
@@ -141,13 +145,17 @@ public class SettingParameter {
                 String stop = binding.stopEditText.getText().toString();
                 int candidateCount = (int) binding.sliderCandidateCOunt.getValue();
 
-                GenerativeModelManager.setTemperature(temperature);
-                GenerativeModelManager.setTopP(topP);
-                GenerativeModelManager.setTopK(topK);
-                GenerativeModelManager.setMaxOutputToken(maxOutputToken);
-                GenerativeModelManager.setCandidateCount(candidateCount);
-                if (!stop.isEmpty()) GenerativeModelManager.setStopSequences(Collections.singletonList(stop));
-                GenerativeModelManager.initializeGenerativeModel();
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putFloat("temperature", temperature);
+                editor.putFloat("topP", topP);
+                editor.putInt("topK", topK);
+                editor.putInt("maxOutputToken", maxOutputToken);
+                editor.putString("stop", stop);
+                editor.putInt("candidateCount", candidateCount);
+
+                editor.apply();
+
+                GenerativeModelManager.initializeGenerativeModel(context);
                 GeminiContentBuilder.resetChatNormal();
 
                 Toast.makeText(context,"模型修改成功！",Toast.LENGTH_SHORT).show();

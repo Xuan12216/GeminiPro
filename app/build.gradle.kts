@@ -59,4 +59,7 @@ dependencies {
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
+
+    implementation("androidx.concurrent:concurrent-futures:1.1.0")
+    implementation ("io.reactivex.rxjava3:rxandroid:3.0.2")
 }
