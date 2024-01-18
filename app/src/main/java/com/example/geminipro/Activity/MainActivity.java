@@ -10,6 +10,7 @@ import androidx.room.Room;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,6 +19,10 @@ import android.view.Gravity;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
 import com.example.geminipro.Database.AppDatabase;
@@ -28,7 +33,10 @@ import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.RecordFunc;
 import com.example.geminipro.databinding.ActivityMainBinding;
+import com.example.geminipro.databinding.NavHeaderBinding;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -46,6 +54,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private PickImageFunc pickImageFunc;
     private ImageAdapter imageAdapter;
     public static AppDatabase appDatabase;
+    //AdapterModel
+    private List<String> StringUris = new ArrayList<>();
+    private List<String> userOrGemini = new ArrayList<>();
+    private HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
+    //AdapterImage
+    private List<Uri> imageUrisBackup = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +75,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void init(){
         appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "my-database").build();
         //==============
-        GenerativeModelManager.initializeGenerativeModel(context);
+        if (null == GenerativeModelManager.getGenerativeModel() && null == GenerativeModelManager.getGenerativeModelVision()){
+            GenerativeModelManager.initializeGenerativeModel(context);
+        }
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         binding.recyclerView.setAdapter(modelAdapter);
@@ -77,6 +93,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //===listener=====================================================
     public void openNavigationDrawer(View view) {
         binding.drawerLayout.openDrawer(GravityCompat.START);
+        View headerView = binding.navigationView.getHeaderView(0);
+        ImageView imageView = headerView.findViewById(R.id.avatarImageView);
+        TextView textView = headerView.findViewById(R.id.navUserName);
+
+        SharedPreferences preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
+        String userName = preferences.getString("userName", "");
+        String storedImagePath = preferences.getString("userImage", "");
+
+        if (!storedImagePath.isEmpty()) {
+            System.out.println("TestXuan:"+ storedImagePath);
+            Glide.with(context).load(storedImagePath).into(imageView);
+        }
+        if (!userName.isEmpty()) textView.setText(userName);
     }
     //=====
     public void showPopupMenu(View view) {
@@ -220,5 +249,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onResume();
         if (null != modelAdapter) modelAdapter.checkSharedPreferences();
         GenerativeModelManager.checkApiKey(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }
