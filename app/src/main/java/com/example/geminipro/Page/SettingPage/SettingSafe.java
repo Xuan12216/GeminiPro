@@ -23,11 +23,12 @@ public class SettingSafe {
     private String[] contentUp = new String[4], contentDown = new String[5];
     private String[] safeList = new String[4], contentCurrent = new String[5];
     private int harassment = 0, hate_speech = 0, sexually_explicit = 0, dangerous_content = 0;
+    private String HARASSMENT = "", HATE_SPEECH = "", SEXUALLY_EXPLICIT = "", DANGEROUS_CONTENT = "";
 
     public SettingSafe(Activity activity, Context context){
         this.context = context;
         this.activity = activity;
-        preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
+        preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
         safeList = GenerativeModelManager.getSafetyList();
     }
 
@@ -42,6 +43,8 @@ public class SettingSafe {
     }
     //settingPage================================================
     private void settingPage(SettingParameterBinding binding) {
+        String[] title = context.getResources().getStringArray(R.array.settingsItem);
+        binding.textviewTitle.setText(title[2]);
         binding.stopSequences.setVisibility(View.GONE);
         binding.textInputLayout.setVisibility(View.GONE);
         binding.contentStop.setVisibility(View.GONE);
@@ -65,6 +68,11 @@ public class SettingSafe {
         contentCurrent[2] = "MEDIUM_AND_ABOVE";
         contentCurrent[3] = "LOW_AND_ABOVE";
         contentCurrent[4] = "UNSPECIFIED";
+
+        HARASSMENT = context.getResources().getString(R.string.harassment);
+        HATE_SPEECH = context.getResources().getString(R.string.hate_speech);
+        SEXUALLY_EXPLICIT = context.getResources().getString(R.string.sexually_explicit);
+        DANGEROUS_CONTENT = context.getResources().getString(R.string.dangerous);
     }
     //set data================================================
     private void setData(SettingParameterBinding binding){
@@ -74,19 +82,19 @@ public class SettingSafe {
         dangerous_content = Integer.parseInt(safeList[3]);
 
         float textSizeInSp = 16;
-        binding.temperature.setText("HARASSMENT(騷擾)");
+        binding.temperature.setText(HARASSMENT + "\n" + contentCurrent[harassment]);
         binding.temperature.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSizeInSp);
         binding.contentTemperature.setText(contentUp[0] + "\n" + contentDown[harassment]);
 
-        binding.topK.setText("HATE_SPEECH(仇恨言論)");
+        binding.topK.setText(HATE_SPEECH + "\n" + contentCurrent[hate_speech]);
         binding.topK.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSizeInSp);
         binding.contentTopK.setText(contentUp[1] + "\n" + contentDown[hate_speech]);
 
-        binding.topP.setText("SEXUALLY_EXPLICIT(煽情露骨內容)");
+        binding.topP.setText(SEXUALLY_EXPLICIT + "\n" + contentCurrent[sexually_explicit]);
         binding.topP.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSizeInSp);
         binding.contentTopP.setText(contentUp[2] + "\n" + contentDown[sexually_explicit]);
 
-        binding.maxOutToken.setText("DANGEROUS_CONTENT(危險)");
+        binding.maxOutToken.setText(DANGEROUS_CONTENT + "\n" + contentCurrent[dangerous_content]);
         binding.maxOutToken.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSizeInSp);
         binding.contentMaxOutputTokens.setText(contentUp[3] + "\n" + contentDown[dangerous_content]);
 
@@ -134,31 +142,31 @@ public class SettingSafe {
         binding.sliderTemperature.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.temperature.setText("HARASSMENT(騷擾)" + "\n" + contentCurrent[harassment] + " \u2192 " + contentCurrent[(int) value]);
+                binding.temperature.setText(HARASSMENT + "\n" + contentCurrent[harassment] + " \u2192 " + contentCurrent[(int) value]);
                 binding.contentTemperature.setText(contentUp[0] + "\n" + contentDown[(int) value]);
-            }
-        });
-
-        binding.sliderTopP.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.topP.setText("SEXUALLY_EXPLICIT(煽情露骨內容)" + "\n" + contentCurrent[hate_speech] + " \u2192 " + contentCurrent[(int) value]);
-                binding.contentTopP.setText(contentUp[1] + "\n" + contentDown[(int) value]);
             }
         });
 
         binding.sliderTopK.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.topK.setText("HATE_SPEECH(仇恨言論)" + "\n" + contentCurrent[sexually_explicit] + " \u2192 " + contentCurrent[(int) value]);
-                binding.contentTopK.setText(contentUp[2] + "\n" + contentDown[(int) value]);
+                binding.topK.setText(HATE_SPEECH + "\n" + contentCurrent[hate_speech] + " \u2192 " + contentCurrent[(int) value]);
+                binding.contentTopK.setText(contentUp[1] + "\n" + contentDown[(int) value]);
+            }
+        });
+
+        binding.sliderTopP.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                binding.topP.setText(SEXUALLY_EXPLICIT + "\n" + contentCurrent[sexually_explicit] + " \u2192 " + contentCurrent[(int) value]);
+                binding.contentTopP.setText(contentUp[2] + "\n" + contentDown[(int) value]);
             }
         });
 
         binding.sliderMaxOutTokken.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                binding.maxOutToken.setText("DANGEROUS_CONTENT(危險)" + "\n" + contentCurrent[dangerous_content] + " \u2192 " + contentCurrent[(int) value]);
+                binding.maxOutToken.setText(DANGEROUS_CONTENT + "\n" + contentCurrent[dangerous_content] + " \u2192 " + contentCurrent[(int) value]);
                 binding.contentMaxOutputTokens.setText(contentUp[3] + "\n" + contentDown[(int) value]);
             }
         });
@@ -182,7 +190,7 @@ public class SettingSafe {
                 GenerativeModelManager.initializeGenerativeModel(context);
                 GeminiContentBuilder.resetChatNormal();
 
-                Toast.makeText(context,"模型修改成功！",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,R.string.successfully_toast,Toast.LENGTH_SHORT).show();
                 activity.finish();
             }
         });

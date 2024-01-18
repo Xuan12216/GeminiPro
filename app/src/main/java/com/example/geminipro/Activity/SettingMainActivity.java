@@ -13,11 +13,14 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.example.geminipro.BuildConfig;
+import com.example.geminipro.Page.SettingPage.SettingApi;
 import com.example.geminipro.Page.SettingPage.SettingName;
 import com.example.geminipro.Page.SettingPage.SettingParameter;
 import com.example.geminipro.Page.SettingPage.SettingSafe;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.Utils;
+import com.example.geminipro.databinding.SettingApiKeyBinding;
 import com.example.geminipro.databinding.SettingNameBinding;
 import com.example.geminipro.databinding.SettingParameterBinding;
 
@@ -39,14 +42,17 @@ public class SettingMainActivity extends AppCompatActivity {
         if (intent.hasExtra("id")){
             String text = intent.getStringExtra("id");
 
-            if ("設定名字，圖片".equals(text)) initName();
-            else if ("設定模型參數".equals(text)) initParameter();
-            else if ("設定安全參數".equals(text)) initSafe();
-            else if ("設定api".equals(text)) initSetApi();
+            if ("設定名字，圖片".equals(text) || "Set name, picture".equals(text)) initName();
+            else if ("設定模型參數".equals(text) || "Set model parameters".equals(text)) initParameter();
+            else if ("設定安全參數".equals(text) || "Set security parameters".equals(text)) initSafe();
+            else if ("設定apiKey".equals(text) || "Set apiKey".equals(text)) initSetApi();
         }
     }
 
     private void initSetApi() {
+        SettingApi api = new SettingApi(context, this);
+        SettingApiKeyBinding binding = api.startPage();
+        setContentView(binding.getRoot());
     }
 
     private void initSafe() {

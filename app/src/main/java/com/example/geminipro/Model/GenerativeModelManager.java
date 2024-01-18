@@ -1,10 +1,13 @@
 package com.example.geminipro.Model;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.example.geminipro.Activity.SettingMainActivity;
 import com.example.geminipro.BuildConfig;
 import com.example.geminipro.R;
+import com.example.geminipro.Util.Secure.SecuritySharedPreference;
 import com.google.ai.client.generativeai.GenerativeModel;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.BlockThreshold;
@@ -32,23 +35,36 @@ public class GenerativeModelManager {
     private static Integer candidateCount = 1;
     private static List<String> stopSequences = new ArrayList<>();
     private static SharedPreferences preferences;
+    private static SecuritySharedPreference pres;
     private static String[] safeList = new String[4];
 
     public static void initializeGenerativeModel(Context context) {
 
-        preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
+        preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
+        pres = new SecuritySharedPreference(context, "gemini_private_api_prefs", Context.MODE_PRIVATE);
         resetModel();
         generateConfig();
         setSafetySetting();
         // 初始化 Generative Model
-        GenerativeModel gm1 = new GenerativeModel("gemini-pro", BuildConfig.apiKey, generationConfig, safetyList);
-        GenerativeModel gm2 = new GenerativeModel("gemini-pro-vision", BuildConfig.apiKey, generationConfig, safetyList);
+        String api = pres.getString("api_key", "");
+        GenerativeModel gm1 = new GenerativeModel("gemini-pro", api, generationConfig, safetyList);
+        GenerativeModel gm2 = new GenerativeModel("gemini-pro-vision", api, generationConfig, safetyList);
 
         // 使用 GenerativeModelFutures 创建 GenerativeModelFutures 实例
         model = GenerativeModelFutures.from(gm1);
         modelVision = GenerativeModelFutures.from(gm2);
 
         createHistoryData();
+    }
+
+    public static void checkApiKey(Context context) {
+        SecuritySharedPreference pres = new SecuritySharedPreference(context, "gemini_private_api_prefs", Context.MODE_PRIVATE);
+        String api = pres.getString("api_key", "");
+        if (api.isEmpty()) {
+            Intent intent = new Intent(context, SettingMainActivity.class);
+            intent.putExtra("id", "設定apiKey");
+            context.startActivity(intent);
+        }
     }
 
     private static void setSafetySetting() {

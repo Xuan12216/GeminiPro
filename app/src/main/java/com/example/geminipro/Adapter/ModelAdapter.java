@@ -94,7 +94,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
 
     public void checkSharedPreferences() {
         if (context != null){
-            preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
+            preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
             geminiName = preferences.getString("geminiName", "");
             userName = preferences.getString("userName", "");
             storedImagePath = preferences.getString("userImage", "");

@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        context = getApplicationContext();
+        context = this;
 
         init();
         setListener();
@@ -219,5 +219,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     protected void onResume() {
         super.onResume();
         if (null != modelAdapter) modelAdapter.checkSharedPreferences();
+        GenerativeModelManager.checkApiKey(this);
     }
 }

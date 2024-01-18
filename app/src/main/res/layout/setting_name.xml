@@ -8,14 +8,26 @@
 
     <ImageView
         android:id="@+id/backBtn"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:src="@drawable/baseline_arrow_back_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="?colorPrimary" />
+
+    <TextView
+        android:id="@+id/textviewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="設定名字，圖片"
+        android:textSize="24sp"
+        android:textColor="?colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/backBtn"
+        app:layout_constraintStart_toEndOf="@+id/backBtn"
+        app:layout_constraintTop_toTopOf="@+id/backBtn" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -96,7 +108,7 @@
             android:id="@+id/textInputEditText_gemini"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Gemini Name"
+            android:hint="@string/enter_gemini_name"
             android:maxLines="2"
             android:textColor="?colorPrimary"
             android:textColorHint="?colorPrimary" />
@@ -124,7 +136,7 @@
             android:id="@+id/textInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Your Name"
+            android:hint="@string/enter_name"
             android:maxLines="2"
             android:textColor="?colorPrimary"
             android:textColorHint="?colorPrimary" />

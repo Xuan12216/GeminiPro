@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
 import com.bumptech.glide.Glide;
+import com.example.geminipro.R;
 import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.databinding.SettingNameBinding;
@@ -20,12 +21,13 @@ public class SettingName {
     private Context context;
     private SharedPreferences preferences;
     private String pictureSave = "";
+    private String name = "", gemini_name = "", enter_name = "", enter_gemini_name = "";
 
     public SettingName(Activity activity, Context context){
         this.context = context;
         this.activity = activity;
         pickImageFunc = new PickImageFunc((ComponentActivity) activity, context);
-        preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
+        preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
     }
 
     public SettingNameBinding startRunPage(){
@@ -42,6 +44,11 @@ public class SettingName {
         String geminiName = preferences.getString("geminiName", "");
         String userName = preferences.getString("userName", "");
 
+        name = context.getResources().getString(R.string.name);
+        gemini_name = context.getResources().getString(R.string.gemini_name);
+        enter_name = context.getResources().getString(R.string.enter_name);
+        enter_gemini_name = context.getResources().getString(R.string.enter_gemini_name);
+
         if (!storedImagePath.isEmpty()){
             pictureSave = storedImagePath;
             Glide.with(context)
@@ -49,8 +56,14 @@ public class SettingName {
                     .into(binding.imageViewSetting);
         }
 
-        if (!geminiName.isEmpty()) binding.textViewGemini.setText("Gemini Name : "+geminiName);
-        if (!userName.isEmpty()) binding.textViewName.setText("Your Name : "+userName);
+        if (!geminiName.isEmpty()) binding.textViewGemini.setText(gemini_name + geminiName);
+        else binding.textViewGemini.setText(gemini_name + "Gemini");
+
+        if (!userName.isEmpty()) binding.textViewName.setText(name + userName);
+        else binding.textViewName.setText(name + "User");
+
+        String[] title = context.getResources().getStringArray(R.array.settingsItem);
+        binding.textviewTitle.setText(title[0]);
     }
     //listener================================================
     private void setListener(SettingNameBinding binding) {
@@ -91,6 +104,7 @@ public class SettingName {
 
                 String textUser = binding.textInputEditText.getText().toString();
                 String textGemini = binding.textInputEditTextGemini.getText().toString();
+                String toast = context.getResources().getString(R.string.successfully_toast);
 
                 binding.textInputEditText.setText("");
                 binding.textInputEditTextGemini.setText("");
@@ -103,7 +117,7 @@ public class SettingName {
 
                 editor.apply();
 
-                Toast.makeText(context,"修改成功！",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,toast,Toast.LENGTH_SHORT).show();
                 activity.finish();
             }
         });

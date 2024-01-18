@@ -36,7 +36,7 @@ public class SettingParameter {
     public SettingParameter(Activity activity, Context context){
         this.activity = activity;
         this.context = context;
-        preferences = context.getSharedPreferences("your_private_prefs", Context.MODE_PRIVATE);
+        preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
     }
 
     public SettingParameterBinding startRunPage(){
@@ -72,6 +72,9 @@ public class SettingParameter {
         if (candidateCount > 0) binding.sliderCandidateCOunt.setValue(candidateCount);
 
         if (!stop.isEmpty()) binding.stopSequences.setText("Stop Sequences : " + stop.get(0));
+
+        String[] title = context.getResources().getStringArray(R.array.settingsItem);
+        binding.textviewTitle.setText(title[1]);
     }
 
     private void setListener(SettingParameterBinding binding){
@@ -158,7 +161,7 @@ public class SettingParameter {
                 GenerativeModelManager.initializeGenerativeModel(context);
                 GeminiContentBuilder.resetChatNormal();
 
-                Toast.makeText(context,"模型修改成功！",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,R.string.successfully_toast,Toast.LENGTH_SHORT).show();
                 activity.finish();
             }
         });

@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">GeminiPro</string>
-
-
-    <string name="EditText_hint">Enter a prompt here</string>
-    <string name="EditText_hint_api">Enter a API key here</string>
+    <string name="EditText_hint">在此输入提示</string>
+    <string name="EditText_hint_api">在此输入 API 密钥</string>
     <string name="get_api_key_url">https://ai.google.dev/</string>
     <string name="what_is_api_key">何謂API：API 金鑰通常由 API 提供者提供，並且需要在應用程式中設定。應用程式在向 API 發出請求時會提供 API 密鑰，API 提供者會使用該密鑰來驗證應用程式是否有權存取 API。本App必須使用API。</string>
     <string name="get_api_hint">沒有 API key ? 可以點 這裏</string>
@@ -57,6 +55,4 @@
     <string name="enter_name">輸入用戶名</string>
     <string name="enter_gemini_name">輸入Gemini名</string>
     <string name="successfully_toast">修改成功!</string>
-
-    //menu
 </resources>

@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">GeminiPro</string>
+    <string name="EditText_hint">Enter a prompt here</string>
+    <string name="EditText_hint_api">Enter a API key here</string>
+    <string name="get_api_key_url">https://ai.google.dev/</string>
+    <string name="what_is_api_key">What is an API: API keys are usually provided by the API provider and need to be set in the application. An application provides an API key when making a request to the API, which is used by the API provider to verify that the application has permission to access the API. This App must use API.</string>
+    <string name="get_api_hint">Don’t have an API key? You can click here</string>
+    <string name="editText_empty">Please enter API key</string>
+
+    <string-array name="settingsItem">
+        <item>Set name, picture</item>
+        <item>Set model parameters</item>
+        <item>Set security parameters</item>
+        <item>Set apiKey</item>
+    </string-array>
+
+    <string-array name="settingsIcon">
+        <item>setting_name</item>
+        <item>setting_parameter</item>
+        <item>setting_safe</item>
+        <item>setting_api</item>
+    </string-array>
+
+    <string name="temperature_content">temperature: the randomness of the output content. The closer it is to 1.0, the responses will be richer, more diverse, and more creative; conversely, the closer it is to 0.0, the responses will be more certain and more likely.</string>
+    <string name="topK_content">topK: The parameter changes the way the model selects output tokens. A topK of 1 means that the selected token is the most likely token among all tokens in the model vocabulary (also known as "greedy decoding"). If topK is 3, it means that the model will select the next symbol from the three most likely symbols based on the randomness parameter. In each token selection step, the model samples the topK tokens with the highest probability. Then, the system will further filter the symbols based on topP, and finally use temperature sampling to select the final symbol.</string>
+    <string name="topP_content">topP: The parameter changes the way the model selects output tokens. The model will select tokens in order from most likely to least likely until the sum of the likelihoods of the selected tokens equals the topP value. For example, if the probabilities of tokens A, B, and C are 0.3, 0.2, and 0.1 respectively, and the topP value is 0.5, the model will select A or B as the next token based on the randomness parameter, and exclude C . The default value of topP is 0.95.</string>
+    <string name="stop_sequences_content">stopSequences: Set the stop sequence to instruct the model to stop generating content. The stop sequence can be any sequence of characters. Please avoid using character sequences that may appear in generated content.</string>
+    <string name="max_output_token_content">maxOutputTokens: The maximum number of output response Tokens. Gemini Pro model preset 2048; Gemini Pro Vision model preset 4096.</string>
+    <string name="candidate_count_content">candidateCount: The number of responses to be returned. Default is 1, can be set to 1~8, but currently it seems to be limited to 1.</string>
+    <string name="accept_btn_content">!!! After clicking, the model will adjust parameters, so the previous chat memory function will be reset.</string>
+
+    //safe
+    <string name="harassment_content">HARASSMENT: Negative or harmful comments involving identity and/or protected attributes.</string>
+    <string name="hate_speech_content">HATE_SPEECH: Vulgar, offensive or indecent content.</string>
+    <string name="sexually_explicit_content">SEXUALLY_EXPLICIT (sensational and explicit content): Contains sexual behavior or other obscene content.</string>
+    <string name="dangerous_content">DANGEROUS_CONTENT: Promotes, encourages, or promotes harmful behavior.</string>
+
+    <string name="harassment">HARASSMENT</string>
+    <string name="hate_speech">HATE_SPEECH</string>
+    <string name="sexually_explicit">SEXUALLY_EXPLICIT</string>
+    <string name="dangerous">DANGEROUS_CONTENT</string>
+
+    <string name="status_true">Status: There is currently an API key</string>
+    <string name="status_false">Status: Currently no API key</string>
+
+    <string name="block_none">BLOCK_NONE (do not block any items): Display regardless of whether the content may be unsafe</string>
+    <string name="block_only_hig">BLOCK_ONLY_HIGH (block a few): Block when content that is highly likely to be unsafe appears</string>
+    <string name="block_medium_and_above">BLOCK_MEDIUM_AND_ABOVE (block some): Block all moderately or extremely unsafe content</string>
+    <string name="block_low_and_above">BLOCK_LOW_AND_ABOVE: Block content that is low, medium or high likely to be unsafe</string>
+    <string name="harm_block_threshold_unspecified">HARM_BLOCK_THRESHOLD_UNSPECIFIED (default): No threshold is specified, use the default threshold to block</string>
+
+    //name
+    <string name="name">YourName：</string>
+    <string name="gemini_name">Gemini Name：</string>
+    <string name="enter_name">Enter Your Name</string>
+    <string name="enter_gemini_name">Enter Gemini Name</string>
+    <string name="successfully_toast">Successfully modified!</string>
+</resources>
