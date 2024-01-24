@@ -62,4 +62,11 @@ dependencies {
 
     implementation("androidx.concurrent:concurrent-futures:1.1.0")
     implementation ("io.reactivex.rxjava3:rxandroid:3.0.2")
+
+    //rx
+    implementation ("com.uber.autodispose:autodispose:1.4.0")
+    implementation ("com.uber.autodispose:autodispose-android-archcomponents:1.4.0")
+
+    //flexbox
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
 }

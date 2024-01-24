@@ -55,4 +55,18 @@
     <string name="enter_name">Enter Your Name</string>
     <string name="enter_gemini_name">Enter Gemini Name</string>
     <string name="successfully_toast">Successfully modified!</string>
+
+    <string-array name="flexboxItem">
+        <item>Plan a trip:to experience Seoul like a local</item>
+        <item>Show me a code snippet:of a webside\'s sticky header</item>
+        <item>Give me ideas:for what do with my kids\' art</item>
+        <item>Compare business strategies:for transitioning from budget to luxury vs. lu…</item>
+        <item>Create a workout plan:for resistance training</item>
+        <item>Brainstorm names:for an orange cat we\'re adopting from the s…</item>
+        <item>Explain nostalgia:to a kindergartener</item>
+        <item>Create a personal webpage for me:after asking me three questions</item>
+        <item>Help me pick:a gift for my dad who loves fishing</item>
+        <item>Recommend activities:for a team-building day with remote employ…</item>
+    </string-array>
+
 </resources>

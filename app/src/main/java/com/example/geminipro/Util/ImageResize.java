@@ -31,7 +31,7 @@ public class ImageResize {
             Glide.with(context)
                     .asBitmap()
                     .load(imageUri)
-                    .override(500, 500)
+                    .override(500)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
@@ -49,7 +49,7 @@ public class ImageResize {
 
     private Uri compressAndSaveBitmap(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
 
         // 这里是示例代码，实际情况可能需要根据具体需求调整
         File compressedFile = saveByteArrayToFile(byteArrayOutputStream.toByteArray());

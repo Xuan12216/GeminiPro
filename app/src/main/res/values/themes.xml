@@ -18,5 +18,16 @@
         <item name="android:popupBackground">@drawable/custom_popup_background</item>
         <item name="android:textColor">@color/black</item>
     </style>
+    
+    <style name="FlexTitle">
+        <item name="android:textColor">@color/black</item>
+    </style>
 
+    <style name="FlexBelow">
+        <item name="android:textColor">@color/gray</item>
+    </style>
+
+    <style name="FlexCardView">
+        <item name="cardBackgroundColor">@color/gray1</item>
+    </style>
 </resources>

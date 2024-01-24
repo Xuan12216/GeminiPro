@@ -15,14 +15,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.geminipro.Adapter.FlexAdapter;
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
 import com.example.geminipro.Database.AppDatabase;
@@ -32,6 +37,7 @@ import com.example.geminipro.R;
 import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.RecordFunc;
+import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.ActivityMainBinding;
 import com.example.geminipro.databinding.NavHeaderBinding;
 
@@ -41,6 +47,8 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import kotlin.Triple;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener{
 
@@ -53,13 +61,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private RecordFunc recordFunc;
     private PickImageFunc pickImageFunc;
     private ImageAdapter imageAdapter;
+    private FlexAdapter flexAdapter;
     public static AppDatabase appDatabase;
     //AdapterModel
-    private List<String> StringUris = new ArrayList<>();
-    private List<String> userOrGemini = new ArrayList<>();
-    private HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
-    //AdapterImage
-    private List<Uri> imageUrisBackup = new ArrayList<>();
+    private static List<String> StringUris = new ArrayList<>();
+    private static List<String> userOrGemini = new ArrayList<>();
+    private static HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,16 +82,27 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void init(){
         appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "my-database").build();
         //==============
-        if (null == GenerativeModelManager.getGenerativeModel() && null == GenerativeModelManager.getGenerativeModelVision()){
-            GenerativeModelManager.initializeGenerativeModel(context);
-        }
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         binding.recyclerView.setAdapter(modelAdapter);
+        if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
+            modelAdapter.receiveDataAndShow(StringUris, userOrGemini, imageHashMap);
+            index = StringUris.size() - 1;
+            StringUris.clear();
+            userOrGemini.clear();
+            imageHashMap.clear();
+        }
+        else GenerativeModelManager.initializeGenerativeModel(context);
         //===============
         binding.recyclerViewDown.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         imageAdapter = new ImageAdapter(context, this);
         binding.recyclerViewDown.setAdapter(imageAdapter);
+        //===============
+        binding.recyclerViewFlex.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        flexAdapter = new FlexAdapter(context);
+        binding.recyclerViewFlex.setAdapter(flexAdapter);
+        String[] title = getResources().getStringArray(R.array.flexboxItem);
+        flexAdapter.setSettingTitle(title);
         //===============
         recordFunc = new RecordFunc(this,context);
         //===============
@@ -101,10 +119,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         String userName = preferences.getString("userName", "");
         String storedImagePath = preferences.getString("userImage", "");
 
-        if (!storedImagePath.isEmpty()) {
-            System.out.println("TestXuan:"+ storedImagePath);
-            Glide.with(context).load(storedImagePath).into(imageView);
-        }
+        if (!storedImagePath.isEmpty()) Glide.with(context).load(storedImagePath).into(imageView);
         if (!userName.isEmpty()) textView.setText(userName);
     }
     //=====
@@ -186,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
         if (imageUris.size() == 0 && text.isEmpty()) return;
 
-        gotoGeminiBuilder(text, imageUris.size() != 0 && !text.isEmpty());
+        gotoGeminiBuilder(text, imageUris.size() > 0 && !text.isEmpty());
 
         setModelAdapter(text, "User");
         setImageAdapter(null, true);
@@ -208,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //===build and send=====================================================
     private void gotoGeminiBuilder(String text, boolean isVision){
-        GeminiContentBuilder builder = new GeminiContentBuilder(imageUris,context);
+        GeminiContentBuilder builder = new GeminiContentBuilder(imageUris,context, getLifecycle());
         builder.startGeminiBuilder(text, isVision, new GeminiContentBuilder.GeminiBuilderCallback() {
             @Override
             public void callBackResult(String result) {
@@ -249,10 +264,17 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onResume();
         if (null != modelAdapter) modelAdapter.checkSharedPreferences();
         GenerativeModelManager.checkApiKey(this);
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        //save adapter data
+        Triple<List<String>, List<String>, HashMap<Integer, List<Uri>>> result = modelAdapter.saveData();
+        StringUris = new ArrayList<>(result.getFirst());
+        userOrGemini = new ArrayList<>(result.getSecond());
+        imageHashMap = new HashMap<>(result.getThird());
     }
 }

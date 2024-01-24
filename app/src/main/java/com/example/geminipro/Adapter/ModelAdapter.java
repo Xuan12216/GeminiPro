@@ -21,7 +21,10 @@ import com.example.geminipro.databinding.RecyclerItemBinding;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import kotlin.Triple;
 
 public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements ImageAdapter.ImageAdapterListener {
 
@@ -84,6 +87,17 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         userOrGemini.add(who);
         List<Uri> newImageUris = new ArrayList<>(imageUris);
         if (newImageUris.size() > 0 && !"Gemini".equals(who)) imageHashMap.put(index,newImageUris);
+        notifyDataSetChanged();
+    }
+
+    public Triple<List<String>, List<String>, HashMap<Integer,List<Uri>>> saveData(){
+        return new Triple<>(StringUris, userOrGemini, imageHashMap);
+    }
+
+    public void receiveDataAndShow(List<String> StringUris, List<String> userOrGemini, HashMap<Integer,List<Uri>> imageHashMap){
+        this.StringUris = new ArrayList<>(StringUris);
+        this.userOrGemini = new ArrayList<>(userOrGemini);
+        this.imageHashMap = new HashMap<>(imageHashMap);
         notifyDataSetChanged();
     }
 

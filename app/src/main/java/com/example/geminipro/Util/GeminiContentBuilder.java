@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+
 import com.example.geminipro.Model.GenerativeModelManager;
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
@@ -21,10 +24,12 @@ public class GeminiContentBuilder {
     private List<Content> historyNormal = new ArrayList<>();
     private List<Uri> imageUris = new ArrayList<>();
     private Context context;
+    private Lifecycle lifecycle;
 
-    public GeminiContentBuilder(List<Uri> imageUris, Context context){
+    public GeminiContentBuilder(List<Uri> imageUris, Context context, Lifecycle lifecycle){
         this.context = context;
         this.imageUris = imageUris;
+        this.lifecycle = lifecycle;
         historyNormal = Arrays.asList(GenerativeModelManager.getUserContent(),GenerativeModelManager.getModelContent());
     }
 
@@ -52,7 +57,7 @@ public class GeminiContentBuilder {
 
         Content contentUser = builder.build();
 
-        SendToServer sendToServer = isVision ? new SendToServer(model, context) : new SendToServer(chatNormal, context);
+        SendToServer sendToServer = isVision ? new SendToServer(model, context, lifecycle) : new SendToServer(chatNormal, context, lifecycle);
         sendToServer.sendToServerFunc(isVision, contentUser, new SendToServer.ResultCallback() {
             @Override
             public void onResult(String result) {
@@ -63,7 +68,6 @@ public class GeminiContentBuilder {
 
     public static void resetChatNormal() {
         GeminiContentBuilder.chatNormal = null;
-
     }
 
     public interface GeminiBuilderCallback{
