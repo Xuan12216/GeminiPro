@@ -58,16 +58,20 @@
 
     //flexbox
     <string-array name="flexboxItem">
-        <item>计划一次旅行:像当地人一样体验首尔</item>
-        <item>给我看一个代码片段:网站的粘性标题</item>
-        <item>给我想法:我孩子的艺术该怎么办</item>
-        <item>比较业务策略:从预算过渡到豪华与卢…</item>
-        <item>制定锻炼计划:用于阻力训练</item>
-        <item>集思广益的名字:对于一只橙色的猫，我们从…收养</item>
-        <item>解释怀旧之情:给一名幼儿园老师</item>
-        <item>为我创建一个个人网页:问了我三个问题后</item>
-        <item>帮我选一下:送给喜欢钓鱼的爸爸的礼物</item>
-        <item>推荐活动:远程员工团队建设日……</item>
+        <item>计划一次旅行 : 像当地人一样体验首尔</item>
+        <item>给我看一个代码片段 : 网站的粘性标题</item>
+        <item>给我想法 : 我孩子的艺术该怎么办</item>
+        <item>比较业务策略 : 从预算过渡到豪华与卢…</item>
+        <item>制定锻炼计划 : 用于阻力训练</item>
+        <item>集思广益的名字 : 对于一只橙色的猫，我们从…收养</item>
+        <item>解释怀旧之情 : 给一名幼儿园老师</item>
+        <item>为我创建一个个人网页 : 问了我三个问题后</item>
+        <item>帮我选一下 : 送给喜欢钓鱼的爸爸的礼物</item>
+        <item>推荐活动 : 远程员工团队建设日……</item>
     </string-array>
+
+    //pickImage
+    <string name="useCameraPickImage">打开相机</string>
+    <string name="useGalleryPickImage">打开图库</string>
 
 </resources>

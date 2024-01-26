@@ -50,7 +50,6 @@ public class ImageResize {
     private Uri compressAndSaveBitmap(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
-
         // 这里是示例代码，实际情况可能需要根据具体需求调整
         File compressedFile = saveByteArrayToFile(byteArrayOutputStream.toByteArray());
         return Uri.fromFile(compressedFile);

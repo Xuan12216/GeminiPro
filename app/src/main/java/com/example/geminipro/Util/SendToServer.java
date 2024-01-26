@@ -1,7 +1,6 @@
 package com.example.geminipro.Util;
 
 import android.content.Context;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
@@ -17,8 +16,6 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import coil.request.Disposable;
-import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -26,8 +23,8 @@ import io.reactivex.schedulers.Schedulers;
 public class SendToServer {
     private GenerativeModelFutures model;
     private ChatFutures chatNormal;
-    private Context context;
-    private Lifecycle lifecycle;
+    private final Context context;
+    private final Lifecycle lifecycle;
 
     public SendToServer(GenerativeModelFutures model, Context context, Lifecycle lifecycle) {
         this.model = model;

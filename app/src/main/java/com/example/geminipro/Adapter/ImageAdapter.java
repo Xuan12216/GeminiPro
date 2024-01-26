@@ -111,5 +111,4 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public interface ImageAdapterListener {
         void onImageListUpdated(List<Uri> updatedImageUris);
     }
-
 }

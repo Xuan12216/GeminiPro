@@ -7,7 +7,6 @@ import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,42 +14,32 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.TypedValue;
-import android.view.ContextThemeWrapper;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.example.geminipro.Adapter.FlexAdapter;
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
 import com.example.geminipro.Database.AppDatabase;
-import com.example.geminipro.Database.User;
+import com.example.geminipro.Fragment.BottomSheet;
 import com.example.geminipro.Model.GenerativeModelManager;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.Util.PickImageFunc;
+import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
-import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.ActivityMainBinding;
-import com.example.geminipro.databinding.NavHeaderBinding;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import kotlin.Triple;
 
-public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener{
+public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener, FlexAdapter.FlexAdapterListener {
 
     private ActivityMainBinding binding;
     private List<Uri> imageUris = new ArrayList<>();
@@ -60,8 +49,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private boolean isWait = false;
     private RecordFunc recordFunc;
     private PickImageFunc pickImageFunc;
+    private PickImageUsingCamera pickImageUsingCamera;
     private ImageAdapter imageAdapter;
-    private FlexAdapter flexAdapter;
     public static AppDatabase appDatabase;
     //AdapterModel
     private static List<String> StringUris = new ArrayList<>();
@@ -99,14 +88,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.recyclerViewDown.setAdapter(imageAdapter);
         //===============
         binding.recyclerViewFlex.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        flexAdapter = new FlexAdapter(context);
+        FlexAdapter flexAdapter = new FlexAdapter(context, this);
         binding.recyclerViewFlex.setAdapter(flexAdapter);
         String[] title = getResources().getStringArray(R.array.flexboxItem);
         flexAdapter.setSettingTitle(title);
+        checkShowSuggestionsOrNot();
         //===============
         recordFunc = new RecordFunc(this,context);
         //===============
         pickImageFunc = new PickImageFunc(this, context);
+        pickImageUsingCamera = new PickImageUsingCamera(this,context);
     }
     //===listener=====================================================
     public void openNavigationDrawer(View view) {
@@ -140,16 +131,35 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 else return false;
             }
         });
+
         popupMenu.show();
     }
     //=====
     public void AddImage(View view) {
-        pickImageFunc.startPickImage(new PickImageFunc.onImageResultCallback() {
+
+        BottomSheet bottomSheet = new BottomSheet();
+        bottomSheet.setCallback(new BottomSheet.BottomSheetCallback() {
             @Override
-            public void onResult(Uri compressedUri) {
-                setImageAdapter(compressedUri, false);
+            public void onCameraClicked() {
+                pickImageUsingCamera.startPickImage(new PickImageUsingCamera.onImageResultCallback() {
+                    @Override
+                    public void onResult(Uri compressedUri) {
+                        setImageAdapter(compressedUri, false);
+                    }
+                });
+            }
+
+            @Override
+            public void onGalleryClicked() {
+                pickImageFunc.startPickImage(new PickImageFunc.onImageResultCallback() {
+                    @Override
+                    public void onResult(Uri compressedUri) {
+                        setImageAdapter(compressedUri, false);
+                    }
+                });
             }
         });
+        bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
     }
     //=====
     private void setListener(){
@@ -244,9 +254,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     int size = binding.textInputEditText.getText().toString().length();
                     binding.textInputLayout.setEndIconDrawable(size > 0 ? getDrawable(R.drawable.baseline_send_24) : getDrawable(R.drawable.baseline_keyboard_voice_24));
                 }
+                checkShowSuggestionsOrNot();
             }
         });
     }
+
+    private void checkShowSuggestionsOrNot() {
+        if (index == -1) binding.recyclerViewFlex.setVisibility(View.VISIBLE);
+        else binding.recyclerViewFlex.setVisibility(View.GONE);
+    }
+
     //=====
     private void setImageAdapter(Uri compressedUri, boolean isClearList) {
         if (isClearList) imageUris.clear();
@@ -259,6 +276,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     public void onImageListUpdated(List<Uri> updatedImageUris) {
         this.imageUris = updatedImageUris;
     }
+
+    @Override
+    public void onChooseFlex(String text) {
+        if (!text.isEmpty()) binding.textInputEditText.setText(text);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
