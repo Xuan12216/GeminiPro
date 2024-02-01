@@ -5,7 +5,7 @@
     <string name="EditText_hint">Enter a prompt here</string>
     <string name="EditText_hint_api">Enter a API key here</string>
     <string name="get_api_key_url">https://ai.google.dev/</string>
-    <string name="what_is_api_key">何謂API：API 金鑰通常由 API 提供者提供，並且需要在應用程式中設定。應用程式在向 API 發出請求時會提供 API 密鑰，API 提供者會使用該密鑰來驗證應用程式是否有權存取 API。本App必須使用API。</string>
+    <string name="what_is_api_key">何謂API：API 金鑰通常由 API 提供者提供，並且需要在應用程式中設定。 應用程式在向 API 發出請求時會提供 API 金鑰，API 提供者會使用該金鑰來驗證應用程式是否有權限存取 API。 本App必須使用API。</string>
     <string name="get_api_hint">沒有 API key ? 可以點 這裏</string>
     <string name="editText_empty">請輸入API key</string>
 
@@ -67,33 +67,33 @@
 
     //flexbox
     <string-array name="flexboxItem">
-        <item>计划一次旅行 : 像当地人一样体验首尔</item>
-        <item>给我看一个代码片段 : 网站的粘性标题</item>
-        <item>给我想法 : 我孩子的艺术该怎么办</item>
-        <item>比较业务策略 : 从预算过渡到豪华与卢…</item>
-        <item>制定锻炼计划 : 用于阻力训练</item>
-        <item>集思广益的名字 : 对于一只橙色的猫，我们从…收养</item>
-        <item>解释怀旧之情 : 给一名幼儿园老师</item>
-        <item>为我创建一个个人网页 : 问了我三个问题后</item>
-        <item>帮我选一下 : 送给喜欢钓鱼的爸爸的礼物</item>
-        <item>推荐活动 : 远程员工团队建设日……</item>
+        <item>計劃一次旅行 : 像當地人一樣體驗首爾</item>
+        <item>給我看一個程式碼片段 : 網站的黏性標題</item>
+        <item>給我想法 : 我孩子的藝術該怎麼辦</item>
+        <item>比較業務策略 : 從預算過渡到豪華與盧…</item>
+        <item>制定運動計畫 : 用於阻力訓練</item>
+        <item>集思廣益的名字 : 對於一隻橘色的貓，我們從…收養</item>
+        <item>解釋懷舊之情 : 給一位幼兒園老師</item>
+        <item>為我建立一個個人網頁 : 問了我三個問題後</item>
+        <item>幫我選 : 送給喜歡釣魚的爸爸的禮物</item>
+        <item>推薦活動 : 遠距員工團隊建立日……</item>
     </string-array>
 
     //pickImage
-    <string name="useCameraPickImage">打开相机</string>
-    <string name="useGalleryPickImage">打开图库</string>
+    <string name="useCameraPickImage">開啟相機</string>
+    <string name="useGalleryPickImage">打開圖庫</string>
 
     //welcomeText
-    <string name="welcome_text">欢迎来到 Gemini！有什么问题或需求我可以帮你解决吗？</string>
+    <string name="welcome_text">歡迎來到 Gemini！ 有什麼問題或需求我可以幫你解決嗎？</string>
 
     //addNotes
-    <string name="add_notes_toast">添加新聊天成功！</string>
+    <string name="add_notes_toast">新增聊天成功！</string>
     <string name="add_notes_toast1">請稍後重試！</string>
 
     //info
     <string name="info_url">https://ai.google.dev/</string>
-    <string name="info_load_success">加载成功！</string>
-    <string name="info_load_fail">加载失败，请检查网络连接或重试！</string>
+    <string name="info_load_success">加載成功！</string>
+    <string name="info_load_fail">載入失敗，請檢查網路連線或重試！</string>
 
 
 </resources>
