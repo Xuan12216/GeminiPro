@@ -59,6 +59,11 @@
     <string name="successfully_toast">修改成功!</string>
 
     //menu
+    <string name="info_title">詳情</string>
+    <string name="setting_title">設定</string>
+
+    //record
+    <string name="record_value">說點什麼吧…</string>
 
     //flexbox
     <string-array name="flexboxItem">
@@ -77,4 +82,18 @@
     //pickImage
     <string name="useCameraPickImage">打开相机</string>
     <string name="useGalleryPickImage">打开图库</string>
+
+    //welcomeText
+    <string name="welcome_text">欢迎来到 Gemini！有什么问题或需求我可以帮你解决吗？</string>
+
+    //addNotes
+    <string name="add_notes_toast">添加新聊天成功！</string>
+    <string name="add_notes_toast1">請稍後重試！</string>
+
+    //info
+    <string name="info_url">https://ai.google.dev/</string>
+    <string name="info_load_success">加载成功！</string>
+    <string name="info_load_fail">加载失败，请检查网络连接或重试！</string>
+
+
 </resources>

@@ -69,4 +69,11 @@ dependencies {
 
     //flexbox
     implementation ("com.google.android.flexbox:flexbox:3.0.0")
+
+    //gif
+    implementation ("pl.droidsonroids.gif:android-gif-drawable:1.2.28")
+
+    //swiperefreshlayout
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
 }

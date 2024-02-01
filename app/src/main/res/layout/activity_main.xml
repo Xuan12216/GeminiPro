@@ -49,19 +49,32 @@
                         android:layout_marginStart="15dp"
                         android:text="Gemini"
                         android:textColor="?colorPrimary"
-                        android:textSize="24sp"
+                        android:textSize="23sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@+id/navigationDrawerButton"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <ImageView
+                    <pl.droidsonroids.gif.GifImageView
+                        android:id="@+id/gifImageView"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginStart="10dp"
                         android:adjustViewBounds="true"
-                        android:src="@mipmap/gemini"
+                        android:src="@drawable/sparkle_resting"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/textView"
                         app:layout_constraintTop_toTopOf="@+id/textView" />
+
+                    <ImageView
+                        android:id="@+id/addNote"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="25dp"
+                        android:src="@drawable/baseline_edit_note_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/menuImageView"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="?colorPrimary"/>
 
                     <ImageView
                         android:id="@+id/menuImageView"
@@ -98,6 +111,42 @@
             app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
             app:layout_constraintStart_toStartOf="@+id/imageCardView" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/welcomeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/recyclerViewFlex"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/imageGif"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/sparkle_resting"
+                app:layout_constraintBottom_toTopOf="@+id/welcomeText"
+                app:layout_constraintEnd_toEndOf="@+id/welcomeText"
+                app:layout_constraintStart_toStartOf="@+id/welcomeText" />
+
+            <TextView
+                android:id="@+id/welcomeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?colorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.35" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <androidx.cardview.widget.CardView
             android:id="@+id/imageCardView"
             android:layout_width="40dp"
@@ -165,16 +214,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <ProgressBar
+        <pl.droidsonroids.gif.GifImageView
             android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/loading"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone"
-            android:indeterminateTint="?colorPrimary"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabScrollToBottom"

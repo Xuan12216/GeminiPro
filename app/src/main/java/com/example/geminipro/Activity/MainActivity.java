@@ -3,6 +3,7 @@ package com.example.geminipro.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,8 +11,11 @@ import androidx.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -20,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.geminipro.Adapter.FlexAdapter;
 import com.example.geminipro.Adapter.ImageAdapter;
@@ -44,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private ActivityMainBinding binding;
     private List<Uri> imageUris = new ArrayList<>();
     private Context context;
+    private Handler handler;
     private ModelAdapter modelAdapter;
     private int index = -1;
     private boolean isWait = false;
@@ -117,13 +123,26 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     public void showPopupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(this, view, Gravity.END, 0, R.style.MyPopupMenuStyle);
         popupMenu.setForceShowIcon(true);
-        MenuInflater inflater = popupMenu.getMenuInflater();
-        inflater.inflate(R.menu.menu_item, popupMenu.getMenu());
+        popupMenu.inflate(R.menu.menu_item);
+
+        int size = popupMenu.getMenu().size();
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES){
+            for (int i = 0; i < size; i++){
+                Drawable iconDrawable = popupMenu.getMenu().getItem(i).getIcon();
+                if (iconDrawable != null) {
+                    iconDrawable.setTint(getResources().getColor(R.color.white,null));
+                }
+            }
+        }
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (item.getItemId() == R.id.Info) return true;
+                if (item.getItemId() == R.id.Info) {
+                    startActivity(new Intent(MainActivity.this, InfoActivity.class));
+                    return true;
+                }
                 else if (item.getItemId() == R.id.settings){
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                     return true;
@@ -205,6 +224,23 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 else if (!isWait && text.isEmpty()) gotoRecordFunc();
             }
         });
+        //======================================
+        binding.addNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (index != -1 && index % 2 != 0 ){
+                    StringUris.clear();
+                    userOrGemini.clear();
+                    imageHashMap.clear();
+                    modelAdapter.receiveDataAndShow(StringUris, userOrGemini, imageHashMap);
+                    index = - 1;
+                    checkShowSuggestionsOrNot();
+                    Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
+                }
+                else if (index == -1) Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
+                else Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     //===prepare=====================================================
     private void handleEndIconClick(String text) {
@@ -260,8 +296,38 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
 
     private void checkShowSuggestionsOrNot() {
-        if (index == -1) binding.recyclerViewFlex.setVisibility(View.VISIBLE);
-        else binding.recyclerViewFlex.setVisibility(View.GONE);
+        if (index == -1) {
+            binding.recyclerViewFlex.setVisibility(View.VISIBLE);
+            binding.recyclerViewFlex.smoothScrollToPosition(0);
+            binding.welcomeLayout.setVisibility(View.VISIBLE);
+            binding.welcomeText.setText("");
+
+            String text = getResources().getString(R.string.welcome_text);
+            final int[] currentIndex = {0};
+
+            if (null != handler) {
+                handler.removeCallbacksAndMessages(null);
+                handler = null;
+            }
+
+            handler = new Handler();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (currentIndex[0] < text.length()) {
+                        binding.welcomeText.append(String.valueOf(text.charAt(currentIndex[0])));
+                        currentIndex[0]++;
+                        handler.postDelayed(this, 100);
+                    }
+                }
+            };
+
+            handler.postDelayed(runnable, 100);
+        }
+        else {
+            binding.recyclerViewFlex.setVisibility(View.GONE);
+            binding.welcomeLayout.setVisibility(View.GONE);
+        }
     }
 
     //=====
@@ -287,7 +353,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onResume();
         if (null != modelAdapter) modelAdapter.checkSharedPreferences();
         GenerativeModelManager.checkApiKey(this);
-
     }
 
     @Override
@@ -299,5 +364,15 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         StringUris = new ArrayList<>(result.getFirst());
         userOrGemini = new ArrayList<>(result.getSecond());
         imageHashMap = new HashMap<>(result.getThird());
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        if (null != handler) {
+            handler.removeCallbacksAndMessages(null);
+            handler = null;
+        }
     }
 }

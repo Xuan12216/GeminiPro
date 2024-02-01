@@ -65,16 +65,13 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
         holder.binding.usernameTextView.setText(("User").equals(who) ? userName : geminiName);
 
-        if (storedImagePath.isEmpty()){
-            Glide.with(context)
-                    .load(("User").equals(who) ? R.drawable.baseline_person_24 : R.mipmap.gemini)
-                    .into(holder.binding.avatarImageView);
-        }
-        else {
-            Glide.with(context)
-                    .load(("User").equals(who) ? storedImagePath : R.mipmap.gemini)
-                    .into(holder.binding.avatarImageView);
-        }
+        Glide.with(context)
+                .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("User").equals(who)) ?
+                        R.drawable.sparkle_resting :
+                        storedImagePath.isEmpty() ?
+                        (("User").equals(who) ? R.drawable.baseline_person_24 : R.mipmap.logo_single_color) :
+                        (("User").equals(who) ? storedImagePath : R.mipmap.logo_single_color))
+                .into(holder.binding.avatarImageView);
     }
 
     @Override

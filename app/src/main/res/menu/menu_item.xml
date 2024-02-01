@@ -3,9 +3,9 @@
     <item
         android:id="@+id/Info"
         android:icon="@drawable/info"
-        android:title="Info"/>
+        android:title="@string/info_title"/>
     <item
         android:id="@+id/settings"
         android:icon="@drawable/baseline_settings_24"
-        android:title="Settings"/>
+        android:title="@string/setting_title"/>
 </menu>

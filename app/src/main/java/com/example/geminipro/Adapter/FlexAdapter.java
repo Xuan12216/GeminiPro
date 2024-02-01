@@ -7,8 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.ItemFlexboxBinding;
-
-import java.util.List;
 import java.util.Random;
 
 public class FlexAdapter extends RecyclerView.Adapter<FlexAdapter.FlexViewHolder> {
@@ -21,6 +19,7 @@ public class FlexAdapter extends RecyclerView.Adapter<FlexAdapter.FlexViewHolder
         this.settingTitle = new String[0];
         this.listener = listener;
     }
+
     @NonNull
     @Override
     public FlexViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

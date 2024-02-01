@@ -51,7 +51,16 @@ public class SettingApi {
         String oriString = context.getResources().getString(R.string.get_api_hint);
 
         if (!preferences.contains("api_key")) binding.textViewStatus.setText(statusFalse);
-        else binding.textViewStatus.setText(statusTrue);
+        else {
+            binding.textViewStatus.setText(statusTrue);
+            final String key = preferences.getString("api_key","");
+            int midIndex = 0;
+
+            if (key.length() > 2) {
+                midIndex = key.length() / 2;
+                binding.textViewStatus.setText(statusTrue + " :\n\n" + key.substring(0, midIndex) + printStar(midIndex, key.length()));
+            }
+        }
 
         SpannableString spannableString = new SpannableString(oriString);
 
@@ -62,6 +71,15 @@ public class SettingApi {
         String[] title = context.getResources().getStringArray(R.array.settingsItem);
         binding.textViewTitle.setText(title[3]);
     }
+
+    private String printStar(int midIndex, int length) {
+        String text = "";
+        for (int i = midIndex; i < length; i++){
+            text += "*";
+        }
+        return text;
+    }
+
     //setListener=================================================
     private void setListener(SettingApiKeyBinding binding) {
 

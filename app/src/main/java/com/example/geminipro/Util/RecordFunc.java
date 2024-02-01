@@ -9,6 +9,9 @@ import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.ActivityResultRegistry;
 import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.example.geminipro.R;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -29,7 +32,7 @@ public class RecordFunc {
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak something...");
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, context.getString(R.string.record_value));
 
                 ActivityResultLauncher<Intent> launcher = activityResultRegistry.register("key", new ActivityResultContracts.StartActivityForResult(), result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {

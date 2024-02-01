@@ -56,6 +56,13 @@
     <string name="enter_gemini_name">Enter Gemini Name</string>
     <string name="successfully_toast">Successfully modified!</string>
 
+    //menu
+    <string name="info_title">Info</string>
+    <string name="setting_title">Setting</string>
+
+    //record
+    <string name="record_value">Speak something…</string>
+
     <string-array name="flexboxItem">
         <item>Plan a trip : to experience Seoul like a local</item>
         <item>Show me a code snippet : of a webside\'s sticky header</item>
@@ -72,4 +79,16 @@
     //pickImage
     <string name="useCameraPickImage">Open Camera</string>
     <string name="useGalleryPickImage">Open Gallery</string>
+
+    //welcomeText
+    <string name="welcome_text">Welcome to Gemini ! How can I help you today ?</string>
+
+    //addNotes
+    <string name="add_notes_toast">New chat added successfully !</string>
+    <string name="add_notes_toast1">Please try again later !</string>
+
+    //info
+    <string name="info_url">https://ai.google.dev/</string>
+    <string name="info_load_success">Loading successful! </string>
+    <string name="info_load_fail">Loading failed, please check the network connection or try again! </string>
 </resources>
