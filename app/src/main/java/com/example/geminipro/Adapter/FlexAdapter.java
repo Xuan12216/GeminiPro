@@ -1,5 +1,6 @@
 package com.example.geminipro.Adapter;
 import android.content.Context;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,6 +84,7 @@ public class FlexAdapter extends RecyclerView.Adapter<FlexAdapter.FlexViewHolder
     private final View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             int position = (int) v.getTag();
             String text = settingTitle[position];
             if (!text.isEmpty() && null != listener) listener.onChooseFlex(text);
