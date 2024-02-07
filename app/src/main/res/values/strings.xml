@@ -2,7 +2,7 @@
     <string name="app_name">GeminiPro</string>
 
 
-    <string name="EditText_hint">Enter a prompt here</string>
+    <string name="EditText_hint">在此输入提示</string>
     <string name="EditText_hint_api">Enter a API key here</string>
     <string name="get_api_key_url">https://ai.google.dev/</string>
     <string name="what_is_api_key">何謂API：API 金鑰通常由 API 提供者提供，並且需要在應用程式中設定。應用程式在向 API 發出請求時會提供 API 密鑰，API 提供者會使用該密鑰來驗證應用程式是否有權存取 API。本App必須使用API。</string>
@@ -67,16 +67,36 @@
 
     //flexbox
     <string-array name="flexboxItem">
-        <item>计划一次旅行 : 像当地人一样体验首尔</item>
-        <item>给我看一个代码片段 : 网站的粘性标题</item>
-        <item>给我想法 : 我孩子的艺术该怎么办</item>
-        <item>比较业务策略 : 从预算过渡到豪华与卢…</item>
-        <item>制定锻炼计划 : 用于阻力训练</item>
-        <item>集思广益的名字 : 对于一只橙色的猫，我们从…收养</item>
-        <item>解释怀旧之情 : 给一名幼儿园老师</item>
-        <item>为我创建一个个人网页 : 问了我三个问题后</item>
-        <item>帮我选一下 : 送给喜欢钓鱼的爸爸的礼物</item>
-        <item>推荐活动 : 远程员工团队建设日……</item>
+        <item>計劃一次旅行 : 像當地人一樣體驗首爾</item>
+        <item>給我看一個代碼片段 : 網站的粘性標題</item>
+        <item>給我想法 : 我孩子的藝術該怎麼辦</item>
+        <item>比較業務策略 : 從預算過渡到豪華與盧…</item>
+        <item>製定鍛煉計劃 : 用於阻力訓練</item>
+        <item>集思廣益的名字 : 對於一只橙色的貓，我們從…收養</item>
+        <item>解釋懷舊之情 : 給一名幼兒園老師</item>
+        <item>為我創建一個個人網頁 : 問了我三個問題後</item>
+        <item>幫我選一下 : 送給喜歡釣魚的爸爸的禮物</item>
+        <item>推薦活動 : 遠程員工團隊建設日……</item>
+        <item>製作美味的家庭晚餐 : 新鮮食材，簡單食譜</item>
+        <item>學習新的手工藝 : 例如織毛衣或製作陶器</item>
+        <item>規劃下一個假期 : 探索未知的目的地</item>
+        <item>閱讀一本經典小說 : 重新發現文學的魅力</item>
+        <item>挑戰自己 : 完成一項新的運動或運動挑戰</item>
+        <item>分享一次美食之旅 : 探索當地的餐廳和小吃</item>
+        <item>參加誌工活動 : 為社區或慈善機構貢獻時間</item>
+        <item>探索當地的自然景點 : 遠離城市喧囂，感受大自然的美麗</item>
+        <item>學習新的語言 : 開拓視野，與世界溝通</item>
+        <item>嘗試烹調一道國際美食 : 體驗不同文化的味道</item>
+        <item>建立一個家庭遊樂區 : 為孩子們創造一個快樂的空間</item>
+        <item>發現當地博物館或美術館 : 欣賞藝術與歷史的魅力</item>
+        <item>開始一個健康的生活方式 : 運動，飲食和心理健康的平衡</item>
+        <item>體驗戶外冒險活動 : 遠足，露營或劃橡皮艇等</item>
+        <item>學習一項新的技能 : 例如攝影，程式設計或音樂製作</item>
+        <item>籌辦一場家庭電影夜 : 選擇一部大家都喜歡的電影</item>
+        <item>重新佈置家裡的一個房間 : 創造一個舒適和溫馨的空間</item>
+        <item>參加當地的文化活動 : 音樂會，藝術展覽或戲劇表演</item>
+        <item>準備一頓精緻的自製早午餐 : 美味的食物和愉快的氛圍</item>
+        <item>學習如何種植自己的蔬菜 : 享受自給自足的樂趣</item>
     </string-array>
 
     //pickImage

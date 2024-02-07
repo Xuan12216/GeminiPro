@@ -1,11 +1,19 @@
 package com.example.geminipro.Adapter;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +23,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.geminipro.R;
 import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.databinding.ItemImageBinding;
 
@@ -90,9 +99,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     }
 
     private void showImageDialog(int position, @NonNull ImageViewHolder holder) {
-        ImageDialog dialog = new ImageDialog(holder.itemView.getContext(), imageUris, position);
+        ImageDialog dialog = new ImageDialog(holder.itemView.getContext(), imageUris, position, holder);
         dialog.show();
     }
+
+
 
     @Override
     public int getItemCount() {

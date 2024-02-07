@@ -4,13 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.geminipro.R;
-import com.github.chrisbanes.photoview.OnPhotoTapListener;
 import com.github.chrisbanes.photoview.OnScaleChangedListener;
 import com.github.chrisbanes.photoview.OnViewDragListener;
+import com.github.chrisbanes.photoview.OnViewTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
 
 public class ImageFragment extends Fragment {
@@ -49,12 +48,15 @@ public class ImageFragment extends Fragment {
                     .into(photoView);
         }
 
-        photoView.setOnPhotoTapListener(new OnPhotoTapListener() {
+        setListener();
+        return rootView;
+    }
+
+    private void setListener() {
+        photoView.setOnViewTapListener(new OnViewTapListener() {
             @Override
-            public void onPhotoTap(ImageView view, float x, float y) {
-                if (listener != null) {
-                    listener.DialogDismiss("dismiss");
-                }
+            public void onViewTap(View view, float x, float y) {
+                if (listener != null) listener.DialogDismiss("dismiss");
             }
         });
 
@@ -72,8 +74,6 @@ public class ImageFragment extends Fragment {
                 if (listener != null && scale == 1) listener.DialogDismiss("no_scale");
             }
         });
-
-        return rootView;
     }
 
     public void setDialogStatusListener(DialogStatusListener listener) {

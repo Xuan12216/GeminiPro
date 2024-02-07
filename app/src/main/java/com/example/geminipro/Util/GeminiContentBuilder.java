@@ -4,15 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-
 import com.example.geminipro.Model.GenerativeModelManager;
 import com.google.ai.client.generativeai.java.ChatFutures;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.Content;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,7 +29,7 @@ public class GeminiContentBuilder {
         historyNormal = Arrays.asList(GenerativeModelManager.getUserContent(),GenerativeModelManager.getModelContent());
     }
 
-    public void startGeminiBuilder(String text, boolean isVision, GeminiBuilderCallback callback){
+    public void startGeminiBuilder(String text, boolean isVision, GeminiBuilderCallback callback) {
         GenerativeModelFutures model = isVision ? GenerativeModelManager.getGenerativeModelVision()
                 : GenerativeModelManager.getGenerativeModel();
 
