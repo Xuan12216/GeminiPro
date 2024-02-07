@@ -103,7 +103,19 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         dialog.show();
     }
 
-
+    private void removeAnimatedView(View view) {
+        // 创建并执行渐变动画
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0f);
+        alphaAnimator.setDuration(200); // 设置渐变动画持续时间
+        alphaAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // 动画结束后移除动画视图
+                ((ViewGroup) view.getParent()).removeView(view);
+            }
+        });
+        alphaAnimator.start();
+    }
 
     @Override
     public int getItemCount() {
