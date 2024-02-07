@@ -76,4 +76,10 @@ dependencies {
     //swiperefreshlayout
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
+    //viewpager2
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
+
+    //photoview
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
+
 }

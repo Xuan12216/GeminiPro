@@ -1,7 +1,6 @@
 package com.example.geminipro.Util;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import com.google.ai.client.generativeai.java.ChatFutures;
@@ -21,13 +20,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class SendToServer {
-    private GenerativeModelFutures model;
+    private GenerativeModelFutures modelVision;
     private ChatFutures chatNormal;
     private final Context context;
     private final Lifecycle lifecycle;
 
-    public SendToServer(GenerativeModelFutures model, Context context, Lifecycle lifecycle) {
-        this.model = model;
+    public SendToServer(GenerativeModelFutures modelVision, Context context, Lifecycle lifecycle) {
+        this.modelVision = modelVision;
         this.context = context;
         this.lifecycle = lifecycle;
     }
@@ -39,7 +38,7 @@ public class SendToServer {
     }
 
     public void sendToServerFunc(boolean isVision, Content contentUser, ResultCallback callback) {
-        ListenableFuture<GenerateContentResponse> response = isVision ? model.generateContent(contentUser) : chatNormal.sendMessage(contentUser);
+        ListenableFuture<GenerateContentResponse> response = isVision ? modelVision.generateContent(contentUser) : chatNormal.sendMessage(contentUser);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             Single<GenerateContentResponse> single = Single.create(
                     e -> Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
@@ -55,9 +54,8 @@ public class SendToServer {
                             e.onError(throwable);
                             if (throwable.toString().contains("PromptBlockedException")) {
                                 callback.onResult(throwable.toString());
-                            } else {
-                                tryToUseStreamSendToServer(contentUser, callback, isVision);
                             }
+                            else tryToUseStreamSendToServer(contentUser, callback, isVision);
                         }
                     }, context.getMainExecutor()));
 
@@ -66,10 +64,11 @@ public class SendToServer {
                     .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
                     .subscribe(result -> {}, throwable -> {});
         }
+        else tryToUseStreamSendToServer(contentUser, callback, isVision);
     }
 
     private void tryToUseStreamSendToServer(Content contentUser, ResultCallback callback, boolean isVision) {
-        Publisher<GenerateContentResponse> response = isVision ? model.generateContentStream(contentUser) : chatNormal.sendMessageStream(contentUser);
+        Publisher<GenerateContentResponse> response = isVision ? modelVision.generateContentStream(contentUser) : chatNormal.sendMessageStream(contentUser);
         final String[] fullResponse = {""};
         Single<GenerateContentResponse> single = Single.create(
                 emitter -> response.subscribe(new Subscriber<GenerateContentResponse>() {

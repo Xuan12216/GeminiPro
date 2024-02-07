@@ -237,7 +237,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     checkShowSuggestionsOrNot();
                     Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
                 }
-                else if (index == -1) Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
+                else if (index == -1) {
+                    checkShowSuggestionsOrNot();
+                    Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
+                }
                 else Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
             }
         });
@@ -322,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 }
             };
 
-            handler.postDelayed(runnable, 100);
+            handler.postDelayed(runnable, 350);
         }
         else {
             binding.recyclerViewFlex.setVisibility(View.GONE);

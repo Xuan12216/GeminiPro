@@ -15,6 +15,9 @@ import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.databinding.SettingNameBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SettingName {
     private Activity activity;
     private PickImageFunc pickImageFunc;
@@ -88,14 +91,16 @@ public class SettingName {
             }
         });
 
-        binding.imageViewSetting.setOnLongClickListener(view -> {
-            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        binding.imageViewSetting.setOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             if (!pictureSave.isEmpty()){
                 Uri uri = Uri.parse(pictureSave);
-                ImageDialog dialog = new ImageDialog(activity, uri);
+                List<Uri> list = new ArrayList<>();
+                list.add(uri);
+
+                ImageDialog dialog = new ImageDialog(activity, list, 0);
                 dialog.show();
             }
-            return true;
         });
 
         binding.acceptBtn.setOnClickListener(new View.OnClickListener() {

@@ -56,10 +56,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        holder.binding.imageView.setOnLongClickListener(view -> {
-                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                            showImageDialog(imageUris.get(holder.getAdapterPosition()), holder);
-                            return true;
+                        holder.binding.imageView.setOnClickListener(view -> {
+                            holder.binding.imageView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                            showImageDialog(holder.getAdapterPosition(), holder);
                         });
                         return false;
                     }
@@ -68,10 +67,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
         holder.binding.closeImageView.setVisibility(isShowCloseBtn ? View.VISIBLE : View.GONE);
 
-        holder.binding.closeImageView.setOnClickListener(v -> {
-            removeImage(holder.getAdapterPosition());
-        });
+        holder.binding.closeImageView.setTag(holder.getAdapterPosition());
+        holder.binding.closeImageView.setOnClickListener(onClickListener);
     }
+
+    private final View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int position = (int) v.getTag();
+            removeImage(position);
+        }
+    };
 
     public void removeImage(int position) {
         if (position >= 0 && position < imageUris.size()) {
@@ -83,8 +89,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         }
     }
 
-    private void showImageDialog(Uri imageUri, @NonNull ImageViewHolder holder) {
-        ImageDialog dialog = new ImageDialog(holder.itemView.getContext(), imageUri);
+    private void showImageDialog(int position, @NonNull ImageViewHolder holder) {
+        ImageDialog dialog = new ImageDialog(holder.itemView.getContext(), imageUris, position);
         dialog.show();
     }
 
