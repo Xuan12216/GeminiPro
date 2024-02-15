@@ -6,33 +6,32 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.widget.ViewPager2;
-
-import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ImagePagerAdapter;
 import com.example.geminipro.Fragment.ImageFragment;
 import com.example.geminipro.R;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class ImageDialog extends Dialog implements ImageFragment.DialogStatusListener {
-    private Context context;
+    private final Context context;
     private ViewPager2 viewPager;
-    private ImagePagerAdapter imagePagerAdapter;
     private int position = 0;
     private List<Uri> imageUris = new ArrayList<>();
-    private ImageAdapter.ImageViewHolder holder;
+    private HashMap<Integer, ImageView> imageViews = new HashMap<>();
+    private AnimatorSet currentAnimator = null;
+    private final int shortAnimationDuration = 300;
+    private final float startScale = 0.2f;
+
     //=================
 
     public ImageDialog(@NonNull Context context, List<Uri> imageUris, int position) {
@@ -42,14 +41,14 @@ public class ImageDialog extends Dialog implements ImageFragment.DialogStatusLis
         this.imageUris = imageUris;
     }
 
-    public ImageDialog(@NonNull Context context, List<Uri> imageUris, int position, ImageAdapter.ImageViewHolder holder) {
+    public ImageDialog(@NonNull Context context, List<Uri> imageUris, int position, HashMap<Integer, ImageView> imageViews) {
         super(context, android.R.style.Theme_NoTitleBar);
         this.position = position;
         this.context = context;
         this.imageUris = imageUris;
-        this.holder = holder;
+        this.imageViews = imageViews;
     }
-
+    //====================================================
     @Override
     protected void onCreate(Bundle savedInstanceState){
         setContentView(R.layout.image_dialog);
@@ -59,7 +58,7 @@ public class ImageDialog extends Dialog implements ImageFragment.DialogStatusLis
 
         imageViewClose.setOnClickListener(v -> dismiss());
 
-        this.imagePagerAdapter = new ImagePagerAdapter((FragmentActivity) context, imageUris, this);
+        ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter((FragmentActivity) context, imageUris, this);
         this.viewPager.setAdapter(imagePagerAdapter);
 
         // Set the current item in ViewPager2
@@ -67,101 +66,121 @@ public class ImageDialog extends Dialog implements ImageFragment.DialogStatusLis
 
         openDialogAnim();
     }
-
+    //====================================================
     private void openDialogAnim() {
 
-        viewPager.setPivotX(0);
-        viewPager.setPivotY(0);
-        viewPager.setScaleX(0.15f);
-        viewPager.setScaleY(0.15f);
-
-        if (null == holder){
-
+        if (imageViews.size() == 0){
+            viewPager.setScaleX(0.2f);
+            viewPager.setScaleY(0.2f);
             ObjectAnimator.ofFloat(viewPager, "scaleX", 1f).start();
             ObjectAnimator.ofFloat(viewPager, "scaleY", 1f).start();
         }
-        else {
-            // 获取点击视图的位置信息
-            int[] location = new int[2];
-            holder.binding.imageView.getLocationOnScreen(location);
-            int startX = location[0];
-            int startY = location[1];
+        else if (position >= 0 && position < imageViews.size()){
+            ImageView imageView = imageViews.get(position);
 
-            viewPager.setX(startX);
-            viewPager.setY(startY - 100);
+            if (imageView != null){
+                viewPager.setPivotX(0);
+                viewPager.setPivotY(0);
 
-            int endX = (viewPager.getRootView().getWidth() - viewPager.getWidth()) / 2;
-            int endY = (viewPager.getRootView().getHeight() - viewPager.getHeight()) / 2;
+                final Rect startBounds = new Rect();
+                final Rect finalBounds = new Rect();
 
-            // 创建并执行动画
-            ObjectAnimator xAnimator = ObjectAnimator.ofFloat(viewPager, View.X, startX, endX);
-            ObjectAnimator yAnimator = ObjectAnimator.ofFloat(viewPager, View.Y, startY - 100, endY);
-            ObjectAnimator.ofFloat(viewPager, "scaleX", 1f).start();
-            ObjectAnimator.ofFloat(viewPager, "scaleY", 1f).start();
+                imageView.getGlobalVisibleRect(startBounds);
+                if (currentAnimator != null) {
+                    currentAnimator.cancel();
+                }
 
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.playTogether(xAnimator, yAnimator);
-            animatorSet.setDuration(280); // 设置动画持续时间
-            animatorSet.start();
+                AnimatorSet set = new AnimatorSet();
+                set.play(ObjectAnimator.ofFloat(viewPager, View.X, startBounds.left, finalBounds.left))
+                        .with(ObjectAnimator.ofFloat(viewPager, View.Y, startBounds.top, finalBounds.top))
+                        .with(ObjectAnimator.ofFloat(viewPager, View.SCALE_X, startScale, 1f))
+                        .with(ObjectAnimator.ofFloat(viewPager, View.SCALE_Y, startScale, 1f));
+                set.setDuration(shortAnimationDuration);
+                set.setInterpolator(new DecelerateInterpolator());
+                set.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        currentAnimator = null;
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        currentAnimator = null;
+                    }
+                });
+                set.start();
+                currentAnimator = set;
+            }
+            else {
+                viewPager.setScaleX(1f);
+                viewPager.setScaleY(1f);
+            }
         }
     }
-
+    //====================================================
     @Override
     public void dismiss() {
 
-        if (null == holder){
+        if (imageViews.size() == 0){
             ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(viewPager, "scaleX", 0.5f);
             ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(viewPager, "scaleY", 0.5f);
             ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(viewPager, "alpha", 1f, 0f);
 
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.playTogether(scaleXAnimator, scaleYAnimator, alphaAnimator);
-            animatorSet.setDuration(200);
+            animatorSet.setDuration(shortAnimationDuration);
             animatorSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     ImageDialog.super.dismiss();
-
                 }
             });
 
             animatorSet.start();
         }
-        else {
-            int[] location = new int[2];
-            holder.binding.imageView.getLocationOnScreen(location);
-            int endX = location[0];
-            int endY = location[1];
+        else if (viewPager.getCurrentItem() >= 0 && viewPager.getCurrentItem() < imageViews.size()){
+            ImageView imageView = imageViews.get(viewPager.getCurrentItem());
 
-            int startX = (viewPager.getRootView().getWidth() - viewPager.getWidth()) / 2;
-            int startY = (viewPager.getRootView().getHeight() - viewPager.getHeight()) / 2;
-
-            viewPager.setX(startX);
-            viewPager.setY(startY);
-
-            // 创建并执行动画
-            ObjectAnimator xAnimator = ObjectAnimator.ofFloat(viewPager, View.X, startX, endX);
-            ObjectAnimator yAnimator = ObjectAnimator.ofFloat(viewPager, View.Y, startY - 100, endY);
-            ObjectAnimator.ofFloat(viewPager, "scaleX", 0.15f).start();
-            ObjectAnimator.ofFloat(viewPager, "scaleY", 0.15f).start();
-
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.playTogether(xAnimator, yAnimator);
-            animatorSet.setDuration(280); // 设置动画持续时间
-            animatorSet.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    ImageDialog.super.dismiss();
-
+            if (imageView != null){
+                if (currentAnimator != null) {
+                    currentAnimator.cancel();
                 }
-            });
 
-            animatorSet.start();
+                final Rect bounds = new Rect();
+                imageView.getGlobalVisibleRect(bounds);
+
+                if (bounds.left == bounds.top){
+                    viewPager.setPivotX(viewPager.getMeasuredWidth() / 2f);
+                    viewPager.setPivotY(viewPager.getMeasuredHeight() / 2f);
+                }
+
+                AnimatorSet set = new AnimatorSet();
+                set.play(ObjectAnimator
+                                .ofFloat(viewPager, View.X, bounds.left))
+                        .with(ObjectAnimator
+                                .ofFloat(viewPager, View.Y, bounds.top - ((bounds.bottom - bounds.top) / 2f)))
+                        .with(ObjectAnimator
+                                .ofFloat(viewPager, View.SCALE_X, startScale))
+                        .with(ObjectAnimator
+                                .ofFloat(viewPager, View.SCALE_Y, startScale));
+                set.setDuration(shortAnimationDuration);
+                set.setInterpolator(new DecelerateInterpolator());
+                set.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        currentAnimator = null;
+                        ImageDialog.super.dismiss();
+                    }
+                });
+                set.start();
+                currentAnimator = set;
+            }
         }
+        else ImageDialog.super.dismiss();
     }
-
+    //====================================================
     @Override
     public void DialogDismiss(String status) {
 

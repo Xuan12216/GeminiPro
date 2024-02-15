@@ -66,34 +66,34 @@
     <string-array name="flexboxItem">
         <item>Plan a trip: Experience Seoul like a local</item>
         <item>Show me a code snippet: Sticky title for website</item>
-        <item>Give me ideas: What to do with my child’s art</item>
-        <item>Comparing Business Strategies: Transitioning from Budget to Luxury vs Luxury…</item>
-        <item>Develop an exercise plan: for resistance training</item>
-        <item>Brainstorm names: For an orange cat, we adopt from…</item>
-        <item>Explaining Nostalgia: To a Kindergarten Teacher</item>
-        <item>Create a personal webpage for me: after asking me three questions</item>
-        <item>Help me choose: a gift for my dad who loves fishing</item>
+        <item>Get ideas: What to do with my child’s art</item>
+        <item>Compare Business Strategies: Budget to Luxury vs Luxury…</item>
+        <item>Develop an exercise plan: resistance training</item>
+        <item>Brainstorm names: For an orange cat adoption</item>
+        <item>Explain Nostalgia: To a Kindergarten Teacher</item>
+        <item>Create a personal webpage: after three questions</item>
+        <item>Help me choose: a gift for dad who loves fishing</item>
         <item>Recommended activity: Remote employee team building day…</item>
-        <item>Making delicious family dinners: fresh ingredients, simple recipes</item>
-        <item>Learn a new craft: such as knitting or making pottery</item>
+        <item>Make family dinners: fresh ingredients, simple recipes</item>
+        <item>Learn a new craft: knitting or pottery making</item>
         <item>Plan your next vacation: Explore unknown destinations</item>
-        <item>Read a classic novel: rediscover the charm of literature</item>
-        <item>Challenge yourself: Complete a new sport or sports challenge</item>
-        <item>Share a food journey: explore local restaurants and snacks</item>
-        <item>Participate in volunteer activities: donate time to the community or charity</item>
-        <item>Explore local natural attractions: stay away from the hustle and bustle of the city and experience the beauty of nature</item>
-        <item>Learn a new language: broaden your horizons and communicate with the world</item>
-        <item>Try cooking an international dish: experience the taste of different cultures</item>
-        <item>Build a family play area: create a happy space for children</item>
-        <item>Discover a local museum or art gallery: appreciate the charm of art and history</item>
-        <item>Start a healthy lifestyle: a balance of exercise, diet and mental health</item>
-        <item>Experience outdoor adventure activities: hiking, camping or kayaking</item>
-        <item>Learn a new skill: such as photography, programming or music production</item>
-        <item>Plan a family movie night: choose a movie everyone likes</item>
-        <item>Rearrange a room in your home: Create a comfortable and welcoming space</item>
-        <item>Attend a local cultural event: a concert, art exhibition or theater performance</item>
-        <item>Prepare an exquisite homemade brunch: delicious food and a pleasant atmosphere</item>
-        <item>Learn how to grow your own vegetables: enjoy the joy of self-sufficiency</item>
+        <item>Read a classic novel: rediscover literary charm</item>
+        <item>Challenge yourself: Complete a new sport or challenge</item>
+        <item>Share a food journey: explore local cuisine</item>
+        <item>Participate in volunteer activities: donate time to charity</item>
+        <item>Outline a social media post: for my network</item>
+        <item>Learn a new language: broaden horizons</item>
+        <item>Cook an international dish: taste different cultures</item>
+        <item>Build a family play area: create a happy space</item>
+        <item>Discover a local museum or gallery: appreciate art and history</item>
+        <item>Start a healthy lifestyle: balance exercise, diet, mental health</item>
+        <item>Experience outdoor adventure: hiking, camping, kayaking</item>
+        <item>Learn a new skill: photography, programming, music</item>
+        <item>Plan a family movie night: choose a movie</item>
+        <item>Rearrange a room: Create a welcoming space</item>
+        <item>Attend a cultural event: concert, art exhibition, theater</item>
+        <item>Prepare a homemade brunch: delicious food, pleasant atmosphere</item>
+        <item>Learn how to grow vegetables: enjoy self-sufficiency</item>
     </string-array>
 
     //pickImage

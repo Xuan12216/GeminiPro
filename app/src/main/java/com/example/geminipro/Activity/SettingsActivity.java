@@ -2,21 +2,12 @@ package com.example.geminipro.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-
 import com.example.geminipro.Adapter.SettingsAdapter;
-import com.example.geminipro.Page.SettingPage.SettingApi;
-import com.example.geminipro.Page.SettingPage.SettingName;
-import com.example.geminipro.Page.SettingPage.SettingParameter;
-import com.example.geminipro.Page.SettingPage.SettingSafe;
 import com.example.geminipro.R;
 import com.example.geminipro.databinding.ActivitySettingsBinding;
-import com.example.geminipro.databinding.SettingApiKeyBinding;
-import com.example.geminipro.databinding.SettingNameBinding;
-import com.example.geminipro.databinding.SettingParameterBinding;
 
 public class SettingsActivity extends AppCompatActivity {
     private ActivitySettingsBinding binding;

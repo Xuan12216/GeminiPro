@@ -3,7 +3,6 @@ package com.example.geminipro.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +18,6 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,10 +36,11 @@ import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
 import com.example.geminipro.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import kotlin.Triple;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener, FlexAdapter.FlexAdapterListener {
@@ -62,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private static List<String> StringUris = new ArrayList<>();
     private static List<String> userOrGemini = new ArrayList<>();
     private static HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
+    //UserName
+    private String userName,storedImagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,33 +113,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         ImageView imageView = headerView.findViewById(R.id.avatarImageView);
         TextView textView = headerView.findViewById(R.id.navUserName);
 
-        SharedPreferences preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
-        String userName = preferences.getString("userName", "");
-        String storedImagePath = preferences.getString("userImage", "");
-
         if (!storedImagePath.isEmpty()) Glide.with(context).load(storedImagePath).into(imageView);
         if (!userName.isEmpty()) textView.setText(userName);
-    }
-    //=====
-    public void showPopupMenu(View view) {
-        PopupMenu popupMenu = new PopupMenu(this, view, Gravity.END, 0, R.style.MyPopupMenuStyle);
-        popupMenu.setForceShowIcon(true);
-        popupMenu.inflate(R.menu.menu_item);
 
-        int size = popupMenu.getMenu().size();
-        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES){
-            for (int i = 0; i < size; i++){
-                Drawable iconDrawable = popupMenu.getMenu().getItem(i).getIcon();
-                if (iconDrawable != null) {
-                    iconDrawable.setTint(getResources().getColor(R.color.white,null));
-                }
-            }
-        }
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+        binding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if (item.getItemId() == R.id.Info) {
                     startActivity(new Intent(MainActivity.this, InfoActivity.class));
                     return true;
@@ -147,11 +127,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                     return true;
                 }
-                else return false;
+                return false;
             }
         });
-
-        popupMenu.show();
     }
     //=====
     public void AddImage(View view) {
@@ -356,6 +334,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onResume();
         if (null != modelAdapter) modelAdapter.checkSharedPreferences();
         GenerativeModelManager.checkApiKey(this);
+        //===============
+        SharedPreferences preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
+        userName = preferences.getString("userName", "");
+        storedImagePath = preferences.getString("userImage", "");
+
+        if (!storedImagePath.isEmpty()) Glide.with(context).load(storedImagePath).into(binding.navigationDrawerButton);
+        else Glide.with(context).load(R.drawable.baseline_person_24).into(binding.navigationDrawerButton);
     }
 
     @Override
