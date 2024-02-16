@@ -34,7 +34,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.Settin
     @Override
     public void onBindViewHolder(@NonNull SettingViewHolder holder, int position) {
 
-        if (settingTitle.length != settingIcon.length) return;
+        if (settingTitle.length != settingIcon.length || position < 0 || position >= settingTitle.length) {
+            return;
+        }
 
         holder.binding.avatarCardView.setVisibility(View.GONE);
         String text = settingTitle[position];
@@ -47,15 +49,22 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.Settin
         holder.binding.imageViewSetting.setVisibility(View.VISIBLE);
         holder.binding.imageViewSetting.setImageResource(resourceData.getResource(textIcon, ResType.drawable));
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, SettingMainActivity.class);
-                intent.putExtra("id",holder.binding.messageTextView.getText().toString());
-                context.startActivity(intent);
-            }
-        });
+        holder.itemView.setOnClickListener(onClickListener);
+        holder.itemView.setTag(String.valueOf(holder.getAdapterPosition()));
     }
+
+    private final View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String id = String.valueOf(v.getTag());
+            Intent intent = new Intent(context, SettingMainActivity.class);
+
+            if (!id.isEmpty()) intent.putExtra("id", id);
+            else intent.putExtra("id", "0");
+
+            context.startActivity(intent);
+        }
+    };
 
     @Override
     public int getItemCount() {

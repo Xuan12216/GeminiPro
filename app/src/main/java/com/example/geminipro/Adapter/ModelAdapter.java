@@ -64,6 +64,9 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.messageTextView.setText(text);
         holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
         holder.binding.usernameTextView.setText(("User").equals(who) ? userName : geminiName);
+        holder.binding.imageViewShare.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.imageViewCopy.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.imageViewSound.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
 
         Glide.with(context)
                 .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("User").equals(who)) ?

@@ -62,7 +62,7 @@ public class GenerativeModelManager {
         String api = pres.getString("api_key", "");
         if (api.isEmpty()) {
             Intent intent = new Intent(context, SettingMainActivity.class);
-            intent.putExtra("id", "設定apiKey");
+            intent.putExtra("id", "3");
             context.startActivity(intent);
         }
     }

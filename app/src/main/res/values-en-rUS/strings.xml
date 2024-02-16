@@ -111,4 +111,7 @@
     <string name="info_url">https://ai.google.dev/</string>
     <string name="info_load_success">Loading successful! </string>
     <string name="info_load_fail">Loading failed, please check the network connection or try again! </string>
+
+    //navigation
+    <string name="navigation_history">Recent</string>
 </resources>

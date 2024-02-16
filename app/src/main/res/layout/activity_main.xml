@@ -53,8 +53,8 @@
 
                     <ImageView
                         android:id="@+id/addNote"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_marginEnd="15dp"
                         android:src="@drawable/baseline_edit_note_24"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -71,6 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             app:layout_constraintBottom_toTopOf="@+id/recyclerViewFlex"
             app:layout_constraintEnd_toEndOf="parent"
@@ -220,11 +221,12 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/menu_item"
         android:background="?colorSecondary"
         app:drawerLayoutCornerSize="1px"
         app:itemVerticalPadding="20dp"
         app:itemIconTint="?colorPrimary"
-        app:itemTextColor="?colorPrimary" />
+        app:itemTextColor="?colorPrimary">
+
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>
