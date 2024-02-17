@@ -16,16 +16,26 @@ public class User {
     private HashMap<Integer, List<Uri>> imageHashMap;
     private String date;
     private String title;
+    private boolean pin;
 
-    public User(String title, String date, List<String> stringUris, List<String> userOrGemini, HashMap<Integer,List<Uri>> imageHashMap) {
+    public User(String title, String date, List<String> stringUris, List<String> userOrGemini, HashMap<Integer, List<Uri>> imageHashMap, boolean pin) {
         this.title = title;
         this.date = date;
         this.stringUris = stringUris;
         this.userOrGemini = userOrGemini;
         this.imageHashMap = imageHashMap;
+        this.pin = pin;
     }
 
     // Getters and setters
+
+    public boolean isPin() {
+        return pin;
+    }
+
+    public void setPin(boolean pin) {
+        this.pin = pin;
+    }
 
     public String getTitle() {
         return title;

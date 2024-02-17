@@ -60,6 +60,11 @@
     <string name="info_title">詳情</string>
     <string name="setting_title">設定</string>
 
+    //menuMore
+    <string name="menu_pin">置頂</string>
+    <string name="menu_rename">重命名</string>
+    <string name="menu_delete">刪除</string>
+
     //record
     <string name="record_value">說點什麼吧…</string>
 
@@ -115,5 +120,6 @@
 
     //navigation
     <string name="navigation_history">歷史記錄</string>
+    <string name="searchEditText">搜尋</string>
 
 </resources>

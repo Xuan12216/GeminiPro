@@ -60,6 +60,11 @@
     <string name="info_title">Info</string>
     <string name="setting_title">Setting</string>
 
+    //menuMore
+    <string name="menu_pin">Pin</string>
+    <string name="menu_rename">Rename</string>
+    <string name="menu_delete">Delete</string>
+
     //record
     <string name="record_value">Speak something…</string>
 
@@ -114,4 +119,5 @@
 
     //navigation
     <string name="navigation_history">Recent</string>
+    <string name="searchEditText">Search</string>
 </resources>

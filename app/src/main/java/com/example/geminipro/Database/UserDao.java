@@ -1,6 +1,7 @@
 package com.example.geminipro.Database;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -13,7 +14,7 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE title = :title LIMIT 1")
     User getUserByTitle(String title);
 
-    @Query("SELECT * FROM users ORDER BY id DESC")
+    @Query("SELECT * FROM users ORDER BY pin DESC, date DESC")
     List<User> getAllUsersDesc();
 
     @Query("SELECT * FROM users")
@@ -24,4 +25,7 @@ public interface UserDao {
 
     @Update
     void updateUser(User user);
+
+    @Delete
+    void deleteUser(User user);
 }

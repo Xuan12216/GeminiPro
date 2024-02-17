@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/pin"
+        android:icon="@drawable/baseline_push_pin_24"
+        android:title="@string/menu_pin"/>
+    <item
+        android:id="@+id/rename"
+        android:icon="@drawable/baseline_drive_file_rename_outline_24"
+        android:title="@string/menu_rename"/>
+
+    <item
+        android:id="@+id/delete"
+        android:icon="@drawable/baseline_delete_24"
+        android:title="@string/menu_delete"/>
+</menu>

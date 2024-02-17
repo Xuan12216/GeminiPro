@@ -34,6 +34,7 @@ import com.example.geminipro.Fragment.BottomSheet;
 import com.example.geminipro.Model.GenerativeModelManager;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.GeminiContentBuilder;
+import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
@@ -67,6 +68,11 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private static List<String> StringUris = new ArrayList<>();
     private static List<String> userOrGemini = new ArrayList<>();
     private static HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
+    //NavigationView
+    private List<User> usersList = new ArrayList<>();
+    //Database
+    private boolean isClickByHistory = false;
+    private boolean isPause = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //===init=====================================================
     private void init(){
         //database
-        AppDatabase appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "my-database").build();
+        AppDatabase appDatabase = Room.databaseBuilder(context, AppDatabase.class, "my-database").build();
         userDao = appDatabase.userDao();
 
         //==============
@@ -118,6 +124,11 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         //===============
         pickImageFunc = new PickImageFunc(this, context);
         pickImageUsingCamera = new PickImageUsingCamera(this,context);
+
+        //===============
+        binding.recyclerViewHistory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        historyAdapter = new HistoryAdapter(context, this);
+        binding.recyclerViewHistory.setAdapter(historyAdapter);
     }
 
     //===listener=====================================================
@@ -202,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.addNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (index != -1 && index % 2 != 0 ){
+                if (index != -1 && !isWait ){
                     StringUris.clear();
                     userOrGemini.clear();
                     imageHashMap.clear();
@@ -218,26 +229,93 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 else Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
             }
         });
+
+        //=====
+        binding.searchEdittext.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (usersList.size() > 0){
+                    List<User> filteredUsers = new ArrayList<>();
+                    String keyword = s.toString().toLowerCase();
+
+                    for (User user : usersList){
+                        for (String uri : user.getStringUris()) {
+                            if (uri.toLowerCase().contains(keyword)) {
+                                filteredUsers.add(user);
+                                break;
+                            }
+                        }
+                    }
+                    if (null != historyAdapter) historyAdapter.setSettingTitle(filteredUsers);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     //=====
     @Override
     public void onChooseHistory(User user) {
+        if (isWait) {
+            Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         saveDataFunc(true);
+        binding.searchEdittext.setText("");
         if (null != modelAdapter){
             index = user.getStringUris().size() - 1;
             binding.welcomeLayout.setVisibility(View.GONE);
             binding.recyclerViewFlex.setVisibility(View.GONE);
+            binding.drawerLayout.closeDrawers();
+            binding.progressBar.setVisibility(View.VISIBLE);
 
             binding.drawerLayout.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     modelAdapter.receiveDataAndShow(user.getStringUris(), user.getUserOrGemini(), user.getImageHashMap());
-                    binding.drawerLayout.closeDrawer(GravityCompat.START);
+                    binding.progressBar.setVisibility(View.GONE);
+                    isClickByHistory = true;
                 }
-            }, 300);
+            }, 1000);
         }
     }
+
+    //=====
+    @Override
+    public void onChooseHistoryStatus(User user, String status, String rename) {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                switch (status) {
+                    case "pin":
+                        user.setPin(!user.isPin());
+                        userDao.updateUser(user);
+                        break;
+                    case "rename":
+                        break;
+                    case "delete":
+                        userDao.deleteUser(user);
+                        break;
+                    default:
+                        break;
+                }
+                getSaveData();
+            }
+        });
+    }
+
     //===prepare=====================================================
     private void handleEndIconClick(String text) {
 
@@ -343,12 +421,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         View headerView = binding.navigationView.getHeaderView(0);
         ImageView imageView = headerView.findViewById(R.id.avatarImageView);
         TextView textView = headerView.findViewById(R.id.navUserName);
-        RecyclerView recyclerView_history = headerView.findViewById(R.id.recyclerView_history);
         ImageView image_more = headerView.findViewById(R.id.imageView_more);
-
-        recyclerView_history.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        historyAdapter = new HistoryAdapter(context, this);
-        recyclerView_history.setAdapter(historyAdapter);
 
         image_more.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -374,8 +447,31 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             }
         });
 
-        if (!storedImagePath.isEmpty()) Glide.with(context).load(storedImagePath).into(imageView);
+        if (!storedImagePath.isEmpty()) {
+            Glide.with(context).load(storedImagePath).into(imageView);
+            List<Uri> list = new ArrayList<>();
+            list.add(Uri.parse(storedImagePath));
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                    ImageDialog imageDialog = new ImageDialog(context, list, 0);
+                    imageDialog.show();
+                }
+            });
+
+        }
         if (!userName.isEmpty()) textView.setText(userName);
+
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                Intent intent = new Intent(MainActivity.this, SettingMainActivity.class);
+                intent.putExtra("id", "0");
+                startActivity(intent);
+            }
+        });
     }
     //=====
     private void saveDataFunc(boolean clear) {
@@ -387,8 +483,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
         if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
             Date date = new Date();
-            String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(date);
-            User user = new User(StringUris.get(0), today, StringUris, userOrGemini, imageHashMap);
+            String today = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date);
+            User user = new User(StringUris.get(0), today, StringUris, userOrGemini, imageHashMap, false);
 
             ExecutorService service = Executors.newSingleThreadExecutor();
             service.execute(new Runnable() {
@@ -397,9 +493,22 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     User existingUser = userDao.getUserByTitle(user.getTitle());
                     if (existingUser == null) userDao.insertUser(user);
                     else {
-                        user.setId(existingUser.getId()); // 設置現有用戶的 ID
-                        userDao.updateUser(user); // 使用更新方法更新用戶數據
+                        if (isClickByHistory) {
+                            user.setId(existingUser.getId()); // 設置現有用戶的 ID
+                            user.setPin(existingUser.isPin());
+                            userDao.updateUser(user); // 使用更新方法更新用戶數據
+                        }
+                        else {
+                            // 合併新數據到現有的數據
+                            existingUser.getStringUris().addAll(user.getStringUris());
+                            existingUser.getUserOrGemini().addAll(user.getUserOrGemini());
+                            existingUser.getImageHashMap().putAll(user.getImageHashMap());
+                            existingUser.setDate(today);
+                            userDao.updateUser(existingUser); // 使用更新方法更新用戶數據
+                        }
                     }
+                    if (!isPause) isClickByHistory = false;
+                    else isPause = false;
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -429,13 +538,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             @Override
             public void run() {
                 List<User> users = userDao.getAllUsersDesc();
-                if (!users.isEmpty()) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() { historyAdapter.setSettingTitle(users);}
-                    });
-
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        usersList = users;
+                        historyAdapter.setSettingTitle(users);
+                    }
+                });
             }
         });
     }
@@ -465,7 +574,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     protected void onPause() {
         super.onPause();
 
-        saveDataFunc(false);
+        if (!isWait) saveDataFunc(false);
+        isPause = true;
     }
     //=====
     @Override
