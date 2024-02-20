@@ -65,6 +65,16 @@
     <string name="menu_rename">Rename</string>
     <string name="menu_delete">Delete</string>
 
+    //rename
+    <string name="rename_title">Rename this chat?</string>
+    <string name="rename_accept">Rename</string>
+    <string name="rename_cancel">Cancel</string>
+    <string name="rename_repeat">Title again, try again</string>
+    <string name="rename_successful">Success</string>
+    <string name="rename_error">Error, try again</string>
+    <string name="delete_title">Delete this chat?</string>
+    <string name="delete_accept">Accept</string>
+
     //record
     <string name="record_value">Speak something…</string>
 

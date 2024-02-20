@@ -6,7 +6,6 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,9 +26,8 @@ import com.example.geminipro.Adapter.FlexAdapter;
 import com.example.geminipro.Adapter.HistoryAdapter;
 import com.example.geminipro.Adapter.ImageAdapter;
 import com.example.geminipro.Adapter.ModelAdapter;
-import com.example.geminipro.Database.AppDatabase;
 import com.example.geminipro.Database.User;
-import com.example.geminipro.Database.UserDao;
+import com.example.geminipro.Database.UserRepository;
 import com.example.geminipro.Fragment.BottomSheet;
 import com.example.geminipro.Model.GenerativeModelManager;
 import com.example.geminipro.R;
@@ -39,6 +37,8 @@ import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
 import com.example.geminipro.databinding.ActivityMainBinding;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,9 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import kotlin.Triple;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener, FlexAdapter.FlexAdapterListener, HistoryAdapter.HistoryAdapterListener {
     private ActivityMainBinding binding;
@@ -63,16 +60,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private PickImageFunc pickImageFunc;
     private PickImageUsingCamera pickImageUsingCamera;
     private ImageAdapter imageAdapter;
-    public static UserDao userDao;
+    public UserRepository userRepository;
     //AdapterModel
     private static List<String> StringUris = new ArrayList<>();
     private static List<String> userOrGemini = new ArrayList<>();
     private static HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
+    private String title = "";
     //NavigationView
     private List<User> usersList = new ArrayList<>();
     //Database
     private boolean isClickByHistory = false;
     private boolean isPause = false;
+    private boolean isClear = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,16 +88,17 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //===init=====================================================
     private void init(){
         //database
-        AppDatabase appDatabase = Room.databaseBuilder(context, AppDatabase.class, "my-database").build();
-        userDao = appDatabase.userDao();
-
+        userRepository = new UserRepository(context, getLifecycle());
+        
         //==============
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         binding.recyclerView.setAdapter(modelAdapter);
         //解決轉換theme時會被重置的問題
         if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
-            modelAdapter.receiveDataAndShow(StringUris, userOrGemini, imageHashMap);
+            User user = new User("", "", StringUris, userOrGemini, imageHashMap, false);
+
+            modelAdapter.receiveDataAndShow(user);
             index = StringUris.size() - 1;
             StringUris.clear();
             userOrGemini.clear();
@@ -221,8 +222,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     checkShowSuggestionsOrNot();
                     Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
                     saveDataFunc(true);
+                    historyAdapter.setTargetTitle("");
                 }
-                else if (index == -1) {
+                else if (index == -1 && !isWait) {
                     checkShowSuggestionsOrNot();
                     Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
                 }
@@ -244,13 +246,18 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     String keyword = s.toString().toLowerCase();
 
                     for (User user : usersList){
-                        for (String uri : user.getStringUris()) {
-                            if (uri.toLowerCase().contains(keyword)) {
-                                filteredUsers.add(user);
-                                break;
+                        String userTitle = user.getTitle();
+                        if (userTitle.toLowerCase().contains(keyword)) filteredUsers.add(user);
+                        else {
+                            for (String uri : user.getStringUris()) {
+                                if (uri.toLowerCase().contains(keyword)) {
+                                    filteredUsers.add(user);
+                                    break;
+                                }
                             }
                         }
                     }
+
                     if (null != historyAdapter) historyAdapter.setSettingTitle(filteredUsers);
                 }
             }
@@ -282,9 +289,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             binding.drawerLayout.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    modelAdapter.receiveDataAndShow(user.getStringUris(), user.getUserOrGemini(), user.getImageHashMap());
-                    binding.progressBar.setVisibility(View.GONE);
+                    modelAdapter.receiveDataAndShow(user);
                     isClickByHistory = true;
+                    binding.progressBar.setVisibility(View.GONE);
                 }
             }, 1000);
         }
@@ -292,28 +299,25 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
     //=====
     @Override
-    public void onChooseHistoryStatus(User user, String status, String rename) {
-        ExecutorService service = Executors.newSingleThreadExecutor();
+    public void onChooseHistoryStatus(User user, String status) {
+        isClear = false;
 
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-                switch (status) {
-                    case "pin":
-                        user.setPin(!user.isPin());
-                        userDao.updateUser(user);
-                        break;
-                    case "rename":
-                        break;
-                    case "delete":
-                        userDao.deleteUser(user);
-                        break;
-                    default:
-                        break;
-                }
-                getSaveData();
-            }
-        });
+        switch (status) {
+            case "pin":
+                saveDatabase("update", user, "PinUpdate");
+                break;
+            case "rename":
+                isClear = true;
+                saveDatabase("update", user, "RenameUpdate");
+                break;
+            case "delete":
+                String currentTarget = historyAdapter.getTargetTitle();
+                if (user.getTitle().equals(currentTarget)) isClear = true;
+                saveDatabase("delete", user, "DeleteData");
+                break;
+            default:
+                break;
+        }
     }
 
     //===prepare=====================================================
@@ -474,53 +478,68 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         });
     }
     //=====
+
     private void saveDataFunc(boolean clear) {
-        //save adapter data
-        Triple<List<String>, List<String>, HashMap<Integer, List<Uri>>> result = modelAdapter.saveData();
-        StringUris = new ArrayList<>(result.getFirst());
-        userOrGemini = new ArrayList<>(result.getSecond());
-        imageHashMap = new HashMap<>(result.getThird());
+        System.out.println("TestXuan: saveDataFunc");
+        // Save adapter data
+        isClear = clear;
+        User saveData = modelAdapter.saveData();
+        StringUris = new ArrayList<>(saveData.getStringUris());
+        userOrGemini = new ArrayList<>(saveData.getUserOrGemini());
+        imageHashMap = new HashMap<>(saveData.getImageHashMap());
+        title = saveData.getTitle();
 
         if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
-            Date date = new Date();
-            String today = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date);
-            User user = new User(StringUris.get(0), today, StringUris, userOrGemini, imageHashMap, false);
 
-            ExecutorService service = Executors.newSingleThreadExecutor();
-            service.execute(new Runnable() {
-                @Override
-                public void run() {
-                    User existingUser = userDao.getUserByTitle(user.getTitle());
-                    if (existingUser == null) userDao.insertUser(user);
-                    else {
-                        if (isClickByHistory) {
-                            user.setId(existingUser.getId()); // 設置現有用戶的 ID
-                            user.setPin(existingUser.isPin());
-                            userDao.updateUser(user); // 使用更新方法更新用戶數據
-                        }
-                        else {
-                            // 合併新數據到現有的數據
-                            existingUser.getStringUris().addAll(user.getStringUris());
-                            existingUser.getUserOrGemini().addAll(user.getUserOrGemini());
-                            existingUser.getImageHashMap().putAll(user.getImageHashMap());
-                            existingUser.setDate(today);
-                            userDao.updateUser(existingUser); // 使用更新方法更新用戶數據
-                        }
-                    }
-                    if (!isPause) isClickByHistory = false;
-                    else isPause = false;
+            if (title.isEmpty()) title = StringUris.get(0);
+            System.out.println("TestXuan: title: "+title+": "+StringUris.size());
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getSaveData();
-                            clearDataIfNecessary(clear);
-                        }
-                    });
-                }
-            });
+            // 在異步線程中從數據庫中查詢用戶信息
+            userRepository.getUserByTitle(title)
+                    .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
+                    .subscribe(this::matchTitle);
+
         }
         else clearDataIfNecessary(clear);
+    }
+
+    private void matchTitle(User data, Throwable object1) {
+        Date date = new Date();
+        String today = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date);
+        User user = new User(title, today, StringUris, userOrGemini, imageHashMap, false);
+        title = "";
+        System.out.println("TestXuan: matchTitle");
+
+        if (data == null) {
+            // 如果用戶不存在，則插入新用戶信息
+            saveDatabase("insert", user, "Insert Complete");
+        }
+        else {
+            if (isClickByHistory) {
+                // 如果是來自歷史點擊，則更新用戶信息
+                user.setId(data.getId()); // 設置現有用戶的 ID
+                user.setPin(data.isPin());
+                user.setTitle(data.getTitle());
+                user.setDate(today);
+                saveDatabase("update", user, "saveUpdate1");
+
+            } else {
+                // 如果是在輸入框輸入的，如果有重複的title則合併新數據到現有的數據
+                data.getStringUris().addAll(user.getStringUris());
+                data.getUserOrGemini().addAll(user.getUserOrGemini());
+                data.getImageHashMap().putAll(user.getImageHashMap());
+                data.setDate(today);
+                saveDatabase("update", data, "saveUpdate2");
+            }
+        }
+    }
+
+    // 在UI線程中處理下一步操作
+    private void handleNextStep(boolean clear) {
+        if (!isPause) isClickByHistory = false;
+        else isPause = false;
+        getSaveData();
+        clearDataIfNecessary(clear);
     }
     //=====
     private void clearDataIfNecessary(boolean clear) {
@@ -528,23 +547,27 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             StringUris.clear();
             userOrGemini.clear();
             imageHashMap.clear();
-            modelAdapter.receiveDataAndShow(StringUris, userOrGemini, imageHashMap);
+            User user = new User("", "", StringUris, userOrGemini, imageHashMap, false);
+            modelAdapter.receiveDataAndShow(user);
         }
     }
     //=====
     private void getSaveData() {
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(new Runnable() {
+        userRepository.getAllUsersDesc()
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
+                .subscribe(userList -> {
+                    System.out.println("TestXuan: getSaveData");
+                    usersList = userList;
+                    historyAdapter.setSettingTitle(userList);
+                }, Throwable::printStackTrace);
+    }
+
+    //=====
+    private void saveDatabase(String type, User user, String printText){
+        userRepository.saveDatabase(type, user, printText, new UserRepository.onDoneCallback() {
             @Override
-            public void run() {
-                List<User> users = userDao.getAllUsersDesc();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        usersList = users;
-                        historyAdapter.setSettingTitle(users);
-                    }
-                });
+            public void onDone() {
+                handleNextStep(isClear);
             }
         });
     }

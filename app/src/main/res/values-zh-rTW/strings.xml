@@ -65,6 +65,16 @@
     <string name="menu_rename">重命名</string>
     <string name="menu_delete">刪除</string>
 
+    //rename
+    <string name="rename_title">重命名此聊天記錄嗎？</string>
+    <string name="rename_accept">重命名</string>
+    <string name="rename_cancel">取消</string>
+    <string name="rename_repeat">標題重複，請重新輸入</string>
+    <string name="rename_successful">成功</string>
+    <string name="rename_error">請重新輸入</string>
+    <string name="delete_title">刪除此聊天記錄嗎？</string>
+    <string name="delete_accept">確認</string>
+
     //record
     <string name="record_value">說點什麼吧…</string>
 

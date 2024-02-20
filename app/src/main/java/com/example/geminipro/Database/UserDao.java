@@ -9,13 +9,16 @@ import androidx.room.Update;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+
 @Dao
 public interface UserDao {
     @Query("SELECT * FROM users WHERE title = :title LIMIT 1")
-    User getUserByTitle(String title);
+    Single<User> getUserByTitle(String title);
 
-    @Query("SELECT * FROM users ORDER BY pin DESC, date DESC")
-    List<User> getAllUsersDesc();
+    @Query("SELECT * FROM users ORDER BY pin DESC, id DESC")
+    Flowable<List<User>> getAllUsersDesc();
 
     @Query("SELECT * FROM users")
     List<User> getAllUsers();

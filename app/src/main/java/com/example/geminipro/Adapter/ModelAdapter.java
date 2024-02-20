@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.geminipro.Database.User;
 import com.example.geminipro.R;
 import com.example.geminipro.databinding.RecyclerItemBinding;
 
@@ -33,7 +34,9 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     private HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
     private final Context context;
     private SharedPreferences preferences;
-    private String geminiName, userName, storedImagePath;
+    private String geminiName, userName, storedImagePath, title = "", date = "";
+    private User user;
+    private boolean isPin = false;
 
     public ModelAdapter(Context context) {
         this.context = context;
@@ -72,8 +75,8 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
                 .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("User").equals(who)) ?
                         R.drawable.sparkle_resting :
                         storedImagePath.isEmpty() ?
-                        (("User").equals(who) ? R.drawable.baseline_person_24 : R.mipmap.logo_single_color) :
-                        (("User").equals(who) ? storedImagePath : R.mipmap.logo_single_color))
+                                (("User").equals(who) ? R.drawable.baseline_person_24 : R.mipmap.logo_single_color) :
+                                (("User").equals(who) ? storedImagePath : R.mipmap.logo_single_color))
                 .into(holder.binding.avatarImageView);
     }
 
@@ -87,22 +90,29 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         userOrGemini.add(who);
         List<Uri> newImageUris = new ArrayList<>(imageUris);
         if (newImageUris.size() > 0 && !"Gemini".equals(who)) imageHashMap.put(index,newImageUris);
+
+        if (null == user) {
+            this.title = resultText;
+            user = new User(title, date, StringUris, userOrGemini, imageHashMap, isPin);
+        }
+
         notifyDataSetChanged();
     }
 
-    public Triple<List<String>, List<String>, HashMap<Integer,List<Uri>>> saveData(){
-        return new Triple<>(StringUris, userOrGemini, imageHashMap);
+    public User saveData(){
+        user = null;
+        return new User(title, date, StringUris, userOrGemini, imageHashMap, isPin);
     }
 
-    public void receiveDataAndShow(List<String> StringUris, List<String> userOrGemini, HashMap<Integer,List<Uri>> imageHashMap){
-        this.StringUris = new ArrayList<>(StringUris);
-        this.userOrGemini = new ArrayList<>(userOrGemini);
-        this.imageHashMap = new HashMap<>(imageHashMap);
-        notifyDataSetChanged();
-    }
-
-    public void refreshData(String text, int index){
-        StringUris.set(index, text);
+    public void receiveDataAndShow(User user){
+        resetData();
+        this.user = user;
+        this.StringUris = new ArrayList<>(user.getStringUris());
+        this.userOrGemini = new ArrayList<>(user.getUserOrGemini());
+        this.imageHashMap = new HashMap<>(user.getImageHashMap());
+        this.title = user.getTitle();
+        this.date = user.getDate();
+        this.isPin = user.isPin();
         notifyDataSetChanged();
     }
 
@@ -115,6 +125,16 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
             if (geminiName.isEmpty()) geminiName = "Gemini";
             if (userName.isEmpty()) userName  = "You";
         }
+    }
+
+    private void resetData() {
+        this.user = null;
+        this.title = "";
+        this.date = "";
+        this.isPin = false;
+        this.StringUris.clear();
+        this.userOrGemini.clear();
+        this.imageHashMap.clear();
     }
 
     @Override

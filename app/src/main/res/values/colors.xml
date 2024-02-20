@@ -7,6 +7,7 @@
     <color name="gray1">#DCDCDC</color>
     <color name="gray2">#AFAFAF</color>
     <color name="transparent">#00000000</color>
+    <color name="transparent_half">#80000000</color>
     <color name="SageGreen">#8A9A5B</color>
     <color name="Pewter">#899499</color>
 </resources>
