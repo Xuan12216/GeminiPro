@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navHeader"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="80dp"
     android:background="?colorSecondary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
@@ -14,7 +14,7 @@
         android:layout_height="35dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="25dp"
         app:cardBackgroundColor="?colorSecondary"
         app:cardCornerRadius="28dp"
         app:cardElevation="0dp"
@@ -37,17 +37,31 @@
         android:layout_marginStart="20dp"
         android:text="User"
         android:textColor="?colorPrimary"
+        android:maxLines="1"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/avatarCardView"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageView_more"
         app:layout_constraintStart_toEndOf="@+id/avatarCardView"
         app:layout_constraintTop_toTopOf="@+id/avatarCardView" />
 
+    <ImageView
+        android:id="@+id/imageView_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/baseline_more_vert_24"
+        app:layout_constraintBottom_toBottomOf="@+id/avatarCardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/avatarCardView" />
+
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="0.1dp"
-        android:background="?colorPrimary"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="20dp"
+        android:background="@color/gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

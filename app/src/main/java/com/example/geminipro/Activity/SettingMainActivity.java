@@ -42,10 +42,10 @@ public class SettingMainActivity extends AppCompatActivity {
         if (intent.hasExtra("id")){
             String text = intent.getStringExtra("id");
 
-            if ("設定名字，圖片".equals(text) || "Set name, picture".equals(text)) initName();
-            else if ("設定模型參數".equals(text) || "Set model parameters".equals(text)) initParameter();
-            else if ("設定安全參數".equals(text) || "Set security parameters".equals(text)) initSafe();
-            else if ("設定apiKey".equals(text) || "Set apiKey".equals(text)) initSetApi();
+            if ("0".equals(text)) initName();
+            else if ("1".equals(text)) initParameter();
+            else if ("2".equals(text)) initSafe();
+            else if ("3".equals(text)) initSetApi();
         }
     }
 

@@ -31,58 +31,32 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <ImageView
-                        android:id="@+id/navigationDrawerButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="openNavigationDrawer"
-                        android:src="@drawable/baseline_menu_24"
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentLeft="true"
+                        app:cardBackgroundColor="?colorSecondary"
+                        app:cardCornerRadius="28dp"
+                        app:cardElevation="0dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?colorPrimary" />
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:id="@+id/textView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:text="Gemini"
-                        android:textColor="?colorPrimary"
-                        android:textSize="23sp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toEndOf="@+id/navigationDrawerButton"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <pl.droidsonroids.gif.GifImageView
-                        android:id="@+id/gifImageView"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginStart="10dp"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/sparkle_resting"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/textView"
-                        app:layout_constraintTop_toTopOf="@+id/textView" />
+                        <ImageView
+                            android:id="@+id/navigationDrawerButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:onClick="openNavigationDrawer"
+                            android:scaleType="centerCrop" />
+                    </androidx.cardview.widget.CardView>
 
                     <ImageView
                         android:id="@+id/addNote"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="25dp"
-                        android:src="@drawable/baseline_edit_note_24"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/menuImageView"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?colorPrimary"/>
-
-                    <ImageView
-                        android:id="@+id/menuImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_marginEnd="15dp"
-                        android:onClick="showPopupMenu"
-                        android:src="@drawable/baseline_more_vert_24"
+                        android:src="@drawable/baseline_edit_note_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -97,6 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             app:layout_constraintBottom_toTopOf="@+id/recyclerViewFlex"
             app:layout_constraintEnd_toEndOf="parent"
@@ -242,15 +217,78 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/menu_item"
         android:background="?colorSecondary"
-        app:drawerLayoutCornerSize="1px"
+        app:drawerLayoutCornerSize="25dp"
         app:itemVerticalPadding="20dp"
         app:itemIconTint="?colorPrimary"
-        app:itemTextColor="?colorPrimary" />
+        app:itemTextColor="?colorPrimary"
+        android:elevation="10dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchEdittextLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="95dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:boxBackgroundColor="?background"
+                app:boxCornerRadiusBottomEnd="25dp"
+                app:boxCornerRadiusBottomStart="25dp"
+                app:boxCornerRadiusTopEnd="25dp"
+                app:boxCornerRadiusTopStart="25dp"
+                app:boxStrokeColor="?colorPrimary"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="1dp"
+                app:startIconDrawable="@drawable/baseline_search_24"
+                app:startIconTint="?colorPrimary"
+                app:hintTextColor="?colorPrimary">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/searchEdittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/searchEditText"
+                    android:maxLines="1"
+                    android:textColor="?colorPrimary"
+                    android:textColorHint="?colorPrimary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/navigation_history"
+                android:textColor="@color/gray"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/searchEdittextLayout" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView_history"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

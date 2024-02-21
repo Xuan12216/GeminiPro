@@ -6,27 +6,38 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+
 import com.bumptech.glide.Glide;
+import com.example.geminipro.Fragment.BottomSheet;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.Util.PickImageFunc;
+import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.databinding.SettingNameBinding;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class SettingName {
-    private Activity activity;
-    private PickImageFunc pickImageFunc;
-    private Context context;
-    private SharedPreferences preferences;
+    private final Activity activity;
+    private final PickImageFunc pickImageFunc;
+    private final PickImageUsingCamera pickImageUsingCamera;
+    private final Context context;
+    private final SharedPreferences preferences;
     private String pictureSave = "";
-    private String name = "", gemini_name = "", enter_name = "", enter_gemini_name = "";
 
     public SettingName(Activity activity, Context context){
         this.context = context;
         this.activity = activity;
         pickImageFunc = new PickImageFunc((ComponentActivity) activity, context);
+        pickImageUsingCamera = new PickImageUsingCamera((ComponentActivity) activity, context);
         preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
     }
 
@@ -44,10 +55,10 @@ public class SettingName {
         String geminiName = preferences.getString("geminiName", "");
         String userName = preferences.getString("userName", "");
 
-        name = context.getResources().getString(R.string.name);
-        gemini_name = context.getResources().getString(R.string.gemini_name);
-        enter_name = context.getResources().getString(R.string.enter_name);
-        enter_gemini_name = context.getResources().getString(R.string.enter_gemini_name);
+        String name = context.getResources().getString(R.string.name);
+        String gemini_name = context.getResources().getString(R.string.gemini_name);
+        String enter_name = context.getResources().getString(R.string.enter_name);
+        String enter_gemini_name = context.getResources().getString(R.string.enter_gemini_name);
 
         if (!storedImagePath.isEmpty()){
             pictureSave = storedImagePath;
@@ -75,27 +86,50 @@ public class SettingName {
         binding.addImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pickImageFunc.startPickImage(new PickImageFunc.onImageResultCallback() {
+                BottomSheet bottomSheet = new BottomSheet();
+                bottomSheet.setCallback(new BottomSheet.BottomSheetCallback() {
                     @Override
-                    public void onResult(Uri compressedUri) {
-                        Glide.with(context)
-                                .load(compressedUri)
-                                .into(binding.imageViewSetting);
+                    public void onCameraClicked() {
+                        pickImageUsingCamera.startPickImage(new PickImageUsingCamera.onImageResultCallback() {
+                            @Override
+                            public void onResult(Uri compressedUri) {
+                                Glide.with(context)
+                                        .load(compressedUri)
+                                        .into(binding.imageViewSetting);
 
-                        pictureSave = compressedUri.toString();
+                                pictureSave = compressedUri.toString();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onGalleryClicked() {
+                        pickImageFunc.startPickImage(new PickImageFunc.onImageResultCallback() {
+                            @Override
+                            public void onResult(Uri compressedUri) {
+                                Glide.with(context)
+                                        .load(compressedUri)
+                                        .into(binding.imageViewSetting);
+
+                                pictureSave = compressedUri.toString();
+                            }
+                        });
                     }
                 });
+                bottomSheet.show(((AppCompatActivity) activity).getSupportFragmentManager(), bottomSheet.getTag());
             }
         });
 
-        binding.imageViewSetting.setOnLongClickListener(view -> {
-            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        binding.imageViewSetting.setOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             if (!pictureSave.isEmpty()){
                 Uri uri = Uri.parse(pictureSave);
-                ImageDialog dialog = new ImageDialog(activity, uri);
+                List<Uri> list = new ArrayList<>();
+                list.add(uri);
+
+                ImageDialog dialog = new ImageDialog(activity, list, 0);
                 dialog.show();
             }
-            return true;
         });
 
         binding.acceptBtn.setOnClickListener(new View.OnClickListener() {

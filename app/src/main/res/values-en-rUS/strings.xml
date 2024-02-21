@@ -60,20 +60,56 @@
     <string name="info_title">Info</string>
     <string name="setting_title">Setting</string>
 
+    //menuMore
+    <string name="menu_pin">Pin</string>
+    <string name="menu_uppin">UnPin</string>
+    <string name="menu_rename">Rename</string>
+    <string name="menu_delete">Delete</string>
+
+    //rename
+    <string name="rename_title">Rename this chat?</string>
+    <string name="rename_accept">Rename</string>
+    <string name="rename_cancel">Cancel</string>
+    <string name="rename_repeat">Title again, try again</string>
+    <string name="rename_successful">Success</string>
+    <string name="rename_error">Error, try again</string>
+    <string name="delete_title">Delete this chat?</string>
+    <string name="delete_accept">Accept</string>
+
     //record
     <string name="record_value">Speak something…</string>
 
     <string-array name="flexboxItem">
-        <item>Plan a trip : to experience Seoul like a local</item>
-        <item>Show me a code snippet : of a webside\'s sticky header</item>
-        <item>Give me ideas : for what do with my kids\' art</item>
-        <item>Compare business strategies : for transitioning from budget to luxury vs. lu…</item>
-        <item>Create a workout plan : for resistance training</item>
-        <item>Brainstorm names : for an orange cat we\'re adopting from the s…</item>
-        <item>Explain nostalgia : to a kindergartener</item>
-        <item>Create a personal webpage for me : after asking me three questions</item>
-        <item>Help me pick : a gift for my dad who loves fishing</item>
-        <item>Recommend activities : for a team-building day with remote employ…</item>
+        <item>Plan a trip: Experience Seoul like a local</item>
+        <item>Show me a code snippet: Sticky title for website</item>
+        <item>Get ideas: What to do with my child’s art</item>
+        <item>Compare Business Strategies: Budget to Luxury vs Luxury…</item>
+        <item>Develop an exercise plan: resistance training</item>
+        <item>Brainstorm names: For an orange cat adoption</item>
+        <item>Explain Nostalgia: To a Kindergarten Teacher</item>
+        <item>Create a personal webpage: after three questions</item>
+        <item>Help me choose: a gift for dad who loves fishing</item>
+        <item>Recommended activity: Remote employee team building day…</item>
+        <item>Make family dinners: fresh ingredients, simple recipes</item>
+        <item>Learn a new craft: knitting or pottery making</item>
+        <item>Plan your next vacation: Explore unknown destinations</item>
+        <item>Read a classic novel: rediscover literary charm</item>
+        <item>Challenge yourself: Complete a new sport or challenge</item>
+        <item>Share a food journey: explore local cuisine</item>
+        <item>Participate in volunteer activities: donate time to charity</item>
+        <item>Outline a social media post: for my network</item>
+        <item>Learn a new language: broaden horizons</item>
+        <item>Cook an international dish: taste different cultures</item>
+        <item>Build a family play area: create a happy space</item>
+        <item>Discover a local museum or gallery: appreciate art and history</item>
+        <item>Start a healthy lifestyle: balance exercise, diet, mental health</item>
+        <item>Experience outdoor adventure: hiking, camping, kayaking</item>
+        <item>Learn a new skill: photography, programming, music</item>
+        <item>Plan a family movie night: choose a movie</item>
+        <item>Rearrange a room: Create a welcoming space</item>
+        <item>Attend a cultural event: concert, art exhibition, theater</item>
+        <item>Prepare a homemade brunch: delicious food, pleasant atmosphere</item>
+        <item>Learn how to grow vegetables: enjoy self-sufficiency</item>
     </string-array>
 
     //pickImage
@@ -91,4 +127,13 @@
     <string name="info_url">https://ai.google.dev/</string>
     <string name="info_load_success">Loading successful! </string>
     <string name="info_load_fail">Loading failed, please check the network connection or try again! </string>
+
+    //navigation
+    <string name="navigation_history">Recent</string>
+    <string name="searchEditText">Search</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+
+    //copy
+    <string name="copySuccess">Copied</string>
 </resources>

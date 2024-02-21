@@ -59,6 +59,8 @@ dependencies {
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
+    implementation ("androidx.room:room-rxjava2:2.6.1")
+
 
     implementation("androidx.concurrent:concurrent-futures:1.1.0")
     implementation ("io.reactivex.rxjava3:rxandroid:3.0.2")
@@ -75,5 +77,14 @@ dependencies {
 
     //swiperefreshlayout
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    //viewpager2
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
+
+    //photoview
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
+
+    //Gson
+    implementation ("com.google.code.gson:gson:2.10.1")
 
 }
