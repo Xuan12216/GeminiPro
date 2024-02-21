@@ -22,6 +22,7 @@ import com.example.geminipro.R;
 import com.example.geminipro.Util.CustomDialog;
 import com.example.geminipro.databinding.RecyclerHistoryItemBinding;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,8 +52,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         if (!title.isEmpty() && position < title.size() && position >= 0){
             User user = title.get(holder.getAdapterPosition());
             if (user != null) {
+                String date = user.getDate();
+                String formattedDate = formatDate(date);
+
+                if (position > 0 && title.get(position - 1).getDate().equals(date)) {
+                    holder.binding.textViewDate.setVisibility(View.GONE);
+                } else {
+                    holder.binding.textViewDate.setVisibility(View.VISIBLE);
+                    holder.binding.textViewDate.setText(formattedDate);
+                }
                 holder.binding.historyTitle.setText(user.getTitle());
-                holder.binding.imageViewPin.setVisibility(user.isPin() ? View.VISIBLE : View.GONE);
+                holder.binding.imageViewPin.setImageResource(user.isPin() ? R.drawable.baseline_push_pin_24 : R.drawable.baseline_chat_bubble_24);
 
                 holder.itemView.setOnClickListener(onClickListener);
                 holder.itemView.setOnLongClickListener(onClickListenerMore);
@@ -66,6 +76,34 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         }
     }
 
+    private String formatDate(String date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String formattedDate = "";
+
+        try {
+            Date currentDate = sdf.parse(sdf.format(new Date()));
+            Date itemDate = sdf.parse(date);
+
+            assert currentDate != null;
+            assert itemDate != null;
+            long diffInMillies = Math.abs(currentDate.getTime() - itemDate.getTime());
+            long diff = diffInMillies / (24 * 60 * 60 * 1000);
+
+            if (diff == 0) {
+                formattedDate = context.getResources().getString(R.string.today);
+            } else if (diff == 1) {
+                formattedDate = context.getResources().getString(R.string.yesterday);
+            } else {
+                // Format date as needed for other cases
+                SimpleDateFormat sdfOutput = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
+                formattedDate = sdfOutput.format(itemDate);
+            }
+        } 
+        catch (ParseException e) {e.printStackTrace();}
+
+        return formattedDate;
+    }
+    
     @Override
     public int getItemCount() {
         return title.size();
@@ -106,10 +144,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             HistoryViewHolder holder = (HistoryViewHolder) v.getTag();
             int position = holder.getAdapterPosition();
             User user = title.get(position);
+            boolean isPinned = false;
+            if (null != user) isPinned = user.isPin();
 
             PopupMenu popupMenu = new PopupMenu(context, v, Gravity.END, 0, R.style.MyPopupMenuStyle);
             popupMenu.setForceShowIcon(true);
             popupMenu.inflate(R.menu.menu_more_item);
+
+            MenuItem pinMenuItem = popupMenu.getMenu().findItem(R.id.pin);
+            pinMenuItem.setTitle(isPinned ? R.string.menu_uppin : R.string.menu_pin);
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {

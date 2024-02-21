@@ -25,8 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="20dp"
                 android:text="@string/rename_title"
                 android:textColor="?colorPrimary"
                 android:textSize="20sp"
@@ -60,28 +59,32 @@
                     android:id="@+id/renameEdittext"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="@string/searchEditText"
+                    android:hint="@string/rename_accept"
                     android:maxLines="1"
                     android:textColor="?colorPrimary"
                     android:textColorHint="?colorPrimary" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
+            <TextView
                 android:id="@+id/button_rename"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:background="@color/transparent"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="20dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="10dp"
                 android:text="@string/rename_accept"
                 android:textColor="?colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <Button
+            <TextView
                 android:id="@+id/button_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/transparent"
+                android:layout_marginEnd="5dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="10dp"
                 android:text="@string/rename_cancel"
                 android:textColor="?colorPrimary"
                 app:layout_constraintBottom_toBottomOf="@+id/button_rename"

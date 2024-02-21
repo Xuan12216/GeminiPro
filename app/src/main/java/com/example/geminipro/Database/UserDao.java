@@ -17,7 +17,7 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE title = :title LIMIT 1")
     Single<User> getUserByTitle(String title);
 
-    @Query("SELECT * FROM users ORDER BY pin DESC, id DESC")
+    @Query("SELECT * FROM users ORDER BY pin DESC, date DESC, id DESC")
     Flowable<List<User>> getAllUsersDesc();
 
     @Query("SELECT * FROM users")

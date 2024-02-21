@@ -64,6 +64,7 @@
 
     //menuMore
     <string name="menu_pin">置頂</string>
+    <string name="menu_uppin">取消置頂</string>
     <string name="menu_rename">重命名</string>
     <string name="menu_delete">刪除</string>
 
@@ -133,4 +134,9 @@
     //navigation
     <string name="navigation_history">歷史記錄</string>
     <string name="searchEditText">搜尋</string>
+    <string name="today">今日</string>
+    <string name="yesterday">昨天</string>
+
+    //copy
+    <string name="copySuccess">複製成功</string>
 </resources>

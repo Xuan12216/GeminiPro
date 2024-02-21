@@ -9,6 +9,9 @@ import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -35,6 +38,13 @@ public class UserRepository {
         return Completable.fromAction(() -> userDao.updateUser(user))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public void updateUserByPause(User user) {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(() -> {
+            userDao.updateUser(user);
+        });
     }
 
     private Completable deleteUser(User user) {

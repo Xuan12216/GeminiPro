@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="20dp"
+    android:paddingStart="15dp"
     android:paddingEnd="10dp"
     android:paddingTop="5dp"
     android:paddingBottom="5dp"
     android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/textViewDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:paddingBottom="20dp"
+        android:text="2024/02/21"
+        android:textColor="@color/gray"
+        app:layout_constraintStart_toStartOf="@+id/layout"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout"
@@ -18,33 +31,45 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textViewDate">
 
-        <ImageView
-            android:id="@+id/imageViewPin"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_marginStart="5dp"
-            android:src="@drawable/baseline_push_pin_24"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/history_title"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewHistory"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="16dp"
+            android:elevation="0dp"
+            app:cardBackgroundColor="?colorPrimary"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/history_title" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imageViewPin"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center"
+                android:src="@drawable/baseline_push_pin_24"
+                app:layout_constraintBottom_toBottomOf="@+id/history_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="?colorSecondary" />
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/history_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="10dp"
             android:layout_marginEnd="5dp"
-            android:autoHandwritingEnabled="true"
             android:maxLines="1"
             android:singleLine="true"
             android:textColor="?colorPrimary"
             android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/cardViewHistory"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageViewPin"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/cardViewHistory"
+            app:layout_constraintTop_toTopOf="@+id/cardViewHistory" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

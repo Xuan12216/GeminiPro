@@ -62,6 +62,7 @@
 
     //menuMore
     <string name="menu_pin">Pin</string>
+    <string name="menu_uppin">UnPin</string>
     <string name="menu_rename">Rename</string>
     <string name="menu_delete">Delete</string>
 
@@ -130,4 +131,9 @@
     //navigation
     <string name="navigation_history">Recent</string>
     <string name="searchEditText">Search</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+
+    //copy
+    <string name="copySuccess">Copied</string>
 </resources>

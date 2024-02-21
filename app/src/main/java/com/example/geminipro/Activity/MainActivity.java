@@ -2,6 +2,7 @@ package com.example.geminipro.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,7 +17,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,6 +36,7 @@ import com.example.geminipro.Util.ImageDialog;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
+import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.ActivityMainBinding;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
@@ -54,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private Handler handler;
     private ModelAdapter modelAdapter;
     private HistoryAdapter historyAdapter;
-    private int index = -1;
     private boolean isWait = false;
     private RecordFunc recordFunc;
     private PickImageFunc pickImageFunc;
@@ -66,13 +66,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private static List<String> userOrGemini = new ArrayList<>();
     private static HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
     private String title = "";
-    //NavigationView
     private List<User> usersList = new ArrayList<>();
-    //Database
     private boolean isClickByHistory = false;
-    private boolean isPause = false;
     private boolean isClear = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,16 +76,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         context = this;
-
         init();
         setListener();
     }
-
     //===init=====================================================
     private void init(){
         //database
         userRepository = new UserRepository(context, getLifecycle());
-        
         //==============
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
@@ -97,94 +90,67 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         //解決轉換theme時會被重置的問題
         if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
             User user = new User("", "", StringUris, userOrGemini, imageHashMap, false);
-
             modelAdapter.receiveDataAndShow(user);
-            index = StringUris.size() - 1;
-            StringUris.clear();
-            userOrGemini.clear();
-            imageHashMap.clear();
+            resetList();
         }
         else GenerativeModelManager.initializeGenerativeModel(context);
-
         //===============
         binding.recyclerViewDown.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         imageAdapter = new ImageAdapter(context, this);
         binding.recyclerViewDown.setAdapter(imageAdapter);
-
         //===============
         binding.recyclerViewFlex.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         FlexAdapter flexAdapter = new FlexAdapter(context, this);
         binding.recyclerViewFlex.setAdapter(flexAdapter);
         String[] title = getResources().getStringArray(R.array.flexboxItem);
         flexAdapter.setSettingTitle(title);
-        checkShowSuggestionsOrNot();
-
+        controlShowSuggestions(true);
         //===============
         recordFunc = new RecordFunc(this,context);
-
         //===============
         pickImageFunc = new PickImageFunc(this, context);
         pickImageUsingCamera = new PickImageUsingCamera(this,context);
-
         //===============
         binding.recyclerViewHistory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         historyAdapter = new HistoryAdapter(context, this);
         binding.recyclerViewHistory.setAdapter(historyAdapter);
     }
-
     //===listener=====================================================
     public void openNavigationDrawer(View view) {
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
         binding.drawerLayout.openDrawer(GravityCompat.START);
     }
-
     //=====
     public void AddImage(View view) {
-
         BottomSheet bottomSheet = new BottomSheet();
         bottomSheet.setCallback(new BottomSheet.BottomSheetCallback() {
             @Override
             public void onCameraClicked() {
-                pickImageUsingCamera.startPickImage(new PickImageUsingCamera.onImageResultCallback() {
-                    @Override
-                    public void onResult(Uri compressedUri) { setImageAdapter(compressedUri, false);}
-                });
+                pickImageUsingCamera.startPickImage((compressedUri) -> setImageAdapter(compressedUri, false));
             }
-
             @Override
             public void onGalleryClicked() {
-                pickImageFunc.startPickImage(new PickImageFunc.onImageResultCallback() {
-                    @Override
-                    public void onResult(Uri compressedUri) { setImageAdapter(compressedUri, false);}
-                });
+                pickImageFunc.startPickImage((compressedUri) -> setImageAdapter(compressedUri, false));
             }
         });
         bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
     }
     //=====
-
     private void setListener(){
         binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
                 boolean canScrollDown = recyclerView.canScrollVertically(1);
-
                 if (!canScrollDown) binding.fabScrollToBottom.hide();
                 else binding.fabScrollToBottom.show();
             }
         });
-
         //=====
-        binding.fabScrollToBottom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int i = modelAdapter.getItemCount() - 1;
-                if (i >= 0) binding.recyclerView.smoothScrollToPosition(i);
-            }
+        binding.fabScrollToBottom.setOnClickListener((v) -> {
+            int i = modelAdapter.getItemCount() - 1;
+            if (i >= 0) binding.recyclerView.smoothScrollToPosition(i);
         });
-
         //=====
         binding.textInputEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -192,80 +158,50 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!isWait){
-                    if (s.length() > 0) binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_send_24));
-                    else binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_keyboard_voice_24));
+                    if (s.length() > 0) binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_send_24));
+                    else binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
                 }
             }
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
         //=====
-        binding.textInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = Objects.requireNonNull(binding.textInputEditText.getText()).toString();
-                if (!isWait && !text.isEmpty()) handleEndIconClick(text);
-                else if (!isWait) gotoRecordFunc();
-            }
+        binding.textInputLayout.setEndIconOnClickListener(v -> {
+            String text = Objects.requireNonNull(binding.textInputEditText.getText()).toString();
+            if (!isWait && !text.isEmpty()) handleEndIconClick(text);
+            else if (!isWait) gotoRecordFunc();
         });
-
         //=====
-        binding.addNote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (index != -1 && !isWait ){
-                    StringUris.clear();
-                    userOrGemini.clear();
-                    imageHashMap.clear();
-                    index = - 1;
-                    checkShowSuggestionsOrNot();
-                    Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
-                    saveDataFunc(true);
-                    historyAdapter.setTargetTitle("");
-                }
-                else if (index == -1 && !isWait) {
-                    checkShowSuggestionsOrNot();
-                    Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
-                }
-                else Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
-            }
-        });
+        binding.addNote.setOnClickListener(v -> {
+            int index = modelAdapter.getItemCount();
 
+            if (index != 0 && !isWait ){
+                resetList();
+                controlShowSuggestions(true);
+                Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
+                saveDataFunc();
+                historyAdapter.setTargetTitle("");
+            }
+            else if (index == 0 && !isWait) {
+                controlShowSuggestions(true);
+                Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
+            }
+            else Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
+        });
         //=====
         binding.searchEdittext.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (usersList.size() > 0){
-                    List<User> filteredUsers = new ArrayList<>();
+                if (usersList.size() > 0) {
                     String keyword = s.toString().toLowerCase();
-
-                    for (User user : usersList){
-                        String userTitle = user.getTitle();
-                        if (userTitle.toLowerCase().contains(keyword)) filteredUsers.add(user);
-                        else {
-                            for (String uri : user.getStringUris()) {
-                                if (uri.toLowerCase().contains(keyword)) {
-                                    filteredUsers.add(user);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (null != historyAdapter) historyAdapter.setSettingTitle(filteredUsers);
+                    List<User> filteredUsers = Utils.parallelSearch(usersList, keyword);
+                    if (historyAdapter != null) historyAdapter.setSettingTitle(filteredUsers);
                 }
             }
-
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
     }
 
@@ -274,25 +210,26 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     public void onChooseHistory(User user) {
         if (isWait) {
             Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
+            historyAdapter.setTargetTitle("");
             return;
         }
 
-        saveDataFunc(true);
+        controlShowSuggestions(false);
+        saveDataFunc();
         binding.searchEdittext.setText("");
         if (null != modelAdapter){
-            index = user.getStringUris().size() - 1;
-            binding.welcomeLayout.setVisibility(View.GONE);
-            binding.recyclerViewFlex.setVisibility(View.GONE);
-            binding.drawerLayout.closeDrawers();
             binding.progressBar.setVisibility(View.VISIBLE);
+            binding.drawerLayout.closeDrawers();
 
-            binding.drawerLayout.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    modelAdapter.receiveDataAndShow(user);
-                    isClickByHistory = true;
-                    binding.progressBar.setVisibility(View.GONE);
-                }
+            if (handler != null) {
+                handler.removeCallbacksAndMessages(null);
+                handler = null;
+            }
+
+            handler = new Handler();
+            handler.postDelayed(() -> {
+                modelAdapter.receiveDataAndShow(user);
+                binding.progressBar.setVisibility(View.GONE);
             }, 1000);
         }
     }
@@ -319,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 break;
         }
     }
-
     //===prepare=====================================================
     private void handleEndIconClick(String text) {
 
@@ -328,47 +264,34 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         gotoGeminiBuilder(text, imageUris.size() > 0 && !text.isEmpty());
 
         setModelAdapter(text, "User");
+        controlShowSuggestions(false);
         setImageAdapter(null, true);
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.textInputEditText.setText("");
         binding.textInputEditText.clearFocus();
 
         isWait = true;
-        binding.textInputLayout.setEndIconDrawable(getDrawable(R.drawable.baseline_stop_circle_24));
+        binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_stop_circle_24));
     }
     //=====
     private void gotoRecordFunc() {
-        recordFunc.startRecordFunc(new RecordFunc.RecordResultCallback() {
-            @Override
-            public void onResult(String result) {
-                binding.textInputEditText.setText(result);
-            }
-        });
+        recordFunc.startRecordFunc(result -> binding.textInputEditText.setText(result));
     }
     //===build and send=====================================================
     private void gotoGeminiBuilder(String text, boolean isVision){
         GeminiContentBuilder builder = new GeminiContentBuilder(imageUris,context, getLifecycle());
-        builder.startGeminiBuilder(text, isVision, new GeminiContentBuilder.GeminiBuilderCallback() {
-            @Override
-            public void callBackResult(String result) {
-                setModelAdapter(result, "Gemini");
-            }
-        });
+        builder.startGeminiBuilder(text, isVision, result -> setModelAdapter(result, "Gemini"));
     }
     //===adapter for update data=====================================================
     public void setModelAdapter(String resultText, String who){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                modelAdapter.addData(resultText,imageUris, who, ++index);
-                binding.progressBar.setVisibility(View.GONE);
-                binding.recyclerView.smoothScrollToPosition(index);
-                if ("Gemini".equals(who)){
-                    isWait = false;
-                    int size = Objects.requireNonNull(binding.textInputEditText.getText()).toString().length();
-                    binding.textInputLayout.setEndIconDrawable(size > 0 ? getDrawable(R.drawable.baseline_send_24) : getDrawable(R.drawable.baseline_keyboard_voice_24));
-                }
-                checkShowSuggestionsOrNot();
+        runOnUiThread(() -> {
+            modelAdapter.addData(resultText,imageUris, who, modelAdapter.getItemCount());
+            binding.progressBar.setVisibility(View.GONE);
+            binding.recyclerView.smoothScrollToPosition(modelAdapter.getItemCount());
+            if ("Gemini".equals(who)){
+                isWait = false;
+                int size = Objects.requireNonNull(binding.textInputEditText.getText()).toString().length();
+                binding.textInputLayout.setEndIconDrawable(size > 0 ? AppCompatResources.getDrawable(context, R.drawable.baseline_send_24) : AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
             }
         });
     }
@@ -380,12 +303,17 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         imageAdapter.setNewImage(imageUris, true);
     }
     //===method=============================================================
-    private void checkShowSuggestionsOrNot() {
-        boolean showSuggestions = (index == -1);
-        binding.recyclerViewFlex.setVisibility(showSuggestions ? View.VISIBLE : View.GONE);
-        binding.welcomeLayout.setVisibility(showSuggestions ? View.VISIBLE : View.GONE);
+    private void resetList(){
+        StringUris.clear();
+        userOrGemini.clear();
+        imageHashMap.clear();
+    }
+    //=====
+    private void controlShowSuggestions(boolean isShow) {
+        binding.recyclerViewFlex.setVisibility((isShow) ? View.VISIBLE : View.GONE);
+        binding.welcomeLayout.setVisibility((isShow) ? View.VISIBLE : View.GONE);
 
-        if (showSuggestions) {
+        if ((isShow)) {
             binding.recyclerViewFlex.smoothScrollToPosition(0);
             binding.welcomeText.setText("");
 
@@ -412,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             handler.postDelayed(runnable, 300);
         }
     }
-
     //=====
     private void getAndSetProfilePicture() {
         SharedPreferences preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
@@ -427,62 +354,48 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         TextView textView = headerView.findViewById(R.id.navUserName);
         ImageView image_more = headerView.findViewById(R.id.imageView_more);
 
-        image_more.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(context, v, Gravity.END, 0, R.style.MyPopupMenuStyle);
-                popupMenu.setForceShowIcon(true);
-                popupMenu.inflate(R.menu.menu_item);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.Info) {
-                            startActivity(new Intent(MainActivity.this, InfoActivity.class));
-                            return true;
-                        }
-                        else if (item.getItemId() == R.id.settings){
-                            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-                popupMenu.show();
-            }
+        image_more.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(context, v, Gravity.END, 0, R.style.MyPopupMenuStyle);
+            popupMenu.setForceShowIcon(true);
+            popupMenu.inflate(R.menu.menu_item);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.Info) {
+                    startActivity(new Intent(MainActivity.this, InfoActivity.class));
+                    return true;
+                }
+                else if (item.getItemId() == R.id.settings){
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                    return true;
+                }
+                return false;
+            });
+            popupMenu.show();
         });
 
         if (!storedImagePath.isEmpty()) {
             Glide.with(context).load(storedImagePath).into(imageView);
             List<Uri> list = new ArrayList<>();
             list.add(Uri.parse(storedImagePath));
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-                    ImageDialog imageDialog = new ImageDialog(context, list, 0);
-                    imageDialog.show();
-                }
+            imageView.setOnClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                ImageDialog imageDialog = new ImageDialog(context, list, 0);
+                imageDialog.show();
             });
 
         }
         if (!userName.isEmpty()) textView.setText(userName);
 
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-                Intent intent = new Intent(MainActivity.this, SettingMainActivity.class);
-                intent.putExtra("id", "0");
-                startActivity(intent);
-            }
+        textView.setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            Intent intent = new Intent(MainActivity.this, SettingMainActivity.class);
+            intent.putExtra("id", "0");
+            startActivity(intent);
         });
     }
     //=====
-
-    private void saveDataFunc(boolean clear) {
-        System.out.println("TestXuan: saveDataFunc");
+    private void saveDataFunc() {
         // Save adapter data
-        isClear = clear;
+        isClear = true;
         User saveData = modelAdapter.saveData();
         StringUris = new ArrayList<>(saveData.getStringUris());
         userOrGemini = new ArrayList<>(saveData.getUserOrGemini());
@@ -490,41 +403,36 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         title = saveData.getTitle();
 
         if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
-
             if (title.isEmpty()) title = StringUris.get(0);
-            System.out.println("TestXuan: title: "+title+": "+StringUris.size());
+            else isClickByHistory = true;
+
+            System.out.println("TestXuan: title: "+title+": "+isClickByHistory);
 
             // 在異步線程中從數據庫中查詢用戶信息
             userRepository.getUserByTitle(title)
                     .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
                     .subscribe(this::matchTitle);
-
         }
-        else clearDataIfNecessary(clear);
+        else clearDataIfNecessary(true);
     }
-
+    //=====
     private void matchTitle(User data, Throwable object1) {
         Date date = new Date();
-        String today = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date);
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(date);
         User user = new User(title, today, StringUris, userOrGemini, imageHashMap, false);
         title = "";
-        System.out.println("TestXuan: matchTitle");
 
-        if (data == null) {
-            // 如果用戶不存在，則插入新用戶信息
-            saveDatabase("insert", user, "Insert Complete");
-        }
+        if (data == null) saveDatabase("insert", user, "Insert Complete");// 如果用戶不存在，則插入新用戶信息
         else {
-            if (isClickByHistory) {
-                // 如果是來自歷史點擊，則更新用戶信息
+            if (isClickByHistory) { // 如果是來自歷史點擊，則更新用戶信息
+                isClickByHistory = false;
                 user.setId(data.getId()); // 設置現有用戶的 ID
                 user.setPin(data.isPin());
                 user.setTitle(data.getTitle());
                 user.setDate(today);
                 saveDatabase("update", user, "saveUpdate1");
-
-            } else {
-                // 如果是在輸入框輸入的，如果有重複的title則合併新數據到現有的數據
+            }
+            else {// 如果是在輸入框輸入的，如果有重複的title則合併新數據到現有的數據
                 data.getStringUris().addAll(user.getStringUris());
                 data.getUserOrGemini().addAll(user.getUserOrGemini());
                 data.getImageHashMap().putAll(user.getImageHashMap());
@@ -533,20 +441,15 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             }
         }
     }
-
-    // 在UI線程中處理下一步操作
+    //=====
     private void handleNextStep(boolean clear) {
-        if (!isPause) isClickByHistory = false;
-        else isPause = false;
         getSaveData();
         clearDataIfNecessary(clear);
     }
     //=====
     private void clearDataIfNecessary(boolean clear) {
         if (clear){
-            StringUris.clear();
-            userOrGemini.clear();
-            imageHashMap.clear();
+            resetList();
             User user = new User("", "", StringUris, userOrGemini, imageHashMap, false);
             modelAdapter.receiveDataAndShow(user);
         }
@@ -556,31 +459,20 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         userRepository.getAllUsersDesc()
                 .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
                 .subscribe(userList -> {
-                    System.out.println("TestXuan: getSaveData");
                     usersList = userList;
                     historyAdapter.setSettingTitle(userList);
                 }, Throwable::printStackTrace);
     }
-
     //=====
     private void saveDatabase(String type, User user, String printText){
-        userRepository.saveDatabase(type, user, printText, new UserRepository.onDoneCallback() {
-            @Override
-            public void onDone() {
-                handleNextStep(isClear);
-            }
-        });
+        userRepository.saveDatabase(type, user, printText, () -> handleNextStep(isClear));
     }
     //===build and send=====================================================
     @Override
-    public void onImageListUpdated(List<Uri> updatedImageUris) {
-        this.imageUris = updatedImageUris;
-    }
+    public void onImageListUpdated(List<Uri> updatedImageUris) { this.imageUris = updatedImageUris; }
     //=====
     @Override
-    public void onChooseFlex(String text) {
-        if (!text.isEmpty()) binding.textInputEditText.setText(text);
-    }
+    public void onChooseFlex(String text) { if (!text.isEmpty()) binding.textInputEditText.setText(text); }
     //=====
     @Override
     protected void onResume() {
@@ -589,17 +481,11 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         GenerativeModelManager.checkApiKey(this);
         //===============
         getAndSetProfilePicture();
-
         getSaveData();
     }
     //=====
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (!isWait) saveDataFunc(false);
-        isPause = true;
-    }
+    protected void onPause() { super.onPause(); }
     //=====
     @Override
     protected void onDestroy(){

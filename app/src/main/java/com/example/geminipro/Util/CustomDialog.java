@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -30,84 +31,133 @@ import java.util.Objects;
 public class CustomDialog extends Dialog {
     private final Context context;
     private List<User> title = new ArrayList<>();
-    private onEditSuccess callback;
-    private CardView cardView;
+    private final onEditSuccess callback;
     private boolean isForDelete = false;
 
+    //=====
+
+    private CardView cardView;
+    private TextView buttonAccept, buttonCancel, textTitle;
+    private TextInputEditText editText;
+    private TextInputLayout renameEdittextLayout;
+    private View rootView;
+
     public CustomDialog(@NonNull Context context, List<User> title, boolean isForDelete,onEditSuccess callback) {
-        super(context, android.R.style.Theme_NoTitleBar);
+        super(context, android.R.style.Animation_Dialog);
         this.context = context;
         this.title = title;
         this.callback = callback;
         this.isForDelete = isForDelete;
-        Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
     }
 
     //====================================================
     @Override
     protected void onCreate(Bundle savedInstanceState){
         setContentView(R.layout.rename_dialog);
+        Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
 
-        Button buttonAccept = findViewById(R.id.button_rename);
-        Button buttonCancel = findViewById(R.id.button_cancel);
-        TextInputEditText editText = findViewById(R.id.renameEdittext);
-        TextInputLayout renameEdittextLayout = findViewById(R.id.renameEdittextLayout);
-        TextView textView = findViewById(R.id.textTitle);
+        buttonAccept = findViewById(R.id.button_rename);
+        buttonCancel = findViewById(R.id.button_cancel);
+        editText = findViewById(R.id.renameEdittext);
+        renameEdittextLayout = findViewById(R.id.renameEdittextLayout);
+        textTitle = findViewById(R.id.textTitle);
         cardView = findViewById(R.id.renameCardView);
+        rootView = getWindow().getDecorView().getRootView();
 
+        init();
+        setListener();
+        openDialogAnim();
+    }
+
+    private void init(){
         if (isForDelete) {
             ViewGroup.LayoutParams layoutParams = renameEdittextLayout.getLayoutParams();
             layoutParams.height = Utils.convertDpToPixel(1, context);
             renameEdittextLayout.setLayoutParams(layoutParams);
 
             buttonAccept.setText(R.string.delete_accept);
-            textView.setText(R.string.delete_title);
+            textTitle.setText(R.string.delete_title);
         }
+    }
 
-        buttonAccept.setOnClickListener(new View.OnClickListener() {
+    private void setListener() {
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onClick(View v) {
-                if (isForDelete){
-                    Toast.makeText(context, R.string.rename_successful,Toast.LENGTH_SHORT).show();
-                    if (null != callback) callback.onSuccess("true");
-                    dismiss();
-                }
-                else {
-                    String rename = Objects.requireNonNull(editText.getText()).toString();
-                    boolean isSuccess = true;
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                rootView.getWindowVisibleDisplayFrame(r);
+                int screenHeight = rootView.getHeight();
 
-                    if (!rename.isEmpty()){
-                        for (User user : title){
-                            if (user.getTitle().equals(rename)){
-                                Toast.makeText(context, R.string.rename_repeat,Toast.LENGTH_SHORT).show();
-                                isSuccess = false;
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        isSuccess = false;
-                        Toast.makeText(context, R.string.rename_error,Toast.LENGTH_SHORT).show();
-                    }
+                // Calculate the height difference between the screen height and the visible display frame
+                int heightDifference = screenHeight - (r.bottom - r.top);
 
-                    if (isSuccess){
-                        Toast.makeText(context, R.string.rename_successful,Toast.LENGTH_SHORT).show();
-                        if (null != callback) callback.onSuccess(rename);
-                        dismiss();
-                    }
+                // If the height difference is more than 200 pixels, it's probably a keyboard
+                if (heightDifference > 200) {
+                    // Keyboard is showing, adjust the position of cardView
+                    moveCardViewUp();
+                } else {
+                    // Keyboard is hidden, reset the position of cardView
+                    resetCardViewPosition();
                 }
             }
         });
 
-        buttonCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        buttonAccept.setOnClickListener(v -> {
+            if (isForDelete){
+                Toast.makeText(context, R.string.rename_successful,Toast.LENGTH_SHORT).show();
+                if (null != callback) callback.onSuccess("true");
                 dismiss();
             }
+            else {
+                String rename = Objects.requireNonNull(editText.getText()).toString();
+                boolean isSuccess = true;
+
+                if (!rename.isEmpty()){
+                    for (User user : title){
+                        if (user.getTitle().equals(rename)){
+                            Toast.makeText(context, R.string.rename_repeat,Toast.LENGTH_SHORT).show();
+                            isSuccess = false;
+                            break;
+                        }
+                    }
+                }
+                else {
+                    isSuccess = false;
+                    Toast.makeText(context, R.string.rename_error,Toast.LENGTH_SHORT).show();
+                }
+
+                if (isSuccess){
+                    Toast.makeText(context, R.string.rename_successful,Toast.LENGTH_SHORT).show();
+                    if (null != callback) callback.onSuccess(rename);
+                    dismiss();
+                }
+            }
         });
 
-        openDialogAnim();
+        buttonCancel.setOnClickListener((view) -> dismiss());
     }
+
+    private void moveCardViewUp() {
+        // Calculate how much you want to move the cardView up
+        float translationY = -150f; // Adjust this value according to your requirement
+
+        // Animate the translation of cardView
+        cardView.animate()
+                .translationY(translationY)
+                .setDuration(200)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
+    }
+
+    private void resetCardViewPosition() {
+        // Reset the position of cardView
+        cardView.animate()
+                .translationY(0)
+                .setDuration(200)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
+    }
+
 
     private void openDialogAnim() {
         cardView.setScaleX(0.8f);
