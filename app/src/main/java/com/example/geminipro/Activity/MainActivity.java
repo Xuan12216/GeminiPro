@@ -3,7 +3,6 @@ package com.example.geminipro.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,7 +14,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,6 +31,7 @@ import com.example.geminipro.Model.GenerativeModelManager;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.Util.ImageDialog;
+import com.example.geminipro.Util.MyPopupMenu;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
@@ -46,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener, FlexAdapter.FlexAdapterListener, HistoryAdapter.HistoryAdapterListener {
@@ -55,20 +55,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private Handler handler;
     private ModelAdapter modelAdapter;
     private HistoryAdapter historyAdapter;
-    private boolean isWait = false;
+    private FlexAdapter flexAdapter;
+    private ImageAdapter imageAdapter;
+    private boolean isWait = false, isClickByHistory = false, isClear = false;
     private RecordFunc recordFunc;
     private PickImageFunc pickImageFunc;
     private PickImageUsingCamera pickImageUsingCamera;
-    private ImageAdapter imageAdapter;
     public UserRepository userRepository;
-    //AdapterModel
-    private static List<String> StringUris = new ArrayList<>();
-    private static List<String> userOrGemini = new ArrayList<>();
-    private static HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
-    private String title = "";
+    private User forDefault;
+    private static User forChangeTheme;
     private List<User> usersList = new ArrayList<>();
-    private boolean isClickByHistory = false;
-    private boolean isClear = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //===init=====================================================
     private void init(){
+        controlShowSuggestions(true);
         //database
         userRepository = new UserRepository(context, getLifecycle());
         //==============
@@ -88,9 +85,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         modelAdapter = new ModelAdapter(context);
         binding.recyclerView.setAdapter(modelAdapter);
         //解決轉換theme時會被重置的問題
-        if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
-            User user = new User("", "", StringUris, userOrGemini, imageHashMap, false);
-            modelAdapter.receiveDataAndShow(user);
+        if (null != forChangeTheme){
+            controlShowSuggestions(false);
+            modelAdapter.receiveDataAndShow(forChangeTheme);
             resetList();
         }
         else GenerativeModelManager.initializeGenerativeModel(context);
@@ -100,11 +97,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.recyclerViewDown.setAdapter(imageAdapter);
         //===============
         binding.recyclerViewFlex.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        FlexAdapter flexAdapter = new FlexAdapter(context, this);
+        flexAdapter = new FlexAdapter(context, this);
         binding.recyclerViewFlex.setAdapter(flexAdapter);
         String[] title = getResources().getStringArray(R.array.flexboxItem);
         flexAdapter.setSettingTitle(title);
-        controlShowSuggestions(true);
         //===============
         recordFunc = new RecordFunc(this,context);
         //===============
@@ -117,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //===listener=====================================================
     public void openNavigationDrawer(View view) {
+        historyAdapter.setSettingTitle(usersList);
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
         binding.drawerLayout.openDrawer(GravityCompat.START);
     }
@@ -174,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         //=====
         binding.addNote.setOnClickListener(v -> {
             int index = modelAdapter.getItemCount();
+            flexAdapter.refreshTitle();
 
             if (index != 0 && !isWait ){
                 resetList();
@@ -195,8 +193,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (usersList.size() > 0) {
-                    String keyword = s.toString().toLowerCase();
-                    List<User> filteredUsers = Utils.parallelSearch(usersList, keyword);
+                    List<User> filteredUsers = Utils.parallelSearch(usersList, s.toString().toLowerCase());
                     if (historyAdapter != null) historyAdapter.setSettingTitle(filteredUsers);
                 }
             }
@@ -304,9 +301,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //===method=============================================================
     private void resetList(){
-        StringUris.clear();
-        userOrGemini.clear();
-        imageHashMap.clear();
+        forChangeTheme = null;
     }
     //=====
     private void controlShowSuggestions(boolean isShow) {
@@ -355,21 +350,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         ImageView image_more = headerView.findViewById(R.id.imageView_more);
 
         image_more.setOnClickListener(v -> {
-            PopupMenu popupMenu = new PopupMenu(context, v, Gravity.END, 0, R.style.MyPopupMenuStyle);
-            popupMenu.setForceShowIcon(true);
-            popupMenu.inflate(R.menu.menu_item);
-            popupMenu.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.Info) {
-                    startActivity(new Intent(MainActivity.this, InfoActivity.class));
-                    return true;
-                }
-                else if (item.getItemId() == R.id.settings){
-                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                    return true;
-                }
-                return false;
-            });
-            popupMenu.show();
+            MyPopupMenu popupMenu = new MyPopupMenu(context, R.menu.menu_item, v);
+            popupMenu.startPopUp();
         });
 
         if (!storedImagePath.isEmpty()) {
@@ -396,20 +378,14 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void saveDataFunc() {
         // Save adapter data
         isClear = true;
-        User saveData = modelAdapter.saveData();
-        StringUris = new ArrayList<>(saveData.getStringUris());
-        userOrGemini = new ArrayList<>(saveData.getUserOrGemini());
-        imageHashMap = new HashMap<>(saveData.getImageHashMap());
-        title = saveData.getTitle();
+        forDefault = modelAdapter.saveData();
 
-        if (!StringUris.isEmpty() && !userOrGemini.isEmpty()){
-            if (title.isEmpty()) title = StringUris.get(0);
+        if (!forDefault.getStringUris().isEmpty() && !forDefault.getUserOrGemini().isEmpty()){
+            if (forDefault.getTitle().isEmpty()) forDefault.setTitle(forDefault.getStringUris().get(0));
             else isClickByHistory = true;
 
-            System.out.println("TestXuan: title: "+title+": "+isClickByHistory);
-
             // 在異步線程中從數據庫中查詢用戶信息
-            userRepository.getUserByTitle(title)
+            userRepository.getUserByTitle(forDefault.getTitle())
                     .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
                     .subscribe(this::matchTitle);
         }
@@ -419,8 +395,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void matchTitle(User data, Throwable object1) {
         Date date = new Date();
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(date);
-        User user = new User(title, today, StringUris, userOrGemini, imageHashMap, false);
-        title = "";
+        User user = new User(forDefault.getTitle(), today, forDefault.getStringUris(), forDefault.getUserOrGemini(), forDefault.getImageHashMap(), false);
 
         if (data == null) saveDatabase("insert", user, "Insert Complete");// 如果用戶不存在，則插入新用戶信息
         else {
@@ -433,9 +408,15 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 saveDatabase("update", user, "saveUpdate1");
             }
             else {// 如果是在輸入框輸入的，如果有重複的title則合併新數據到現有的數據
+                HashMap<Integer, List<Uri>> tempMap = new HashMap<>();
+                int newSize = data.getStringUris().size();
+                for (Map.Entry<Integer, List<Uri>> entry : user.getImageHashMap().entrySet()){
+                    tempMap.put(newSize + entry.getKey(), entry.getValue());
+                }
+
                 data.getStringUris().addAll(user.getStringUris());
                 data.getUserOrGemini().addAll(user.getUserOrGemini());
-                data.getImageHashMap().putAll(user.getImageHashMap());
+                data.getImageHashMap().putAll(tempMap);
                 data.setDate(today);
                 saveDatabase("update", data, "saveUpdate2");
             }
@@ -450,18 +431,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void clearDataIfNecessary(boolean clear) {
         if (clear){
             resetList();
-            User user = new User("", "", StringUris, userOrGemini, imageHashMap, false);
+            User user = new User("", "", new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false);
             modelAdapter.receiveDataAndShow(user);
         }
     }
     //=====
     private void getSaveData() {
-        userRepository.getAllUsersDesc()
-                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
-                .subscribe(userList -> {
-                    usersList = userList;
-                    historyAdapter.setSettingTitle(userList);
-                }, Throwable::printStackTrace);
+        userRepository.getSaveData(userList -> {
+            usersList = userList;
+            historyAdapter.setSettingTitle(userList);
+        });
     }
     //=====
     private void saveDatabase(String type, User user, String printText){
@@ -485,7 +464,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //=====
     @Override
-    protected void onPause() { super.onPause(); }
+    protected void onPause() {
+        super.onPause();
+        modelAdapter.ttsShutdown();
+    }
     //=====
     @Override
     protected void onDestroy(){
@@ -495,5 +477,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             handler.removeCallbacksAndMessages(null);
             handler = null;
         }
+        if (null == forChangeTheme) forChangeTheme = modelAdapter.saveData();
     }
 }

@@ -139,4 +139,8 @@
 
     //copy
     <string name="copySuccess">複製成功</string>
+
+    //tts
+    <string name="ttsSuccess">開始播放</string>
+    <string name="ttsError">播放失敗</string>
 </resources>

@@ -1,27 +1,16 @@
 package com.example.geminipro.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.geminipro.Activity.InfoActivity;
-import com.example.geminipro.Activity.MainActivity;
-import com.example.geminipro.Activity.SettingsActivity;
 import com.example.geminipro.Database.User;
 import com.example.geminipro.R;
-import com.example.geminipro.Util.CustomDialog;
+import com.example.geminipro.Util.MyPopupMenu;
 import com.example.geminipro.databinding.RecyclerHistoryItemBinding;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,15 +43,29 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             if (user != null) {
                 String date = user.getDate();
                 String formattedDate = formatDate(date);
+                boolean isPin = user.isPin();
 
-                if (position > 0 && title.get(position - 1).getDate().equals(date)) {
+                holder.binding.divider.setVisibility(View.GONE);
+
+                if (position > 0 && title.get(position - 1).isPin() == isPin ) {
                     holder.binding.textViewDate.setVisibility(View.GONE);
-                } else {
+                }
+                else {
+                    holder.binding.textViewDate.setVisibility(View.VISIBLE);
+                    holder.binding.textViewDate.setText(context.getString(R.string.menu_pin));
+                }
+
+                if (position > 0 && title.get(position - 1).getDate().equals(date) && !title.get(position - 1).isPin()) {
+                    holder.binding.textViewDate.setVisibility(View.GONE);
+                }
+                else if (!isPin){
+                    holder.binding.divider.setVisibility(View.VISIBLE);
                     holder.binding.textViewDate.setVisibility(View.VISIBLE);
                     holder.binding.textViewDate.setText(formattedDate);
                 }
+
                 holder.binding.historyTitle.setText(user.getTitle());
-                holder.binding.imageViewPin.setImageResource(user.isPin() ? R.drawable.baseline_push_pin_24 : R.drawable.baseline_chat_bubble_24);
+                holder.binding.imageViewPin.setImageResource(isPin ? R.drawable.baseline_push_pin_24 : R.drawable.baseline_chat_bubble_24);
 
                 holder.itemView.setOnClickListener(onClickListener);
                 holder.itemView.setOnLongClickListener(onClickListenerMore);
@@ -114,6 +117,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         notifyDataSetChanged();
     }
 
+    public List<User> getSettingTitle() {
+        return title;
+    }
+
     public void setTargetTitle(String title){
         targetTitle = title;
         notifyDataSetChanged();
@@ -144,52 +151,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             HistoryViewHolder holder = (HistoryViewHolder) v.getTag();
             int position = holder.getAdapterPosition();
             User user = title.get(position);
-            boolean isPinned = false;
-            if (null != user) isPinned = user.isPin();
 
-            PopupMenu popupMenu = new PopupMenu(context, v, Gravity.END, 0, R.style.MyPopupMenuStyle);
-            popupMenu.setForceShowIcon(true);
-            popupMenu.inflate(R.menu.menu_more_item);
-
-            MenuItem pinMenuItem = popupMenu.getMenu().findItem(R.id.pin);
-            pinMenuItem.setTitle(isPinned ? R.string.menu_uppin : R.string.menu_pin);
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    if (item.getItemId() == R.id.pin) {
-                        if (null != user && null != listener) {
-                            user.setPin(!user.isPin());
-                            listener.onChooseHistoryStatus(user, "pin");
-                        }
-                        return true;
-                    }
-                    else if (item.getItemId() == R.id.rename){
-                        CustomDialog dialog = new CustomDialog(context, title, false, new CustomDialog.onEditSuccess() {
-                            @Override
-                            public void onSuccess(String rename) {
-                                if (null != user && null != listener) {
-                                    user.setTitle(rename);
-                                    listener.onChooseHistoryStatus(user, "rename");
-                                }
-                            }
-                        });
-                        dialog.show();
-                        return true;
-                    }
-                    else if (item.getItemId() == R.id.delete){
-                        CustomDialog dialog = new CustomDialog(context, title, true,new CustomDialog.onEditSuccess() {
-                            @Override
-                            public void onSuccess(String status) {
-                                if (null != user && null != listener && status.equals("true")) listener.onChooseHistoryStatus(user, "delete");
-                            }
-                        });
-                        dialog.show();
-                        return  true;
-                    }
-                    return false;
-                }
-            });
-            popupMenu.show();
+            MyPopupMenu popupMenu = new MyPopupMenu(context, R.menu.menu_more_item, v, title, listener, user);
+            popupMenu.startPopUp();
             return false;
         }
     };

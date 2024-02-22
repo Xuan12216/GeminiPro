@@ -59,7 +59,7 @@ public class UserRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<List<User>> getAllUsersDesc() {
+    private Flowable<List<User>> getAllUsersDesc() {
         return userDao.getAllUsersDesc()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread());
@@ -93,7 +93,25 @@ public class UserRepository {
                 break;
         }
     }
+
+    public void getSaveData(onDoneGetDataCallback callback) {
+        getAllUsersDesc()
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
+                .subscribe(userList -> {
+                    System.out.println("TestXuan: getSaveData");
+                    callback.onDone(userList);
+                }, Throwable::printStackTrace);
+    }
+
     public interface onDoneCallback {
         void onDone();
+    }
+
+    public interface onDoneGetDataCallback {
+        void onDone(List<User> userList);
+    }
+
+    public interface onDoneGetTitleCallback{
+        void onDone(User user);
     }
 }

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHolder> implements ImageAdapter.ImageAdapterListener {
 
@@ -52,6 +54,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     public void onBindViewHolder(@NonNull ModelViewHolder holder, int position) {
 
         holder.binding.recyclerViewModel.setAdapter(null);
+        holder.binding.imageViewSound.setImageResource(R.drawable.baseline_volume_up_24);
 
         if (imageHashMap.containsKey(position)){
             holder.binding.recyclerViewModel.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
@@ -76,7 +79,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.cardCopy.setTag(position);
 
         holder.binding.cardSound.setOnClickListener(soundListener);
-        holder.binding.cardSound.setTag(position);
+        holder.binding.cardSound.setTag(holder);
 
         Glide.with(context)
                 .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("User").equals(who)) ?
@@ -114,26 +117,63 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     };
 
     private final View.OnClickListener soundListener = v -> {
-        int position = (int) v.getTag();
-        String text = StringUris.get(position);
+        ModelViewHolder holder = (ModelViewHolder) v.getTag();
+        String text = StringUris.get(holder.getAdapterPosition());
 
-        if (null != textToSpeech) textToSpeech.shutdown();
-        textToSpeech = new TextToSpeech(context, status -> {
-            if (status == TextToSpeech.SUCCESS){
-                int chineseCount = countChineseCharacters(text);
-                int englishCount = text.length() - chineseCount;
+        // 如果当前有正在播放的 TTS，则停止播放
+        if (null != textToSpeech && textToSpeech.isSpeaking()) {
+            textToSpeech.stop();
+            holder.binding.imageViewSound.setImageResource(R.drawable.baseline_volume_up_24);
+            return;
+        }
 
-                // 判断主要语言类型
-                boolean isChinesePrimary = chineseCount > englishCount;
-
-                int result = isChinesePrimary ? textToSpeech.setLanguage(Locale.TRADITIONAL_CHINESE) : textToSpeech.setLanguage(Locale.US);
-                if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE){
-                    System.out.println("TestXuan: ttsNotSupport");
-                }
-                else textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, null);
-            }
-        });
+        // 否则开始播放新的 TTS
+        if (!TextUtils.isEmpty(text)) {
+            textToSpeech = new TextToSpeech(context, status -> {
+                if (status == TextToSpeech.SUCCESS) initTTS(text, holder);
+                else Toast.makeText(context, R.string.ttsError, Toast.LENGTH_SHORT).show();
+            });
+        }
     };
+
+    private void initTTS(String text, ModelViewHolder holder) {
+        int chineseCount = countChineseCharacters(text);
+        int englishCount = text.length() - chineseCount;
+        // 判断主要语言类型
+        boolean isChinesePrimary = chineseCount > englishCount;
+
+        int result = isChinesePrimary ? textToSpeech.setLanguage(Locale.TRADITIONAL_CHINESE) : textToSpeech.setLanguage(Locale.US);
+        if (result != TextToSpeech.LANG_COUNTRY_AVAILABLE && result != TextToSpeech.LANG_AVAILABLE) {
+            Toast.makeText(context, R.string.ttsError, Toast.LENGTH_SHORT).show();
+        }
+        else {
+            holder.binding.imageViewSound.setImageResource(R.drawable.baseline_stop_24);
+            textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+                    Toast.makeText(context, R.string.ttsSuccess, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    // 在朗读完成时切换图标
+                    holder.binding.imageViewSound.setImageResource(R.drawable.baseline_volume_up_24);
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+                    Toast.makeText(context, R.string.ttsError, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            String utteranceId = UUID.randomUUID().toString();
+            textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId);
+        }
+    }
+
+    public void ttsShutdown(){
+        if (null != textToSpeech) textToSpeech.stop();
+    }
 
     private int countChineseCharacters(String text) {
         int count = 0;
@@ -189,6 +229,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         this.StringUris.clear();
         this.userOrGemini.clear();
         this.imageHashMap.clear();
+        if (null != textToSpeech) textToSpeech.stop();
     }
 
     @Override
