@@ -56,6 +56,11 @@ public class FlexAdapter extends RecyclerView.Adapter<FlexAdapter.FlexViewHolder
         notifyDataSetChanged();
     }
 
+    public void refreshTitle() {
+        this.settingTitle = getRandomTitles(settingTitle, 4);
+        notifyDataSetChanged();
+    }
+
     private String[] getRandomTitles(String[] allTitles, int count) {
         if (allTitles == null || allTitles.length == 0 || count <= 0) {
             return new String[0];

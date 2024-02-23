@@ -136,4 +136,8 @@
 
     //copy
     <string name="copySuccess">Copied</string>
+
+    //tts
+    <string name="ttsSuccess">start play</string>
+    <string name="ttsError">tts error</string>
 </resources>
