@@ -6,6 +6,8 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -193,8 +195,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (usersList.size() > 0) {
-                    List<User> filteredUsers = Utils.parallelSearch(usersList, s.toString().toLowerCase());
-                    if (historyAdapter != null) historyAdapter.setSettingTitle(filteredUsers);
+                    Utils.parallelSearch(context, usersList, s.toString().toLowerCase(), filteredUsers -> {
+                        if (historyAdapter != null) historyAdapter.setSettingTitle(filteredUsers);
+                    });
                 }
             }
             @Override
