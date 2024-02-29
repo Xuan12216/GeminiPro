@@ -141,4 +141,7 @@
     //tts
     <string name="ttsSuccess">開始播放</string>
     <string name="ttsError">播放失敗</string>
+
+    //google search
+    <string name="google_search">即將打開瀏覽器</string>
 </resources>

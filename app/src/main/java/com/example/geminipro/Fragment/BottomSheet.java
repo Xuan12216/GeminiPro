@@ -17,24 +17,14 @@ public class BottomSheet extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = PickImageBottomSheetBinding.inflate(inflater, container, false);
 
-        binding.btnOpenCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (callback != null) {
-                    callback.onCameraClicked();
-                }
-                dismiss();
-            }
+        binding.btnOpenCamera.setOnClickListener((v) -> {
+            if (callback != null) callback.onCameraClicked();
+            dismiss();
         });
 
-        binding.btnOpenGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (callback != null) {
-                    callback.onGalleryClicked();
-                }
-                dismiss();
-            }
+        binding.btnOpenGallery.setOnClickListener((v) -> {
+            if (callback != null) callback.onGalleryClicked();
+            dismiss();
         });
 
         return binding.getRoot();

@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.geminipro.Activity.SettingMainActivity;
 import com.example.geminipro.Util.GetResourceData;
-import com.example.geminipro.databinding.RecyclerItemBinding;
+import com.example.geminipro.Util.Utils;
+import com.example.geminipro.databinding.RecyclerHistoryItemBinding;
 import com.example.geminipro.enums.ResType;
 
 public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.SettingViewHolder> {
@@ -27,7 +27,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.Settin
     @NonNull
     @Override
     public SettingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        RecyclerItemBinding binding = RecyclerItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        RecyclerHistoryItemBinding binding = RecyclerHistoryItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new SettingViewHolder(binding);
     }
 
@@ -38,16 +38,25 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.Settin
             return;
         }
 
-        holder.binding.avatarCardView.setVisibility(View.GONE);
+        // 获取 CardView 的布局参数
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.binding.cardViewHistory.getLayoutParams();
+
+        // 设置边距
+        layoutParams.leftMargin = Utils.convertDpToPixel(0, context);
+        layoutParams.topMargin = Utils.convertDpToPixel(8, context);
+        layoutParams.bottomMargin = Utils.convertDpToPixel(8, context);
+
+        // 应用新的布局参数
+        holder.binding.cardViewHistory.setLayoutParams(layoutParams);
+
+
+        holder.binding.textViewDate.setVisibility(View.GONE);
+        holder.binding.divider.setVisibility(View.GONE);
         String text = settingTitle[position];
         String textIcon = settingIcon[position];
 
-        holder.binding.messageTextView.setText(text);
-        holder.binding.messageTextView.setTextIsSelectable(false);
-        holder.binding.usernameTextView.setText("");
-        holder.binding.imageNext.setVisibility(View.VISIBLE);
-        holder.binding.imageViewSetting.setVisibility(View.VISIBLE);
-        holder.binding.imageViewSetting.setImageResource(resourceData.getResource(textIcon, ResType.drawable));
+        holder.binding.historyTitle.setText(text);
+        holder.binding.imageViewPin.setImageResource(resourceData.getResource(textIcon, ResType.drawable));
 
         holder.itemView.setOnClickListener(onClickListener);
         holder.itemView.setTag(String.valueOf(holder.getAdapterPosition()));
@@ -79,8 +88,8 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.Settin
 
 
     public static class SettingViewHolder extends RecyclerView.ViewHolder {
-        public final RecyclerItemBinding binding;
-        public SettingViewHolder(@NonNull RecyclerItemBinding binding) {
+        public final RecyclerHistoryItemBinding binding;
+        public SettingViewHolder(@NonNull RecyclerHistoryItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

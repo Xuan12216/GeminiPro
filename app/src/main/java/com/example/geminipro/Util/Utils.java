@@ -2,11 +2,22 @@ package com.example.geminipro.Util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.view.HapticFeedbackConstants;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.lifecycle.LifecycleOwner;
 
+import com.bumptech.glide.Glide;
+import com.example.geminipro.Activity.MainActivity;
+import com.example.geminipro.Activity.SettingMainActivity;
 import com.example.geminipro.Database.User;
+import com.example.geminipro.R;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
@@ -66,4 +77,6 @@ public class Utils {
     public interface onFilterDoneCallback{
         void onDone(List<User> filteredList);
     }
+
+    //====================================================
 }

@@ -47,7 +47,7 @@ public class GenerativeModelManager {
         setSafetySetting();
         // 初始化 Generative Model
         String api = pres.getString("api_key", "");
-        GenerativeModel gm1 = new GenerativeModel("gemini-pro", api, generationConfig, safetyList);
+        GenerativeModel gm1 = new GenerativeModel("gemini-1.0-pro-latest", api, generationConfig, safetyList);
         GenerativeModel gm2 = new GenerativeModel("gemini-pro-vision", api, generationConfig, safetyList);
 
         // 使用 GenerativeModelFutures 创建 GenerativeModelFutures 实例

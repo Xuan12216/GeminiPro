@@ -6,8 +6,6 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -157,7 +155,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!isWait){
-                    if (s.length() > 0) binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_send_24));
+                    String text = s.toString().trim();
+                    if (text.length() > 0) binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_send_24));
                     else binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
                 }
             }
@@ -166,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         });
         //=====
         binding.textInputLayout.setEndIconOnClickListener(v -> {
-            String text = Objects.requireNonNull(binding.textInputEditText.getText()).toString();
+            String text = Objects.requireNonNull(binding.textInputEditText.getText()).toString().trim();
             if (!isWait && !text.isEmpty()) handleEndIconClick(text);
             else if (!isWait) gotoRecordFunc();
         });
@@ -290,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             binding.recyclerView.smoothScrollToPosition(modelAdapter.getItemCount());
             if ("Gemini".equals(who)){
                 isWait = false;
-                int size = Objects.requireNonNull(binding.textInputEditText.getText()).toString().length();
+                int size = Objects.requireNonNull(binding.textInputEditText.getText()).toString().trim().length();
                 binding.textInputLayout.setEndIconDrawable(size > 0 ? AppCompatResources.getDrawable(context, R.drawable.baseline_send_24) : AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
             }
         });

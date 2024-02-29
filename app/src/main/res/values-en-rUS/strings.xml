@@ -140,4 +140,7 @@
     //tts
     <string name="ttsSuccess">start play</string>
     <string name="ttsError">tts error</string>
+
+    //google search
+    <string name="google_search">Opening Browser</string>
 </resources>

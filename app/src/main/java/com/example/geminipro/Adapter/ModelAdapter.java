@@ -37,6 +37,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     private String geminiName, userName, storedImagePath, title = "", date = "";
     private boolean isPin = false;
     private TextToSpeech textToSpeech;
+    private ModelViewHolder soundHolderTemp;
 
     public ModelAdapter(Context context) {
         this.context = context;
@@ -71,6 +72,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.cardShare.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
         holder.binding.cardCopy.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
         holder.binding.cardSound.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.cardGoogle.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
 
         holder.binding.cardShare.setOnClickListener(shareListener);
         holder.binding.cardShare.setTag(position);
@@ -80,6 +82,9 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
 
         holder.binding.cardSound.setOnClickListener(soundListener);
         holder.binding.cardSound.setTag(holder);
+
+        holder.binding.cardGoogle.setOnClickListener(gotoGoogleListener);
+        holder.binding.cardGoogle.setTag(position);
 
         Glide.with(context)
                 .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("User").equals(who)) ?
@@ -94,6 +99,29 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     public int getItemCount() {
         return StringUris.size();
     }
+
+    private final View.OnClickListener gotoGoogleListener = v -> {
+        int position = (int) v.getTag();
+        if (position - 1 >= 0 && position - 1 < StringUris.size()) {
+            String query = StringUris.get(position - 1);
+            searchOnGoogle(query);
+        }
+    };
+
+    private void searchOnGoogle(String query) {
+        try {
+            // 构建搜索的 URL
+            String searchUrl = "https://www.google.com/search?q=" + Uri.encode(query);
+
+            // 创建一个 Intent，指定 ACTION_VIEW 操作并传递搜索的 URL
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(searchUrl));
+
+            Toast.makeText(context, R.string.google_search, Toast.LENGTH_SHORT).show();
+            context.startActivity(intent);
+        }
+        catch (Exception e) {throw new RuntimeException(e);}
+    };
 
     private final View.OnClickListener shareListener = v -> {
         int position = (int) v.getTag();
@@ -137,6 +165,8 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     };
 
     private void initTTS(String text, ModelViewHolder holder) {
+        this.soundHolderTemp = holder;
+        text = filterPunctuation(text);
         int chineseCount = countChineseCharacters(text);
         int englishCount = text.length() - chineseCount;
         // 判断主要语言类型
@@ -163,6 +193,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
                 @Override
                 public void onError(String utteranceId) {
                     Toast.makeText(context, R.string.ttsError, Toast.LENGTH_SHORT).show();
+                    holder.binding.imageViewSound.setImageResource(R.drawable.baseline_volume_up_24);
                 }
             });
 
@@ -171,8 +202,16 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         }
     }
 
+    private String filterPunctuation(String text) {
+        // 使用正则表达式去除标点符号
+        return text.replaceAll("[\\p{P}]", " ");
+    }
+
     public void ttsShutdown(){
-        if (null != textToSpeech) textToSpeech.stop();
+        if (null != textToSpeech) {
+            textToSpeech.stop();
+            if (null != soundHolderTemp) soundHolderTemp.binding.imageViewSound.setImageResource(R.drawable.baseline_volume_up_24);
+        }
     }
 
     private int countChineseCharacters(String text) {

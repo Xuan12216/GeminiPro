@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -87,18 +88,11 @@ public class CustomDialog extends Dialog {
                 Rect r = new Rect();
                 rootView.getWindowVisibleDisplayFrame(r);
                 int screenHeight = rootView.getHeight();
+                int keyboardHeight = screenHeight - r.bottom;
 
-                // Calculate the height difference between the screen height and the visible display frame
-                int heightDifference = screenHeight - (r.bottom - r.top);
-
-                // If the height difference is more than 200 pixels, it's probably a keyboard
-                if (heightDifference > 200) {
-                    // Keyboard is showing, adjust the position of cardView
-                    moveCardViewUp();
-                } else {
-                    // Keyboard is hidden, reset the position of cardView
-                    resetCardViewPosition();
-                }
+                boolean isKeyboardOpen = keyboardHeight > screenHeight / 4;
+                if (isKeyboardOpen) moveCardViewUp(keyboardHeight);
+                else resetCardViewPosition();
             }
         });
 
@@ -137,23 +131,32 @@ public class CustomDialog extends Dialog {
         buttonCancel.setOnClickListener((view) -> dismiss());
     }
 
-    private void moveCardViewUp() {
-        // Calculate how much you want to move the cardView up
-        float translationY = -150f; // Adjust this value according to your requirement
+    private void moveCardViewUp(int keyboardHeight) {
+        // 获取屏幕高度
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        Objects.requireNonNull(getWindow()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenHeight = displayMetrics.heightPixels;
+
+        // 计算卡片视图的初始位置（屏幕中心）
+        float cardViewInitialY = (float) (screenHeight - cardView.getHeight()) / 2;
+
+        // 计算需要移动的距离
+        float translationY = cardViewInitialY - keyboardHeight;
 
         // Animate the translation of cardView
         cardView.animate()
                 .translationY(translationY)
-                .setDuration(200)
+                .setDuration(250)
                 .setInterpolator(new DecelerateInterpolator())
                 .start();
     }
+
 
     private void resetCardViewPosition() {
         // Reset the position of cardView
         cardView.animate()
                 .translationY(0)
-                .setDuration(200)
+                .setDuration(250)
                 .setInterpolator(new DecelerateInterpolator())
                 .start();
     }
@@ -165,12 +168,12 @@ public class CustomDialog extends Dialog {
 
         // 创建并启动 X 轴缩放动画
         ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(cardView, "scaleX", 1f);
-        scaleXAnimator.setDuration(200); // 设置动画持续时间为 200 毫秒
+        scaleXAnimator.setDuration(250); // 设置动画持续时间为 250 毫秒
         scaleXAnimator.start();
 
         // 创建并启动 Y 轴缩放动画
         ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(cardView, "scaleY", 1f);
-        scaleYAnimator.setDuration(200); // 设置动画持续时间为 200 毫秒
+        scaleYAnimator.setDuration(250); // 设置动画持续时间为 250 毫秒
         scaleYAnimator.start();
     }
 
@@ -183,7 +186,7 @@ public class CustomDialog extends Dialog {
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(scaleXAnimator, scaleYAnimator, alphaAnimator);
-        animatorSet.setDuration(200);
+        animatorSet.setDuration(250);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
