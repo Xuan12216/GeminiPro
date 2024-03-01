@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private ActivityMainBinding binding;
     private List<Uri> imageUris = new ArrayList<>();
     private Context context;
-    private Handler handler;
     private ModelAdapter modelAdapter;
     private HistoryAdapter historyAdapter;
     private FlexAdapter flexAdapter;
@@ -114,8 +112,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //===listener=====================================================
     public void openNavigationDrawer(View view) {
         historyAdapter.setSettingTitle(usersList);
+        binding.searchEdittext.setText("");
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-        binding.drawerLayout.openDrawer(GravityCompat.START);
+        view.postDelayed(() -> binding.drawerLayout.openDrawer(GravityCompat.START), 300);
     }
     //=====
     public void AddImage(View view) {
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!isWait){
                     String text = s.toString().trim();
-                    if (text.length() > 0) binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_send_24));
+                    if (!text.isEmpty()) binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_send_24));
                     else binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
                 }
             }
@@ -173,13 +172,14 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.addNote.setOnClickListener(v -> {
             int index = modelAdapter.getItemCount();
             flexAdapter.refreshTitle();
+            binding.textviewTitle.setText("");
+            historyAdapter.setTargetTitle("");
 
             if (index != 0 && !isWait ){
                 resetList();
                 controlShowSuggestions(true);
                 Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
                 saveDataFunc();
-                historyAdapter.setTargetTitle("");
             }
             else if (index == 0 && !isWait) {
                 controlShowSuggestions(true);
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (usersList.size() > 0) {
+                if (!usersList.isEmpty()) {
                     Utils.parallelSearch(context, usersList, s.toString().toLowerCase(), filteredUsers -> {
                         if (historyAdapter != null) historyAdapter.setSettingTitle(filteredUsers);
                     });
@@ -217,22 +217,17 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         saveDataFunc();
         binding.searchEdittext.setText("");
         if (null != modelAdapter){
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
             binding.progressBar.setVisibility(View.VISIBLE);
-            binding.drawerLayout.closeDrawers();
+            String text = user.getTitle();
+            setTitleView(text);
 
-            if (handler != null) {
-                handler.removeCallbacksAndMessages(null);
-                handler = null;
-            }
-
-            handler = new Handler();
-            handler.postDelayed(() -> {
+            binding.progressBar.postDelayed(() -> {
                 modelAdapter.receiveDataAndShow(user);
                 binding.progressBar.setVisibility(View.GONE);
-            }, 1000);
+            },1000);
         }
     }
-
     //=====
     @Override
     public void onChooseHistoryStatus(User user, String status) {
@@ -258,9 +253,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //===prepare=====================================================
     private void handleEndIconClick(String text) {
 
-        if (imageUris.size() == 0 && text.isEmpty()) return;
+        if (imageUris.isEmpty() && text.isEmpty()) return;
 
-        gotoGeminiBuilder(text, imageUris.size() > 0 && !text.isEmpty());
+        gotoGeminiBuilder(text, !imageUris.isEmpty() && !text.isEmpty());
 
         setModelAdapter(text, "User");
         controlShowSuggestions(false);
@@ -292,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 int size = Objects.requireNonNull(binding.textInputEditText.getText()).toString().trim().length();
                 binding.textInputLayout.setEndIconDrawable(size > 0 ? AppCompatResources.getDrawable(context, R.drawable.baseline_send_24) : AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
             }
+            if (modelAdapter.getItemCount() == 1) setTitleView(resultText);
         });
     }
     //=====
@@ -302,6 +298,21 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         imageAdapter.setNewImage(imageUris, true);
     }
     //===method=============================================================
+    private void setTitleView(String text) {
+        binding.textviewTitle.setText("");
+        final int[] currentIndex = {0};
+        binding.textviewTitle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (currentIndex[0] < text.length()) {
+                    binding.textviewTitle.append(String.valueOf(text.charAt(currentIndex[0])));
+                    currentIndex[0]++;
+                    binding.textviewTitle.postDelayed(this, 50);
+                }
+            }
+        }, 300);
+    }
+
     private void resetList(){
         forChangeTheme = null;
     }
@@ -317,24 +328,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             String text = getResources().getString(R.string.welcome_text);
             final int[] currentIndex = {0};
 
-            if (handler != null) {
-                handler.removeCallbacksAndMessages(null);
-                handler = null;
-            }
-
-            handler = new Handler();
-            Runnable runnable = new Runnable() {
+            binding.welcomeText.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     if (currentIndex[0] < text.length()) {
                         binding.welcomeText.append(String.valueOf(text.charAt(currentIndex[0])));
                         currentIndex[0]++;
-                        handler.postDelayed(this, 50);
+                        binding.welcomeText.postDelayed(this, 50);
                     }
                 }
-            };
-
-            handler.postDelayed(runnable, 300);
+            }, 300);
         }
     }
     //=====
@@ -475,10 +478,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     protected void onDestroy(){
         super.onDestroy();
 
-        if (null != handler) {
-            handler.removeCallbacksAndMessages(null);
-            handler = null;
-        }
         if (null == forChangeTheme) forChangeTheme = modelAdapter.saveData();
     }
 }

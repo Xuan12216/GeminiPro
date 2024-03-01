@@ -10,6 +10,7 @@ import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,9 @@ import com.bumptech.glide.Glide;
 import com.example.geminipro.Database.User;
 import com.example.geminipro.R;
 import com.example.geminipro.databinding.RecyclerItemBinding;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -104,14 +108,25 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         int position = (int) v.getTag();
         if (position - 1 >= 0 && position - 1 < StringUris.size()) {
             String query = StringUris.get(position - 1);
-            searchOnGoogle(query);
+            List<Uri> list = new ArrayList<>();
+
+            if (imageHashMap.containsKey(position - 1)){
+                list = imageHashMap.get(position - 1);
+            }
+            searchOnGoogle(query, list);
         }
     };
 
-    private void searchOnGoogle(String query) {
+    private void searchOnGoogle(String query, List<Uri> imageUris) {
         try {
-            // 构建搜索的 URL
+            // 构建搜索的 URL，包括查询参数
             String searchUrl = "https://www.google.com/search?q=" + Uri.encode(query);
+
+            // 如果有图片URI，将图像URI作为搜索的一部分
+            if (imageUris != null && !imageUris.isEmpty()) {
+                String imageUrl = imageUris.get(0).getPath();
+                //searchUrl = "https://www.google.com/searchbyimage?image_url=" + imageUrl + "&q=" + Uri.encode(query);
+            }
 
             // 创建一个 Intent，指定 ACTION_VIEW 操作并传递搜索的 URL
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -120,8 +135,8 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
             Toast.makeText(context, R.string.google_search, Toast.LENGTH_SHORT).show();
             context.startActivity(intent);
         }
-        catch (Exception e) {throw new RuntimeException(e);}
-    };
+        catch (Exception e) {e.printStackTrace();}
+    }
 
     private final View.OnClickListener shareListener = v -> {
         int position = (int) v.getTag();
