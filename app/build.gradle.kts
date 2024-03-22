@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId = "com.example.geminipro"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -86,5 +86,4 @@ dependencies {
 
     //Gson
     implementation ("com.google.code.gson:gson:2.10.1")
-
 }
