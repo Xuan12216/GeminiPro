@@ -10,8 +10,6 @@ import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.text.TextUtils;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.geminipro.Database.User;
 import com.example.geminipro.R;
+import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.databinding.RecyclerItemBinding;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,12 +68,12 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         String who = userOrGemini.get(position);
         String text = StringUris.get(position);
         holder.binding.messageTextView.setText(text);
-        holder.binding.avatarCardView.setCardBackgroundColor(("User").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
-        holder.binding.usernameTextView.setText(("User").equals(who) ? userName : geminiName);
-        holder.binding.cardShare.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
-        holder.binding.cardCopy.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
-        holder.binding.cardSound.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
-        holder.binding.cardGoogle.setVisibility(("User").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.avatarCardView.setCardBackgroundColor(("user").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
+        holder.binding.usernameTextView.setText(("user").equals(who) ? userName : geminiName);
+        holder.binding.cardShare.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.cardCopy.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.cardSound.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.cardGoogle.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
 
         holder.binding.cardShare.setOnClickListener(shareListener);
         holder.binding.cardShare.setTag(position);
@@ -91,11 +88,11 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.cardGoogle.setTag(position);
 
         Glide.with(context)
-                .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("User").equals(who)) ?
+                .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("user").equals(who)) ?
                         R.drawable.sparkle_resting :
                         storedImagePath.isEmpty() ?
-                                (("User").equals(who) ? R.drawable.baseline_person_24 : R.mipmap.logo_single_color) :
-                                (("User").equals(who) ? storedImagePath : R.mipmap.logo_single_color))
+                                (("user").equals(who) ? R.drawable.baseline_person_24 :  R.drawable.sparkle_resting) :
+                                (("user").equals(who) ? storedImagePath :  R.drawable.sparkle_resting))
                 .into(holder.binding.avatarImageView);
     }
 
@@ -246,7 +243,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         StringUris.add(resultText);
         userOrGemini.add(who);
         List<Uri> newImageUris = new ArrayList<>(imageUris);
-        if (newImageUris.size() > 0 && !"Gemini".equals(who)) imageHashMap.put(index,newImageUris);
+        if (newImageUris.size() > 0 && !"model".equals(who)) imageHashMap.put(index,newImageUris);
         notifyDataSetChanged();
     }
 
@@ -256,6 +253,10 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
 
     public void receiveDataAndShow(User user){
         resetData();
+        if (user.getImageHashMap().isEmpty() && !user.getStringUris().isEmpty() && !user.getUserOrGemini().isEmpty()){
+            GeminiContentBuilder.resetChatNormal();
+            GeminiContentBuilder.setHistoryNormalList(user.getUserOrGemini(), user.getStringUris());
+        }
         this.StringUris = new ArrayList<>(user.getStringUris());
         this.userOrGemini = new ArrayList<>(user.getUserOrGemini());
         this.imageHashMap = new HashMap<>(user.getImageHashMap());

@@ -40,10 +40,20 @@ public class UserRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void updateUserByPause(User user) {
+    public void updateOrInsertUserByPause(String type, User user, String text) {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(()-> {
+            if (type.equals("update")) userDao.updateUser(user);
+            else if (type.equals("insert")) userDao.insertUser(user);
+        });
+        System.out.println("TestXuan: "+text);
+    }
+
+    public void getUserByTitle_onPause(String title, onDoneGetTitleCallback callback){
         ExecutorService service = Executors.newSingleThreadExecutor();
         service.execute(() -> {
-            userDao.updateUser(user);
+            User user = userDao.getUserByTitle_onPause(title);
+            if (null != callback) callback.onDone(user);
         });
     }
 

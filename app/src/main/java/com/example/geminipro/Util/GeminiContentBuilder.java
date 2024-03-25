@@ -17,7 +17,7 @@ import java.util.List;
 
 public class GeminiContentBuilder {
     private static ChatFutures chatNormal;
-    private List<Content> historyNormal = new ArrayList<>();
+    private static List<Content> historyNormal = new ArrayList<>();
     private List<Uri> imageUris = new ArrayList<>();
     private Context context;
     private Lifecycle lifecycle;
@@ -49,7 +49,9 @@ public class GeminiContentBuilder {
                 catch (IOException e) {e.printStackTrace();throw new RuntimeException(e);}
             }
         }
-        else if (null == chatNormal) chatNormal = model.startChat(historyNormal);
+        else if (null == chatNormal) {
+            chatNormal = model.startChat(historyNormal);
+        }
 
         Content contentUser = builder.build();
 
@@ -64,6 +66,30 @@ public class GeminiContentBuilder {
 
     public static void resetChatNormal() {
         GeminiContentBuilder.chatNormal = null;
+    }
+
+    public static void setHistoryNormalList(List<String> roleList, List<String> contentList){
+        if (roleList.isEmpty() && contentList.isEmpty()) {
+            historyNormal = Arrays.asList(GenerativeModelManager.getUserContent(),GenerativeModelManager.getModelContent());
+            return;
+        }
+        historyNormal = new ArrayList<>();
+        String lastRole = "";
+
+        for (int i = 0; i < roleList.size(); i++){
+            String role = roleList.get(i);
+            String content = contentList.get(i);
+
+            if (!role.isEmpty() && !content.isEmpty() && !lastRole.equals(role)){
+                Content contentTemp;
+                Content.Builder userContentBuilder = new Content.Builder();
+                userContentBuilder.setRole(role);
+                lastRole = role;
+                userContentBuilder.addText(content);
+                contentTemp = userContentBuilder.build();
+                historyNormal.add(contentTemp);
+            }
+        }
     }
 
     public interface GeminiBuilderCallback{

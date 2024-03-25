@@ -168,6 +168,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
     public interface HistoryAdapterListener {
         void onChooseHistory(User user);
-        void onChooseHistoryStatus(User user, String status);
+        void onChooseHistoryStatus(User user, String status, String oriName);
     }
 }

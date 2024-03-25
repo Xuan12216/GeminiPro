@@ -2,7 +2,6 @@ package com.example.geminipro.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import com.example.geminipro.Adapter.SettingsAdapter;
@@ -12,14 +11,11 @@ import com.example.geminipro.databinding.ActivitySettingsBinding;
 public class SettingsActivity extends AppCompatActivity {
     private ActivitySettingsBinding binding;
     private SettingsAdapter adapter;
-    private Context context;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        context = this;
 
         init();
         setListener();

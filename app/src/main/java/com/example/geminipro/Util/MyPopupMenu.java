@@ -41,14 +41,19 @@ public class MyPopupMenu {
     }
 
     public void startPopUp(){
+        String oriName = "";
         PopupMenu popupMenu = new PopupMenu(context, v, Gravity.END, 0, R.style.MyPopupMenuStyle);
         popupMenu.setForceShowIcon(true);
         popupMenu.inflate(menuRes);
 
         if (null != user){
+            oriName = user.getTitle();
             MenuItem pinMenuItem = popupMenu.getMenu().findItem(R.id.pin);
             pinMenuItem.setTitle(user.isPin() ? R.string.menu_uppin : R.string.menu_pin);
         }
+        else return;
+
+        String finalOriName = oriName;
         popupMenu.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.Info) {
                 context.startActivity(new Intent(context, InfoActivity.class));
@@ -61,7 +66,7 @@ public class MyPopupMenu {
             else if (item.getItemId() == R.id.pin) {
                 if (null != user && null != listener) {
                     user.setPin(!user.isPin());
-                    listener.onChooseHistoryStatus(user, "pin");
+                    listener.onChooseHistoryStatus(user, "pin", "");
                 }
                 return true;
             }
@@ -71,7 +76,7 @@ public class MyPopupMenu {
                     public void onSuccess(String rename) {
                         if (null != user && null != listener) {
                             user.setTitle(rename);
-                            listener.onChooseHistoryStatus(user, "rename");
+                            listener.onChooseHistoryStatus(user, "rename", finalOriName);
                         }
                     }
                 });
@@ -82,7 +87,7 @@ public class MyPopupMenu {
                 CustomDialog dialog = new CustomDialog(context, title, true,new CustomDialog.onEditSuccess() {
                     @Override
                     public void onSuccess(String status) {
-                        if (null != user && null != listener && status.equals("true")) listener.onChooseHistoryStatus(user, "delete");
+                        if (null != user && null != listener && status.equals("true")) listener.onChooseHistoryStatus(user, "delete", "");
                     }
                 });
                 dialog.show();

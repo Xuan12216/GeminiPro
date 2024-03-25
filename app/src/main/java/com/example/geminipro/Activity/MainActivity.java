@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
@@ -64,6 +65,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private static User forChangeTheme;
     private List<User> usersList = new ArrayList<>();
 
+    //for title show
+    private Handler handler1;
+    private boolean isPause = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +89,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.recyclerView.setAdapter(modelAdapter);
         //解決轉換theme時會被重置的問題
         if (null != forChangeTheme){
-            controlShowSuggestions(false);
+            boolean isEmpty = forChangeTheme.getStringUris().isEmpty();
+            controlShowSuggestions(isEmpty);
+            if (!isEmpty) setTitleView(forChangeTheme.getTitle());
             modelAdapter.receiveDataAndShow(forChangeTheme);
             resetList();
         }
@@ -172,14 +179,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.addNote.setOnClickListener(v -> {
             int index = modelAdapter.getItemCount();
             flexAdapter.refreshTitle();
-            binding.textviewTitle.setText("");
             historyAdapter.setTargetTitle("");
 
             if (index != 0 && !isWait ){
                 resetList();
                 controlShowSuggestions(true);
                 Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
-                saveDataFunc();
+                saveDataFunc(false);
             }
             else if (index == 0 && !isWait) {
                 controlShowSuggestions(true);
@@ -214,13 +220,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         }
 
         controlShowSuggestions(false);
-        saveDataFunc();
+        saveDataFunc(false);
+
         binding.searchEdittext.setText("");
         if (null != modelAdapter){
             binding.drawerLayout.closeDrawer(GravityCompat.START);
             binding.progressBar.setVisibility(View.VISIBLE);
-            String text = user.getTitle();
-            setTitleView(text);
+            setTitleView(user.getTitle());
 
             binding.progressBar.postDelayed(() -> {
                 modelAdapter.receiveDataAndShow(user);
@@ -230,20 +236,29 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //=====
     @Override
-    public void onChooseHistoryStatus(User user, String status) {
+    public void onChooseHistoryStatus(User user, String status, String oriName) {
         isClear = false;
+        String currentTarget = "";
 
         switch (status) {
             case "pin":
                 saveDatabase("update", user, "PinUpdate");
                 break;
             case "rename":
-                isClear = true;
+                currentTarget = historyAdapter.getTargetTitle();
+                if (null != oriName && null != currentTarget && !oriName.isEmpty()
+                        && !currentTarget.isEmpty() && oriName.equals(currentTarget)){
+                    isClear = true;
+                    controlShowSuggestions(true);
+                }
                 saveDatabase("update", user, "RenameUpdate");
                 break;
             case "delete":
-                String currentTarget = historyAdapter.getTargetTitle();
-                if (user.getTitle().equals(currentTarget)) isClear = true;
+                currentTarget = historyAdapter.getTargetTitle();
+                if (user.getTitle().equals(currentTarget)) {
+                    isClear = true;
+                    controlShowSuggestions(true);
+                }
                 saveDatabase("delete", user, "DeleteData");
                 break;
             default:
@@ -257,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
         gotoGeminiBuilder(text, !imageUris.isEmpty() && !text.isEmpty());
 
-        setModelAdapter(text, "User");
+        setModelAdapter(text, "user");
         controlShowSuggestions(false);
         setImageAdapter(null, true);
         binding.progressBar.setVisibility(View.VISIBLE);
@@ -274,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //===build and send=====================================================
     private void gotoGeminiBuilder(String text, boolean isVision){
         GeminiContentBuilder builder = new GeminiContentBuilder(imageUris,context, getLifecycle());
-        builder.startGeminiBuilder(text, isVision, result -> setModelAdapter(result, "Gemini"));
+        builder.startGeminiBuilder(text, isVision, result -> setModelAdapter(result, "model"));
     }
     //===adapter for update data=====================================================
     public void setModelAdapter(String resultText, String who){
@@ -282,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             modelAdapter.addData(resultText,imageUris, who, modelAdapter.getItemCount());
             binding.progressBar.setVisibility(View.GONE);
             binding.recyclerView.smoothScrollToPosition(modelAdapter.getItemCount());
-            if ("Gemini".equals(who)){
+            if ("model".equals(who)){
                 isWait = false;
                 int size = Objects.requireNonNull(binding.textInputEditText.getText()).toString().trim().length();
                 binding.textInputLayout.setEndIconDrawable(size > 0 ? AppCompatResources.getDrawable(context, R.drawable.baseline_send_24) : AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
@@ -301,13 +316,16 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void setTitleView(String text) {
         binding.textviewTitle.setText("");
         final int[] currentIndex = {0};
-        binding.textviewTitle.postDelayed(new Runnable() {
+
+        if (null != handler1) handler1.removeCallbacksAndMessages(null);
+        handler1 = new Handler();
+        handler1.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (currentIndex[0] < text.length()) {
                     binding.textviewTitle.append(String.valueOf(text.charAt(currentIndex[0])));
                     currentIndex[0]++;
-                    binding.textviewTitle.postDelayed(this, 50);
+                    handler1.postDelayed(this, 50);
                 }
             }
         }, 300);
@@ -322,19 +340,23 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.welcomeLayout.setVisibility((isShow) ? View.VISIBLE : View.GONE);
 
         if ((isShow)) {
+            setTitleView("");
             binding.recyclerViewFlex.smoothScrollToPosition(0);
             binding.welcomeText.setText("");
 
             String text = getResources().getString(R.string.welcome_text);
             final int[] currentIndex = {0};
 
-            binding.welcomeText.postDelayed(new Runnable() {
+            if (null != handler1) handler1.removeCallbacksAndMessages(null);
+            handler1 = new Handler();
+
+            handler1.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     if (currentIndex[0] < text.length()) {
                         binding.welcomeText.append(String.valueOf(text.charAt(currentIndex[0])));
                         currentIndex[0]++;
-                        binding.welcomeText.postDelayed(this, 50);
+                        handler1.postDelayed(this, 50);
                     }
                 }
             }, 300);
@@ -380,19 +402,23 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         });
     }
     //=====
-    private void saveDataFunc() {
+    private void saveDataFunc(boolean onPause) {
         // Save adapter data
         isClear = true;
+        isPause = onPause;
         forDefault = modelAdapter.saveData();
 
         if (!forDefault.getStringUris().isEmpty() && !forDefault.getUserOrGemini().isEmpty()){
             if (forDefault.getTitle().isEmpty()) forDefault.setTitle(forDefault.getStringUris().get(0));
-            else isClickByHistory = true;
+            else isClickByHistory = true;//只有新的記錄才會沒有title
 
             // 在異步線程中從數據庫中查詢用戶信息
-            userRepository.getUserByTitle(forDefault.getTitle())
-                    .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
-                    .subscribe(this::matchTitle);
+            if (onPause) userRepository.getUserByTitle_onPause(forDefault.getTitle(), user -> matchTitle(user, null));
+            else {
+                userRepository.getUserByTitle(forDefault.getTitle())
+                        .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
+                        .subscribe(this::matchTitle);
+            }
         }
         else clearDataIfNecessary(true);
     }
@@ -410,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 user.setPin(data.isPin());
                 user.setTitle(data.getTitle());
                 user.setDate(today);
-                saveDatabase("update", user, "saveUpdate1");
+                saveDatabase("update", user, "saveUpdate for history");
             }
             else {// 如果是在輸入框輸入的，如果有重複的title則合併新數據到現有的數據
                 HashMap<Integer, List<Uri>> tempMap = new HashMap<>();
@@ -423,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 data.getUserOrGemini().addAll(user.getUserOrGemini());
                 data.getImageHashMap().putAll(tempMap);
                 data.setDate(today);
-                saveDatabase("update", data, "saveUpdate2");
+                saveDatabase("update", data, "saveUpdate for repeat title");
             }
         }
     }
@@ -449,6 +475,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //=====
     private void saveDatabase(String type, User user, String printText){
+        if (isPause) {
+            userRepository.updateOrInsertUserByPause(type, user, printText);
+            isPause = false;
+        }
         userRepository.saveDatabase(type, user, printText, () -> handleNextStep(isClear));
     }
     //===build and send=====================================================
@@ -472,6 +502,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     protected void onPause() {
         super.onPause();
         modelAdapter.ttsShutdown();
+        saveDataFunc(true);
     }
     //=====
     @Override
@@ -479,5 +510,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onDestroy();
 
         if (null == forChangeTheme) forChangeTheme = modelAdapter.saveData();
+
+        if (null != handler1) handler1.removeCallbacksAndMessages(null);
+        handler1 = null;
     }
 }
