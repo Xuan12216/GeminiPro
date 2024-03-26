@@ -50,11 +50,13 @@ public class UserRepository {
     }
 
     public void getUserByTitle_onPause(String title, onDoneGetTitleCallback callback){
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(() -> {
-            User user = userDao.getUserByTitle_onPause(title);
-            if (null != callback) callback.onDone(user);
-        });
+        synchronized (this){
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            service.execute(() -> {
+                User user = userDao.getUserByTitle_onPause(title);
+                if (null != callback) callback.onDone(user);
+            });
+        }
     }
 
     private Completable deleteUser(User user) {

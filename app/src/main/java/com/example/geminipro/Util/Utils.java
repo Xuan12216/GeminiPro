@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,6 +37,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class Utils {
+
+    public static void hideKeyboard(Activity activity){
+        if (activity == null) return;
+
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        if (view != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
     public static int convertDpToPixel(float dp, Context context){
         int px = (int) (dp * getDensity(context));

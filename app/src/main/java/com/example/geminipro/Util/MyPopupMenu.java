@@ -51,7 +51,6 @@ public class MyPopupMenu {
             MenuItem pinMenuItem = popupMenu.getMenu().findItem(R.id.pin);
             pinMenuItem.setTitle(user.isPin() ? R.string.menu_uppin : R.string.menu_pin);
         }
-        else return;
 
         String finalOriName = oriName;
         popupMenu.setOnMenuItemClickListener(item -> {

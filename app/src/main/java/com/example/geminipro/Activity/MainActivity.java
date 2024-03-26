@@ -6,6 +6,8 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         setListener();
     }
     //===init=====================================================
-    private void init(){
+    private void init() {
         controlShowSuggestions(true);
         //database
         userRepository = new UserRepository(context, getLifecycle());
@@ -150,6 +153,14 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             }
         });
         //=====
+        binding.recyclerViewHistory.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                Utils.hideKeyboard((Activity) context);
+            }
+        });
+        //=====
         binding.fabScrollToBottom.setOnClickListener((v) -> {
             int i = modelAdapter.getItemCount() - 1;
             if (i >= 0) binding.recyclerView.smoothScrollToPosition(i);
@@ -215,12 +226,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     public void onChooseHistory(User user) {
         if (isWait) {
             Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
-            historyAdapter.setTargetTitle("");
             return;
         }
 
         controlShowSuggestions(false);
         saveDataFunc(false);
+        historyAdapter.setTargetTitle(user.getTitle());
 
         binding.searchEdittext.setText("");
         if (null != modelAdapter){
@@ -477,7 +488,11 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void saveDatabase(String type, User user, String printText){
         if (isPause) {
             userRepository.updateOrInsertUserByPause(type, user, printText);
-            isPause = false;
+            runOnUiThread(() -> {
+                historyAdapter.setTargetTitle(user.getTitle());
+                isPause = false;
+                isClickByHistory = true;
+            });
         }
         userRepository.saveDatabase(type, user, printText, () -> handleNextStep(isClear));
     }

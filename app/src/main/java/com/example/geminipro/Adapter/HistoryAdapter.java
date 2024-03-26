@@ -138,7 +138,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             int position = holder.getAdapterPosition();
             User user = title.get(position);
 
-            targetTitle = holder.binding.historyTitle.getText().toString();
             if (null != user && null != listener) listener.onChooseHistory(user);
             notifyDataSetChanged();
         }
