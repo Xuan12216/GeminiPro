@@ -21,6 +21,22 @@
         <item>setting_api</item>
     </string-array>
 
+    <string-array name="moreFuncItem">
+        <item>AI translation</item>
+        <item>Analysis summary</item>
+        <item>Creation</item>
+        <item>Trip Planning</item>
+    </string-array>
+
+    <string-array name="moreFuncIcon">
+        <item>g_translate_24px</item>
+        <item>analytics_24px</item>
+        <item>draw_24px</item>
+        <item>luggage_24px</item>
+    </string-array>
+
+    <string name="moreFuncTitle">More Function</string>
+
     <string name="temperature_content">temperature: the randomness of the output content. The closer it is to 1.0, the responses will be richer, more diverse, and more creative; conversely, the closer it is to 0.0, the responses will be more certain and more likely.</string>
     <string name="topK_content">topK: The parameter changes the way the model selects output tokens. A topK of 1 means that the selected token is the most likely token among all tokens in the model vocabulary (also known as "greedy decoding"). If topK is 3, it means that the model will select the next symbol from the three most likely symbols based on the randomness parameter. In each token selection step, the model samples the topK tokens with the highest probability. Then, the system will further filter the symbols based on topP, and finally use temperature sampling to select the final symbol.</string>
     <string name="topP_content">topP: The parameter changes the way the model selects output tokens. The model will select tokens in order from most likely to least likely until the sum of the likelihoods of the selected tokens equals the topP value. For example, if the probabilities of tokens A, B, and C are 0.3, 0.2, and 0.1 respectively, and the topP value is 0.5, the model will select A or B as the next token based on the randomness parameter, and exclude C . The default value of topP is 0.95.</string>

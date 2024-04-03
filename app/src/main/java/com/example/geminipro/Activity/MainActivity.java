@@ -6,23 +6,15 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.bumptech.glide.Glide;
 import com.example.geminipro.Adapter.FlexAdapter;
 import com.example.geminipro.Adapter.HistoryAdapter;
 import com.example.geminipro.Adapter.ImageAdapter;
@@ -31,17 +23,15 @@ import com.example.geminipro.Database.User;
 import com.example.geminipro.Database.UserRepository;
 import com.example.geminipro.Fragment.BottomSheet;
 import com.example.geminipro.Model.GenerativeModelManager;
+import com.example.geminipro.Object.ControlShowSuggestions;
+import com.example.geminipro.Object.NavigationLayout;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.GeminiContentBuilder;
-import com.example.geminipro.Util.ImageDialog;
-import com.example.geminipro.Util.MyPopupMenu;
 import com.example.geminipro.Util.PickImageFunc;
 import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
 import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.ActivityMainBinding;
-import com.uber.autodispose.AutoDispose;
-import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener, FlexAdapter.FlexAdapterListener, HistoryAdapter.HistoryAdapterListener {
     private ActivityMainBinding binding;
@@ -67,10 +58,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private User forDefault;
     private static User forChangeTheme;
     private List<User> usersList = new ArrayList<>();
-
-    //for title show
-    private Handler handler1;
-    private boolean isPause = false;
+    private CompositeDisposable disposable;
+    private NavigationLayout navigationLayout;
+    private ControlShowSuggestions suggestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,18 +73,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //===init=====================================================
     private void init() {
-        controlShowSuggestions(true);
+        suggestions = new ControlShowSuggestions(binding, context);
+        //===============
+        suggestions.showSuggestions(true);
         //database
         userRepository = new UserRepository(context, getLifecycle());
         //==============
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         modelAdapter = new ModelAdapter(context);
         binding.recyclerView.setAdapter(modelAdapter);
-        //解決轉換theme時會被重置的問題
-        if (null != forChangeTheme){
+        if (null != forChangeTheme){//解決轉換theme時會被重置的問題
             boolean isEmpty = forChangeTheme.getStringUris().isEmpty();
-            controlShowSuggestions(isEmpty);
-            if (!isEmpty) setTitleView(forChangeTheme.getTitle());
+            if (null != suggestions) suggestions.showSuggestions(isEmpty);
+            if (!isEmpty && null != suggestions) suggestions.setTitleView(forChangeTheme.getTitle());
             modelAdapter.receiveDataAndShow(forChangeTheme);
             resetList();
         }
@@ -118,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         binding.recyclerViewHistory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         historyAdapter = new HistoryAdapter(context, this);
         binding.recyclerViewHistory.setAdapter(historyAdapter);
+        //===============
+        navigationLayout = new NavigationLayout(binding, context);
     }
     //===listener=====================================================
     public void openNavigationDrawer(View view) {
@@ -188,18 +181,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         });
         //=====
         binding.addNote.setOnClickListener(v -> {
+            isClear = true;
             int index = modelAdapter.getItemCount();
             flexAdapter.refreshTitle();
             historyAdapter.setTargetTitle("");
 
             if (index != 0 && !isWait ){
                 resetList();
-                controlShowSuggestions(true);
+                if (null != suggestions) suggestions.showSuggestions(true);
                 Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
                 saveDataFunc(false);
             }
             else if (index == 0 && !isWait) {
-                controlShowSuggestions(true);
+                if (null != suggestions) suggestions.showSuggestions(true);
                 Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
             }
             else Toast.makeText(context, R.string.add_notes_toast1,Toast.LENGTH_SHORT).show();
@@ -229,7 +223,8 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             return;
         }
 
-        controlShowSuggestions(false);
+        if (null != suggestions) suggestions.showSuggestions(false);
+        isClear = true;
         saveDataFunc(false);
         historyAdapter.setTargetTitle(user.getTitle());
 
@@ -237,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         if (null != modelAdapter){
             binding.drawerLayout.closeDrawer(GravityCompat.START);
             binding.progressBar.setVisibility(View.VISIBLE);
-            setTitleView(user.getTitle());
+            if (null != suggestions) suggestions.setTitleView(user.getTitle());
 
             binding.progressBar.postDelayed(() -> {
                 modelAdapter.receiveDataAndShow(user);
@@ -248,8 +243,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //=====
     @Override
     public void onChooseHistoryStatus(User user, String status, String oriName) {
-        isClear = false;
-        String currentTarget = "";
+        String currentTarget;
 
         switch (status) {
             case "pin":
@@ -260,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 if (null != oriName && null != currentTarget && !oriName.isEmpty()
                         && !currentTarget.isEmpty() && oriName.equals(currentTarget)){
                     isClear = true;
-                    controlShowSuggestions(true);
+                    if (null != suggestions) suggestions.showSuggestions(true);
                 }
                 saveDatabase("update", user, "RenameUpdate");
                 break;
@@ -268,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 currentTarget = historyAdapter.getTargetTitle();
                 if (user.getTitle().equals(currentTarget)) {
                     isClear = true;
-                    controlShowSuggestions(true);
+                    if (null != suggestions) suggestions.showSuggestions(true);
                 }
                 saveDatabase("delete", user, "DeleteData");
                 break;
@@ -282,14 +276,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         if (imageUris.isEmpty() && text.isEmpty()) return;
 
         gotoGeminiBuilder(text, !imageUris.isEmpty() && !text.isEmpty());
-
-        setModelAdapter(text, "user");
-        controlShowSuggestions(false);
+        setModelAdapter(text, "user");//把資料設定到adapter
+        if (null != suggestions) suggestions.showSuggestions(false);
         setImageAdapter(null, true);
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.textInputEditText.setText("");
         binding.textInputEditText.clearFocus();
-
         isWait = true;
         binding.textInputLayout.setEndIconDrawable(AppCompatResources.getDrawable(context, R.drawable.baseline_stop_circle_24));
     }
@@ -313,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 int size = Objects.requireNonNull(binding.textInputEditText.getText()).toString().trim().length();
                 binding.textInputLayout.setEndIconDrawable(size > 0 ? AppCompatResources.getDrawable(context, R.drawable.baseline_send_24) : AppCompatResources.getDrawable(context, R.drawable.baseline_keyboard_voice_24));
             }
-            if (modelAdapter.getItemCount() == 1) setTitleView(resultText);
+            if (modelAdapter.getItemCount() == 1 && null != suggestions) suggestions.setTitleView(resultText);
         });
     }
     //=====
@@ -324,112 +316,25 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         imageAdapter.setNewImage(imageUris, true);
     }
     //===method=============================================================
-    private void setTitleView(String text) {
-        binding.textviewTitle.setText("");
-        final int[] currentIndex = {0};
-
-        if (null != handler1) handler1.removeCallbacksAndMessages(null);
-        handler1 = new Handler();
-        handler1.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (currentIndex[0] < text.length()) {
-                    binding.textviewTitle.append(String.valueOf(text.charAt(currentIndex[0])));
-                    currentIndex[0]++;
-                    handler1.postDelayed(this, 50);
-                }
-            }
-        }, 300);
-    }
-
-    private void resetList(){
-        forChangeTheme = null;
-    }
+    private void resetList(){ forChangeTheme = null; }
     //=====
-    private void controlShowSuggestions(boolean isShow) {
-        binding.recyclerViewFlex.setVisibility((isShow) ? View.VISIBLE : View.GONE);
-        binding.welcomeLayout.setVisibility((isShow) ? View.VISIBLE : View.GONE);
-
-        if ((isShow)) {
-            setTitleView("");
-            binding.recyclerViewFlex.smoothScrollToPosition(0);
-            binding.welcomeText.setText("");
-
-            String text = getResources().getString(R.string.welcome_text);
-            final int[] currentIndex = {0};
-
-            if (null != handler1) handler1.removeCallbacksAndMessages(null);
-            handler1 = new Handler();
-
-            handler1.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (currentIndex[0] < text.length()) {
-                        binding.welcomeText.append(String.valueOf(text.charAt(currentIndex[0])));
-                        currentIndex[0]++;
-                        handler1.postDelayed(this, 50);
-                    }
-                }
-            }, 300);
-        }
-    }
-    //=====
-    private void getAndSetProfilePicture() {
-        SharedPreferences preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
-        String userName = preferences.getString("userName", "");
-        String storedImagePath = preferences.getString("userImage", "");
-
-        if (!storedImagePath.isEmpty()) Glide.with(context).load(storedImagePath).into(binding.navigationDrawerButton);
-        else Glide.with(context).load(R.drawable.baseline_person_24).into(binding.navigationDrawerButton);
-
-        View headerView = binding.navigationView.getHeaderView(0);
-        ImageView imageView = headerView.findViewById(R.id.avatarImageView);
-        TextView textView = headerView.findViewById(R.id.navUserName);
-        ImageView image_more = headerView.findViewById(R.id.imageView_more);
-
-        image_more.setOnClickListener(v -> {
-            MyPopupMenu popupMenu = new MyPopupMenu(context, R.menu.menu_item, v);
-            popupMenu.startPopUp();
-        });
-
-        if (!storedImagePath.isEmpty()) {
-            Glide.with(context).load(storedImagePath).into(imageView);
-            List<Uri> list = new ArrayList<>();
-            list.add(Uri.parse(storedImagePath));
-            imageView.setOnClickListener(v -> {
-                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-                ImageDialog imageDialog = new ImageDialog(context, list, 0);
-                imageDialog.show();
-            });
-
-        }
-        if (!userName.isEmpty()) textView.setText(userName);
-
-        textView.setOnClickListener(v -> {
-            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            Intent intent = new Intent(MainActivity.this, SettingMainActivity.class);
-            intent.putExtra("id", "0");
-            startActivity(intent);
-        });
-    }
-    //=====
-    private void saveDataFunc(boolean onPause) {
-        // Save adapter data
-        isClear = true;
-        isPause = onPause;
-        forDefault = modelAdapter.saveData();
+    @SuppressWarnings("all")
+    private void saveDataFunc(boolean isPause) {
+        forDefault = modelAdapter.saveData();// Save adapter data
 
         if (!forDefault.getStringUris().isEmpty() && !forDefault.getUserOrGemini().isEmpty()){
             if (forDefault.getTitle().isEmpty()) forDefault.setTitle(forDefault.getStringUris().get(0));
             else isClickByHistory = true;//只有新的記錄才會沒有title
 
-            // 在異步線程中從數據庫中查詢用戶信息
-            if (onPause) userRepository.getUserByTitle_onPause(forDefault.getTitle(), user -> matchTitle(user, null));
-            else {
-                userRepository.getUserByTitle(forDefault.getTitle())
-                        .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(getLifecycle())))
-                        .subscribe(this::matchTitle);
+            if (isPause) historyAdapter.setTargetTitle(forDefault.getTitle());//如果onPause時執行
+
+            if (null != disposable) {// 在異步線程中從數據庫中查詢用戶信息
+                disposable.dispose();
+                disposable = null;
             }
+            disposable = new CompositeDisposable();
+            disposable.add(userRepository.getUserByTitle(forDefault.getTitle())
+                    .subscribe(this::matchTitle));
         }
         else clearDataIfNecessary(true);
     }
@@ -475,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             resetList();
             User user = new User("", "", new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false);
             modelAdapter.receiveDataAndShow(user);
+            isClear = false;
         }
     }
     //=====
@@ -486,14 +392,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //=====
     private void saveDatabase(String type, User user, String printText){
-        if (isPause) {
-            userRepository.updateOrInsertUserByPause(type, user, printText);
-            runOnUiThread(() -> {
-                historyAdapter.setTargetTitle(user.getTitle());
-                isPause = false;
-                isClickByHistory = true;
-            });
-        }
         userRepository.saveDatabase(type, user, printText, () -> handleNextStep(isClear));
     }
     //===build and send=====================================================
@@ -506,10 +404,9 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     @Override
     protected void onResume() {
         super.onResume();
-        if (null != modelAdapter) modelAdapter.checkSharedPreferences();
-        GenerativeModelManager.checkApiKey(this);
-        //===============
-        getAndSetProfilePicture();
+        if (null != modelAdapter) modelAdapter.checkSharedPreferences();//讀取圖片和名字
+        GenerativeModelManager.checkApiKey(this);//檢查有沒有apikey
+        if (null !=navigationLayout) navigationLayout.getAndSetProfilePicture();//讀取圖片和名字
         getSaveData();
     }
     //=====
@@ -523,10 +420,12 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     @Override
     protected void onDestroy(){
         super.onDestroy();
-
         if (null == forChangeTheme) forChangeTheme = modelAdapter.saveData();
-
-        if (null != handler1) handler1.removeCallbacksAndMessages(null);
-        handler1 = null;
+        if (null != suggestions) suggestions.resetHandler();
+        if (null != disposable){
+            disposable.dispose();
+            disposable = null;
+        }
+        userRepository.disposeService();
     }
 }

@@ -18,9 +18,9 @@ import java.util.List;
 public class GeminiContentBuilder {
     private static ChatFutures chatNormal;
     private static List<Content> historyNormal = new ArrayList<>();
-    private List<Uri> imageUris = new ArrayList<>();
-    private Context context;
-    private Lifecycle lifecycle;
+    private final List<Uri> imageUris;
+    private final Context context;
+    private final Lifecycle lifecycle;
 
     public GeminiContentBuilder(List<Uri> imageUris, Context context, Lifecycle lifecycle){
         this.context = context;
@@ -46,7 +46,7 @@ public class GeminiContentBuilder {
                     inputStream.close();
                     builder.addImage(bitmap);
                 }
-                catch (IOException e) {e.printStackTrace();throw new RuntimeException(e);}
+                catch (IOException e) {throw new RuntimeException(e);}
             }
         }
         else if (null == chatNormal) {
@@ -56,20 +56,17 @@ public class GeminiContentBuilder {
         Content contentUser = builder.build();
 
         SendToServer sendToServer = isVision ? new SendToServer(model, context, lifecycle) : new SendToServer(chatNormal, context, lifecycle);
-        sendToServer.sendToServerFunc(isVision, contentUser, new SendToServer.ResultCallback() {
-            @Override
-            public void onResult(String result) {
-                callback.callBackResult(result);
-            }
-        });
+        sendToServer.sendToServerFunc(isVision, contentUser, callback::callBackResult);
     }
 
     public static void resetChatNormal() {
-        GeminiContentBuilder.chatNormal = null;
+        chatNormal = null;
     }
 
     public static void setHistoryNormalList(List<String> roleList, List<String> contentList){
-        if (roleList.isEmpty() && contentList.isEmpty()) {
+        GenerativeModelFutures model = GenerativeModelManager.getGenerativeModel();
+
+        if (roleList.isEmpty() || contentList.isEmpty()) {
             historyNormal = Arrays.asList(GenerativeModelManager.getUserContent(),GenerativeModelManager.getModelContent());
             return;
         }
@@ -90,6 +87,8 @@ public class GeminiContentBuilder {
                 historyNormal.add(contentTemp);
             }
         }
+
+        chatNormal = model.startChat(historyNormal);
     }
 
     public interface GeminiBuilderCallback{

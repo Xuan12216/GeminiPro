@@ -16,12 +16,14 @@ import com.example.geminipro.enums.ResType;
 public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.SettingViewHolder> {
     private final Context context;
     private String[] settingTitle, settingIcon;
-    private GetResourceData resourceData;
+    private final GetResourceData resourceData;
+    private boolean state = false;
 
-    public SettingsAdapter(Context context){
+    public SettingsAdapter(Context context, boolean state){
         this.context = context;
         this.settingTitle = new String[0];
         this.settingIcon = new String[0];
+        this.state = state;
         resourceData = new GetResourceData(context);
     }
     @NonNull
@@ -59,7 +61,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.Settin
         holder.binding.imageViewPin.setImageResource(resourceData.getResource(textIcon, ResType.drawable));
 
         holder.itemView.setOnClickListener(onClickListener);
-        holder.itemView.setTag(String.valueOf(holder.getAdapterPosition()));
+        int pos = holder.getAdapterPosition();
+        if (state) pos += 4;
+        holder.itemView.setTag(String.valueOf(pos));
     }
 
     private final View.OnClickListener onClickListener = new View.OnClickListener() {

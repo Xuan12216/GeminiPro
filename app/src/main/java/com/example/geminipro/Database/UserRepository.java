@@ -16,11 +16,13 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class UserRepository {
     private final UserDao userDao;
     private final Lifecycle lifecycle;
+    private CompositeDisposable disposable;
 
     public UserRepository(Context context, Lifecycle lifecycle) {
         AppDatabase appDatabase = Room.databaseBuilder(context, AppDatabase.class, "my-database").build();
@@ -38,25 +40,6 @@ public class UserRepository {
         return Completable.fromAction(() -> userDao.updateUser(user))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public void updateOrInsertUserByPause(String type, User user, String text) {
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(()-> {
-            if (type.equals("update")) userDao.updateUser(user);
-            else if (type.equals("insert")) userDao.insertUser(user);
-        });
-        System.out.println("TestXuan: "+text);
-    }
-
-    public void getUserByTitle_onPause(String title, onDoneGetTitleCallback callback){
-        synchronized (this){
-            ExecutorService service = Executors.newSingleThreadExecutor();
-            service.execute(() -> {
-                User user = userDao.getUserByTitle_onPause(title);
-                if (null != callback) callback.onDone(user);
-            });
-        }
     }
 
     private Completable deleteUser(User user) {
@@ -78,30 +61,30 @@ public class UserRepository {
     }
 
     public void saveDatabase(String type, User user, String printText, onDoneCallback callback){
+        if (null != disposable){
+            disposable.dispose();
+            disposable = null;
+        }
+        disposable = new CompositeDisposable();
+
         switch (type){
             case "insert":
-                insertUser(user)
-                        .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
-                        .subscribe(() -> {
-                            System.out.println("TestXuan: "+printText);
-                            callback.onDone();
-                        }, Throwable::printStackTrace);
+                disposable.add(insertUser(user).subscribe(() -> {
+                    System.out.println("TestXuan: "+printText);
+                    callback.onDone();
+                }, Throwable::printStackTrace));
                 break;
             case "update":
-                updateUser(user)
-                        .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
-                        .subscribe(() -> {
-                            System.out.println("TestXuan: "+printText);
-                            callback.onDone();
-                        }, Throwable::printStackTrace);
+                disposable.add(updateUser(user).subscribe(() -> {
+                    System.out.println("TestXuan: "+printText);
+                    callback.onDone();
+                }, Throwable::printStackTrace));
                 break;
             case "delete":
-                deleteUser(user)
-                        .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
-                        .subscribe(() -> {
-                            System.out.println("TestXuan: "+printText);
-                            callback.onDone();
-                        }, Throwable::printStackTrace);
+                disposable.add(deleteUser(user).subscribe(() -> {
+                    System.out.println("TestXuan: "+printText);
+                    callback.onDone();
+                }, Throwable::printStackTrace));
                 break;
         }
     }
@@ -115,15 +98,17 @@ public class UserRepository {
                 }, Throwable::printStackTrace);
     }
 
+    public void disposeService(){
+        if (null != disposable){
+            disposable.dispose();
+            disposable = null;
+        }
+    }
     public interface onDoneCallback {
         void onDone();
     }
 
     public interface onDoneGetDataCallback {
         void onDone(List<User> userList);
-    }
-
-    public interface onDoneGetTitleCallback{
-        void onDone(User user);
     }
 }

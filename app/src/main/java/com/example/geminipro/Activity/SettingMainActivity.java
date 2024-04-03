@@ -16,6 +16,8 @@ import com.example.geminipro.databinding.SettingApiKeyBinding;
 import com.example.geminipro.databinding.SettingNameBinding;
 import com.example.geminipro.databinding.SettingParameterBinding;
 
+import java.util.Objects;
+
 public class SettingMainActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private Context context;
@@ -33,10 +35,20 @@ public class SettingMainActivity extends AppCompatActivity {
         if (intent.hasExtra("id")){
             String text = intent.getStringExtra("id");
 
-            if ("0".equals(text)) initName();
-            else if ("1".equals(text)) initParameter();
-            else if ("2".equals(text)) initSafe();
-            else if ("3".equals(text)) initSetApi();
+            switch (Objects.requireNonNull(text)){
+                case "0" :
+                    initName();
+                    break;
+                case "1" :
+                    initParameter();
+                    break;
+                case "2" :
+                    initSafe();
+                    break;
+                case "3" :
+                    initSetApi();
+                    break;
+            }
         }
     }
 
