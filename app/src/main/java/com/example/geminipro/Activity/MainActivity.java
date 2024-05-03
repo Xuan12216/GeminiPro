@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
@@ -32,15 +34,12 @@ import com.example.geminipro.Util.PickImageUsingCamera;
 import com.example.geminipro.Util.RecordFunc;
 import com.example.geminipro.Util.Utils;
 import com.example.geminipro.databinding.ActivityMainBinding;
-import java.text.SimpleDateFormat;
+import com.example.geminipro.enums.DBType;
+import com.example.geminipro.enums.FuncType;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
-import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity implements ImageAdapter.ImageAdapterListener, FlexAdapter.FlexAdapterListener, HistoryAdapter.HistoryAdapterListener {
     private ActivityMainBinding binding;
@@ -54,13 +53,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private RecordFunc recordFunc;
     private PickImageFunc pickImageFunc;
     private PickImageUsingCamera pickImageUsingCamera;
-    public UserRepository userRepository;
+    private UserRepository userRepository;
     private User forDefault;
     private static User forChangeTheme;
     private List<User> usersList = new ArrayList<>();
-    private CompositeDisposable disposable;
     private NavigationLayout navigationLayout;
     private ControlShowSuggestions suggestions;
+    private final String funcType = FuncType.normal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,10 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //===init=====================================================
     private void init() {
-        suggestions = new ControlShowSuggestions(binding, context);
+        suggestions = new ControlShowSuggestions(context);
+        suggestions.setSuggestionView(binding.recyclerViewFlex, binding.welcomeLayout
+                , binding.welcomeText, context.getResources().getString(R.string.welcome_text));
+        suggestions.setTitleObject(binding.textviewTitle);
         //===============
         suggestions.showSuggestions(true);
         //database
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         pickImageUsingCamera = new PickImageUsingCamera(this,context);
         //===============
         binding.recyclerViewHistory.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        historyAdapter = new HistoryAdapter(context, this);
+        historyAdapter = new HistoryAdapter(context, funcType,this);
         binding.recyclerViewHistory.setAdapter(historyAdapter);
         //===============
         navigationLayout = new NavigationLayout(binding, context);
@@ -136,6 +138,19 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     }
     //=====
     private void setListener(){
+        binding.drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                if (Utils.isKeyboardOpen((Activity) context)) Utils.hideKeyboard((Activity) context);
+            }
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {}
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {}
+            @Override
+            public void onDrawerStateChanged(int newState) {}
+        });
+        //=====
         binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -150,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                Utils.hideKeyboard((Activity) context);
+                if (Utils.isKeyboardOpen((Activity) context)) Utils.hideKeyboard((Activity) context);
             }
         });
         //=====
@@ -205,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!usersList.isEmpty()) {
-                    Utils.parallelSearch(context, usersList, s.toString().toLowerCase(), filteredUsers -> {
+                    Utils.parallelSearch(context, usersList,false, s.toString().toLowerCase(), filteredUsers -> {
                         if (historyAdapter != null) historyAdapter.setSettingTitle(filteredUsers);
                     });
                 }
@@ -223,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             return;
         }
 
+        new Handler().postDelayed(() -> binding.drawerLayout.closeDrawer(GravityCompat.START), 200);
         if (null != suggestions) suggestions.showSuggestions(false);
         isClear = true;
         saveDataFunc(false);
@@ -230,14 +246,14 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
         binding.searchEdittext.setText("");
         if (null != modelAdapter){
-            binding.drawerLayout.closeDrawer(GravityCompat.START);
             binding.progressBar.setVisibility(View.VISIBLE);
-            if (null != suggestions) suggestions.setTitleView(user.getTitle());
 
-            binding.progressBar.postDelayed(() -> {
+            new Handler().postDelayed(() -> {
                 modelAdapter.receiveDataAndShow(user);
                 binding.progressBar.setVisibility(View.GONE);
-            },1000);
+                if (null != suggestions) suggestions.setTitleView(user.getTitle());
+            }, 1000);
+
         }
     }
     //=====
@@ -247,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
         switch (status) {
             case "pin":
-                saveDatabase("update", user, "PinUpdate");
+                saveDatabase(DBType.update, user, "PinUpdate");
                 break;
             case "rename":
                 currentTarget = historyAdapter.getTargetTitle();
@@ -256,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     isClear = true;
                     if (null != suggestions) suggestions.showSuggestions(true);
                 }
-                saveDatabase("update", user, "RenameUpdate");
+                saveDatabase(DBType.update, user, "RenameUpdate");
                 break;
             case "delete":
                 currentTarget = historyAdapter.getTargetTitle();
@@ -264,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     isClear = true;
                     if (null != suggestions) suggestions.showSuggestions(true);
                 }
-                saveDatabase("delete", user, "DeleteData");
+                saveDatabase(DBType.delete, user, "DeleteData");
                 break;
             default:
                 break;
@@ -274,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void handleEndIconClick(String text) {
 
         if (imageUris.isEmpty() && text.isEmpty()) return;
+        if (Utils.isKeyboardOpen((Activity) context)) Utils.hideKeyboard((Activity) context);
 
         gotoGeminiBuilder(text, !imageUris.isEmpty() && !text.isEmpty());
         setModelAdapter(text, "user");//把資料設定到adapter
@@ -318,7 +335,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     //===method=============================================================
     private void resetList(){ forChangeTheme = null; }
     //=====
-    @SuppressWarnings("all")
     private void saveDataFunc(boolean isPause) {
         forDefault = modelAdapter.saveData();// Save adapter data
 
@@ -326,48 +342,32 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             if (forDefault.getTitle().isEmpty()) forDefault.setTitle(forDefault.getStringUris().get(0));
             else isClickByHistory = true;//只有新的記錄才會沒有title
 
-            if (isPause) historyAdapter.setTargetTitle(forDefault.getTitle());//如果onPause時執行
-
-            if (null != disposable) {// 在異步線程中從數據庫中查詢用戶信息
-                disposable.dispose();
-                disposable = null;
+            if (isPause) {
+                historyAdapter.setTargetTitle(forDefault.getTitle());//如果onPause時執行
+                isClickByHistory = true;
             }
-            disposable = new CompositeDisposable();
-            disposable.add(userRepository.getUserByTitle(forDefault.getTitle())
-                    .subscribe(this::matchTitle));
+
+            Utils.parallelSearch(context, usersList,true, forDefault.getTitle().toLowerCase(), filteredUsers -> {
+                boolean isMatch = false;
+                for (User user : filteredUsers){
+                    String title = user.getTitle();
+                    if (!title.isEmpty() && title.equals(forDefault.getTitle())) {
+                        isMatch = true;
+                        matchTitle(user);
+                        break;
+                    }
+                }
+                if (!isMatch) matchTitle(null);
+            });
         }
         else clearDataIfNecessary(true);
     }
     //=====
-    private void matchTitle(User data, Throwable object1) {
-        Date date = new Date();
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(date);
-        User user = new User(forDefault.getTitle(), today, forDefault.getStringUris(), forDefault.getUserOrGemini(), forDefault.getImageHashMap(), false);
+    private void matchTitle(User matchData) {
+        Utils.matchTitle(matchData, forDefault, isClickByHistory, funcType, (type, printText, user)
+                -> saveDatabase(type, user, printText));
 
-        if (data == null) saveDatabase("insert", user, "Insert Complete");// 如果用戶不存在，則插入新用戶信息
-        else {
-            if (isClickByHistory) { // 如果是來自歷史點擊，則更新用戶信息
-                isClickByHistory = false;
-                user.setId(data.getId()); // 設置現有用戶的 ID
-                user.setPin(data.isPin());
-                user.setTitle(data.getTitle());
-                user.setDate(today);
-                saveDatabase("update", user, "saveUpdate for history");
-            }
-            else {// 如果是在輸入框輸入的，如果有重複的title則合併新數據到現有的數據
-                HashMap<Integer, List<Uri>> tempMap = new HashMap<>();
-                int newSize = data.getStringUris().size();
-                for (Map.Entry<Integer, List<Uri>> entry : user.getImageHashMap().entrySet()){
-                    tempMap.put(newSize + entry.getKey(), entry.getValue());
-                }
-
-                data.getStringUris().addAll(user.getStringUris());
-                data.getUserOrGemini().addAll(user.getUserOrGemini());
-                data.getImageHashMap().putAll(tempMap);
-                data.setDate(today);
-                saveDatabase("update", data, "saveUpdate for repeat title");
-            }
-        }
+        if (isClickByHistory) isClickByHistory = false;
     }
     //=====
     private void handleNextStep(boolean clear) {
@@ -378,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void clearDataIfNecessary(boolean clear) {
         if (clear){
             resetList();
-            User user = new User("", "", new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false);
+            User user = new User("", "", new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false, funcType);
             modelAdapter.receiveDataAndShow(user);
             isClear = false;
         }
@@ -422,10 +422,6 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
         super.onDestroy();
         if (null == forChangeTheme) forChangeTheme = modelAdapter.saveData();
         if (null != suggestions) suggestions.resetHandler();
-        if (null != disposable){
-            disposable.dispose();
-            disposable = null;
-        }
         userRepository.disposeService();
     }
 }

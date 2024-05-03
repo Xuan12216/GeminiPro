@@ -1,17 +1,13 @@
 package com.example.geminipro.Database;
 
 import android.content.Context;
-
 import androidx.lifecycle.Lifecycle;
 import androidx.room.Room;
 
+import com.example.geminipro.enums.DBType;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
-
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -23,9 +19,13 @@ public class UserRepository {
     private final UserDao userDao;
     private final Lifecycle lifecycle;
     private CompositeDisposable disposable;
+    private final Object lock1 = new Object();
+    private final Object lock2 = new Object();
 
     public UserRepository(Context context, Lifecycle lifecycle) {
-        AppDatabase appDatabase = Room.databaseBuilder(context, AppDatabase.class, "my-database").build();
+        //AppDatabase appDatabase = Room.databaseBuilder(context, AppDatabase.class, "my-database").addMigrations(AppDatabase.MIGRATION_2_3).build();
+        AppDatabase appDatabase = Room.databaseBuilder(context, AppDatabase.class, "my-database")
+                .build();
         userDao = appDatabase.userDao();
         this.lifecycle = lifecycle;
     }
@@ -61,41 +61,43 @@ public class UserRepository {
     }
 
     public void saveDatabase(String type, User user, String printText, onDoneCallback callback){
-        if (null != disposable){
-            disposable.dispose();
-            disposable = null;
-        }
-        disposable = new CompositeDisposable();
+        if (type == null || user == null || printText == null || callback == null) return;
+        synchronized (lock1) {
+            if (null != disposable){
+                disposable.dispose();
+            }
+            disposable = new CompositeDisposable();
 
-        switch (type){
-            case "insert":
+            if (type.equals(DBType.insert)){
                 disposable.add(insertUser(user).subscribe(() -> {
                     System.out.println("TestXuan: "+printText);
                     callback.onDone();
                 }, Throwable::printStackTrace));
-                break;
-            case "update":
+            }
+            else if (type.equals(DBType.update)){
                 disposable.add(updateUser(user).subscribe(() -> {
                     System.out.println("TestXuan: "+printText);
                     callback.onDone();
                 }, Throwable::printStackTrace));
-                break;
-            case "delete":
+            }
+            else if (type.equals(DBType.delete)){
                 disposable.add(deleteUser(user).subscribe(() -> {
                     System.out.println("TestXuan: "+printText);
                     callback.onDone();
                 }, Throwable::printStackTrace));
-                break;
+            }
         }
     }
 
     public void getSaveData(onDoneGetDataCallback callback) {
-        getAllUsersDesc()
-                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
-                .subscribe(userList -> {
-                    System.out.println("TestXuan: getSaveData");
-                    callback.onDone(userList);
-                }, Throwable::printStackTrace);
+        synchronized (lock2) {
+            getAllUsersDesc()
+                    .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
+                    .subscribe(userList -> {
+                        System.out.println("TestXuan: getSaveData");
+                        callback.onDone(userList);
+                    }, Throwable::printStackTrace);
+        }
     }
 
     public void disposeService(){

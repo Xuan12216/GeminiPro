@@ -15,6 +15,9 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+
+import java.util.concurrent.ExecutionException;
+
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -38,33 +41,31 @@ public class SendToServer {
     }
 
     public void sendToServerFunc(boolean isVision, Content contentUser, ResultCallback callback) {
+
         ListenableFuture<GenerateContentResponse> response = isVision ? modelVision.generateContent(contentUser) : chatNormal.sendMessage(contentUser);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            Single<GenerateContentResponse> single = Single.create(
-                    e -> Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
-                        @Override
-                        public void onSuccess(GenerateContentResponse result) {
-                            e.onSuccess(result);
-                            String resultText = result.getText();
-                            callback.onResult(resultText);
-                        }
+        Single<GenerateContentResponse> single = Single.create(
+                e -> Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+                    @Override
+                    public void onSuccess(GenerateContentResponse result) {
+                        e.onSuccess(result);
+                        String resultText = result.getText();
+                        callback.onResult(resultText);
+                    }
 
-                        @Override
-                        public void onFailure(@NonNull Throwable throwable) {
-                            e.onError(throwable);
-                            if (throwable.toString().contains("PromptBlockedException")) {
-                                callback.onResult(throwable.toString());
-                            }
-                            else tryToUseStreamSendToServer(contentUser, callback, isVision);
+                    @Override
+                    public void onFailure(@NonNull Throwable throwable) {
+                        e.onError(throwable);
+                        if (throwable.toString().contains("PromptBlockedException")) {
+                            callback.onResult(throwable.toString());
                         }
-                    }, context.getMainExecutor()));
+                        else tryToUseStreamSendToServer(contentUser, callback, isVision);
+                    }
+                }, context.getMainExecutor()));
 
-            single.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
-                    .subscribe(result -> {}, throwable -> {});
-        }
-        else tryToUseStreamSendToServer(contentUser, callback, isVision);
+        single.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(lifecycle)))
+                .subscribe(result -> {}, throwable -> {});
     }
 
     private void tryToUseStreamSendToServer(Content contentUser, ResultCallback callback, boolean isVision) {

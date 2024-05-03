@@ -159,4 +159,42 @@
 
     //google search
     <string name="google_search">Opening Browser</string>
+
+    //translate
+    <string-array name="languages">
+        <item>Detect language</item>
+        <item>English(US)</item>
+        <item>English(UK)</item>
+        <item>Chinese(Simplified)</item>
+        <item>Chinese(Traditional)</item>
+        <item>Turkish</item>
+        <item>Japanese</item>
+        <item>Indonesian</item>
+        <item>Spanish (Spain)</item>
+        <item>French</item>
+        <item>Polish</item>
+        <item>Arabic</item>
+        <item>Russian</item>
+        <item>Thai</item>
+        <item>Ukrainian</item>
+        <item>Dutch</item>
+        <item>Vietnamese</item>
+        <item>Italian</item>
+        <item>Portuguese</item>
+        <item>Portuguese (Brazil)</item>
+        <item>German</item>
+        <item>Korean</item>
+    </string-array>
+
+    <string name="language_cannot_change">"Detection language" cannot be changed if selected</string>
+    <string name="spinner1_title">Translate from</string>
+    <string name="spinner2_title">Translate to</string>
+    <string name="spinner_btn">Cancel</string>
+    <string name="translate_title">AI translation</string>
+
+    //welcomeText
+    <string name="translate_welcome_text">Welcome to Gemini Translation Services! How can I help you today ?</string>
+    <string name="translate_context1">Please help me translate the content,</string>
+    <string name="new_translation">New translation</string>
+    <string name="translate_history">History</string>
 </resources>

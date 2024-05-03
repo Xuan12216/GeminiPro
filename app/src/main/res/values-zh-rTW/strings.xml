@@ -134,7 +134,7 @@
     <string name="useGalleryPickImage">打开图库</string>
 
     //welcomeText
-    <string name="welcome_text">欢迎来到 Gemini！有什么问题或需求我可以帮你解决吗？</string>
+    <string name="welcome_text">歡迎來到 Gemini！ 有什麼問題或需求我可以幫你解決嗎？</string>
 
     //addNotes
     <string name="add_notes_toast">添加新聊天成功！</string>
@@ -160,4 +160,42 @@
 
     //google search
     <string name="google_search">即將打開瀏覽器</string>
+
+    //translate
+    <string-array name="languages">
+        <item>偵測語言</item>
+        <item>英文(美國)</item>
+        <item>英文(英國)</item>
+        <item>中文(簡體)</item>
+        <item>中文(繁體)</item>
+        <item>土耳其文</item>
+        <item>日文</item>
+        <item>印尼文</item>
+        <item>西班牙文(西班牙)</item>
+        <item>法文</item>
+        <item>波蘭文</item>
+        <item>阿拉伯文</item>
+        <item>俄文</item>
+        <item>泰文</item>
+        <item>烏克蘭文</item>
+        <item>荷蘭文</item>
+        <item>越南文</item>
+        <item>意大利文</item>
+        <item>葡萄牙文</item>
+        <item>葡萄牙文(巴西)</item>
+        <item>德文</item>
+        <item>韓文</item>
+    </string-array>
+
+    <string name="language_cannot_change">您選擇了"偵測語言"所以不能切換</string>
+    <string name="spinner1_title">原文語言</string>
+    <string name="spinner2_title">譯文語言</string>
+    <string name="spinner_btn">取消</string>
+    <string name="translate_title">AI翻譯</string>
+
+    //welcomeText
+    <string name="translate_welcome_text">歡迎來到 Gemini 翻譯服務！ 我們致力於為您提供高品質的翻譯服務。</string>
+    <string name="translate_context1">請幫我翻譯内容，</string>
+    <string name="new_translation">新翻譯</string>
+    <string name="translate_history">翻譯記錄</string>
 </resources>

@@ -5,118 +5,95 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/transparent">
+    android:background="@drawable/bottom_sheet_style">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="0dp"
-        app:cardBackgroundColor="@color/transparent"
-        app:cardElevation="3dp">
+        android:tint="?colorPrimary"
+        android:layout_marginBottom="10dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btnOpenCamera"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="?android:attr/selectableItemBackground">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="?colorSecondary"
-            app:cardElevation="0dp">
+            android:id="@+id/cardView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="30dp"
+            android:elevation="0dp"
+            app:cardBackgroundColor="?colorPrimary"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="5dp">
-
-                <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:tint="?colorPrimary"
-                    android:layout_marginBottom="10dp"/>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnOpenCamera"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:background="?android:attr/selectableItemBackground">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cardView"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginStart="30dp"
-                        android:elevation="0dp"
-                        app:cardBackgroundColor="?colorPrimary"
-                        app:cardCornerRadius="10dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:id="@+id/imageView"
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/baseline_camera_alt_24"
-                            app:layout_constraintBottom_toBottomOf="@+id/history_title"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:tint="?colorSecondary" />
-                    </androidx.cardview.widget.CardView>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="25dp"
-                        android:text="@string/useCameraPickImage"
-                        android:textColor="?colorPrimary"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@+id/cardView"
-                        app:layout_constraintStart_toEndOf="@+id/cardView"
-                        app:layout_constraintTop_toTopOf="@+id/cardView" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/btnOpenGallery"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="70dp"
-                    android:background="?android:attr/selectableItemBackground">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cardViewImage"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginStart="30dp"
-                        android:elevation="0dp"
-                        app:cardBackgroundColor="?colorPrimary"
-                        app:cardCornerRadius="10dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:id="@+id/imageView2"
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/baseline_image_24"
-                            app:layout_constraintBottom_toBottomOf="@+id/history_title"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:tint="?colorSecondary" />
-                    </androidx.cardview.widget.CardView>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="25dp"
-                        android:text="@string/useGalleryPickImage"
-                        android:textColor="?colorPrimary"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@+id/cardViewImage"
-                        app:layout_constraintStart_toEndOf="@+id/cardViewImage"
-                        app:layout_constraintTop_toTopOf="@+id/cardViewImage" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center"
+                android:src="@drawable/baseline_camera_alt_24"
+                app:layout_constraintBottom_toBottomOf="@+id/history_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="?colorSecondary" />
         </androidx.cardview.widget.CardView>
-    </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:text="@string/useCameraPickImage"
+            android:textColor="?colorPrimary"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/cardView"
+            app:layout_constraintStart_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toTopOf="@+id/cardView" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/btnOpenGallery"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="70dp"
+        android:background="?android:attr/selectableItemBackground">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="30dp"
+            android:elevation="0dp"
+            app:cardBackgroundColor="?colorPrimary"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center"
+                android:src="@drawable/baseline_image_24"
+                app:layout_constraintBottom_toBottomOf="@+id/history_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="?colorSecondary" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:text="@string/useGalleryPickImage"
+            android:textColor="?colorPrimary"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/cardViewImage"
+            app:layout_constraintStart_toEndOf="@+id/cardViewImage"
+            app:layout_constraintTop_toTopOf="@+id/cardViewImage" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

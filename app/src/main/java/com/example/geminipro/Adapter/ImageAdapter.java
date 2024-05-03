@@ -76,21 +76,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         holder.binding.closeImageView.setOnClickListener(onClickListener);
     }
 
-    private final View.OnClickListener onZoomListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int position = (int) v.getTag();
-            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            showImageDialog(position, imageViews);
-        }
+    private final View.OnClickListener onZoomListener = v -> {
+        int position = (int) v.getTag();
+        v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+        showImageDialog(position, imageViews);
     };
 
-    private final View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int position = (int) v.getTag();
-            removeImage(position);
-        }
+    private final View.OnClickListener onClickListener = v -> {
+        int position = (int) v.getTag();
+        removeImage(position);
     };
 
     public void removeImage(int position) {

@@ -18,7 +18,22 @@
         <item name="android:popupBackground">@drawable/custom_popup_background</item>
         <item name="android:textColor">@color/black</item>
     </style>
-    
+
+    <style name="MySpinnerStyle" >
+        <item name="android:popupBackground">@drawable/custom_popup_background_gray</item>
+        <item name="android:background">@drawable/custom_popup_background_gray</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="CustomDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:popupBackground">@drawable/custom_popup_background_gray</item>
+        <item name="android:background">@drawable/custom_popup_background_gray</item>
+    </style>
+
+    <style name="MyTextViewStyle" >
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="FlexTitle">
         <item name="android:textColor">@color/black</item>
     </style>

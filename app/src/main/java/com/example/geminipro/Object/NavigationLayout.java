@@ -1,5 +1,6 @@
 package com.example.geminipro.Object;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,11 @@ import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.activity.ComponentActivity;
+import androidx.activity.OnBackPressedCallback;
+import androidx.lifecycle.LifecycleOwner;
+
 import com.bumptech.glide.Glide;
 import com.example.geminipro.Activity.SettingMainActivity;
 import com.example.geminipro.Activity.SettingsActivity;
@@ -37,38 +43,32 @@ public class NavigationLayout {
         if (!storedImagePath.isEmpty()) Glide.with(context).load(storedImagePath).into(binding.navigationDrawerButton);
         else Glide.with(context).load(R.drawable.baseline_person_24).into(binding.navigationDrawerButton);
 
-        View headerView = binding.navigationView.getHeaderView(0);
-        ImageView imageView = headerView.findViewById(R.id.avatarImageView);
-        TextView textView = headerView.findViewById(R.id.navUserName);
-        ImageView image_more = headerView.findViewById(R.id.imageView_more);
-        ImageView image_more_func = headerView.findViewById(R.id.imageView_moreFunction);
-
-        image_more.setOnClickListener(v -> {
+        binding.imageViewMore.setOnClickListener(v -> {
             MyPopupMenu popupMenu = new MyPopupMenu(context, R.menu.menu_item, v);
             popupMenu.startPopUp();
         });
 
         if (!storedImagePath.isEmpty()) {
-            Glide.with(context).load(storedImagePath).into(imageView);
+            Glide.with(context).load(storedImagePath).into(binding.avatarImageView);
             List<Uri> list = new ArrayList<>();
             list.add(Uri.parse(storedImagePath));
-            imageView.setOnClickListener(v -> {
+            binding.avatarImageView.setOnClickListener(v -> {
                 v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
                 ImageDialog imageDialog = new ImageDialog(context, list, 0);
                 imageDialog.show();
             });
 
         }
-        if (!userName.isEmpty()) textView.setText(userName);
+        if (!userName.isEmpty()) binding.navUserName.setText(userName);
 
-        textView.setOnClickListener(v -> {
+        binding.navUserName.setOnClickListener(v -> {
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             Intent intent = new Intent(context, SettingMainActivity.class);
             intent.putExtra("id", "0");
             context.startActivity(intent);
         });
 
-        image_more_func.setOnClickListener(v ->{
+        binding.cardViewMoreFunc.setOnClickListener(v ->{
             v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
             Intent intent = new Intent(context, SettingsActivity.class);
             intent.putExtra("state", true);

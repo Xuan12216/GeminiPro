@@ -36,11 +36,12 @@
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_alignParentStart="true"
+                        android:layout_marginEnd="15dp"
                         app:cardBackgroundColor="?colorSecondary"
                         app:cardCornerRadius="28dp"
                         app:cardElevation="0dp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
@@ -67,14 +68,14 @@
                         app:layout_constraintEnd_toStartOf="@+id/addNote"
                         app:layout_constraintStart_toEndOf="@+id/cardView2"
                         app:layout_constraintTop_toTopOf="parent" />
+
                     <ImageView
                         android:id="@+id/addNote"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:layout_marginEnd="15dp"
                         android:src="@drawable/baseline_edit_note_24"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:tint="?colorPrimary" />
 
@@ -108,7 +109,7 @@
             android:layout_height="0dp"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/recyclerViewFlex"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -131,6 +132,7 @@
                 android:textColor="?colorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:textAlignment="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -236,9 +238,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header"
         android:background="?colorSecondary"
-        app:drawerLayoutCornerSize="25dp"
+        app:drawerLayoutCornerSize="20dp"
         app:itemVerticalPadding="20dp"
         app:itemIconTint="?colorPrimary"
         app:itemTextColor="?colorPrimary"
@@ -252,12 +253,9 @@
                 android:id="@+id/searchEdittextLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="95dp"
-                android:layout_marginEnd="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
                 app:boxBackgroundColor="?background"
                 app:boxCornerRadiusBottomEnd="25dp"
                 app:boxCornerRadiusBottomStart="25dp"
@@ -266,9 +264,12 @@
                 app:boxStrokeColor="?colorPrimary"
                 app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="1dp"
+                app:hintTextColor="?colorPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:startIconDrawable="@drawable/baseline_search_24"
-                app:startIconTint="?colorPrimary"
-                app:hintTextColor="?colorPrimary">
+                app:startIconTint="?colorPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/searchEdittext"
@@ -277,8 +278,52 @@
                     android:hint="@string/searchEditText"
                     android:maxLines="1"
                     android:textColor="?colorPrimary"
-                    android:textColorHint="?colorPrimary"/>
+                    android:textColorHint="?colorPrimary" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView_moreFunc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="?colorPrimary"
+                app:cardCornerRadius="10dp"
+                app:layout_constraintEnd_toEndOf="@+id/searchEdittextLayout"
+                app:layout_constraintStart_toStartOf="@+id/searchEdittextLayout"
+                app:layout_constraintTop_toBottomOf="@+id/searchEdittextLayout">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutMore_func"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/searchEdittextLayout">
+
+                    <ImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/outline_apps_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="?colorSecondary" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/moreFuncTitle"
+                        android:textColor="?colorSecondary"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/imageView3"
+                        app:layout_constraintTop_toTopOf="@+id/imageView3" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/textView2"
@@ -290,7 +335,7 @@
                 android:textColor="@color/gray"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/searchEdittextLayout"
-                app:layout_constraintTop_toBottomOf="@id/searchEdittextLayout" />
+                app:layout_constraintTop_toBottomOf="@id/cardView_moreFunc" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_history"
@@ -300,10 +345,70 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/headerLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/headerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:padding="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/avatarCardView"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginStart="3dp"
+                    app:cardBackgroundColor="?colorSecondary"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <ImageView
+                        android:id="@+id/avatarImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/baseline_person_24" />
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:id="@+id/navUserName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:maxLines="1"
+                    android:text="User"
+                    android:textColor="?colorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/imageView_moreFunction"
+                    app:layout_constraintStart_toEndOf="@+id/avatarCardView"
+                    app:layout_constraintTop_toTopOf="@+id/avatarCardView" />
+
+                <ImageView
+                    android:id="@+id/imageView_more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="3dp"
+                    android:src="@drawable/baseline_settings_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/avatarCardView" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.navigation.NavigationView>
 

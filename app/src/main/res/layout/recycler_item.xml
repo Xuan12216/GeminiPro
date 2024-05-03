@@ -109,16 +109,15 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
-        android:elevation="0dp"
-        app:cardCornerRadius="30dp"
-        android:visibility="gone"
         android:clickable="true"
+        android:elevation="0dp"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone"
+        app:cardCornerRadius="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/card_share"
+        app:layout_constraintStart_toStartOf="@+id/recyclerView_model"
         app:layout_constraintTop_toBottomOf="@+id/recyclerView_model">
 
         <ImageView
@@ -133,17 +132,17 @@
         android:id="@+id/card_share"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
-        android:elevation="0dp"
-        app:cardCornerRadius="30dp"
-        android:visibility="gone"
         android:clickable="true"
+        android:elevation="0dp"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone"
+        app:cardCornerRadius="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/card_copy"
+        app:layout_constraintStart_toEndOf="@+id/card_google"
         app:layout_constraintTop_toBottomOf="@+id/recyclerView_model">
 
         <ImageView
@@ -158,14 +157,14 @@
         android:id="@+id/card_copy"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginEnd="10dp"
-        android:elevation="0dp"
-        app:cardCornerRadius="30dp"
-        android:visibility="gone"
+        android:layout_marginStart="15dp"
         android:clickable="true"
+        android:elevation="0dp"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        app:layout_constraintEnd_toStartOf="@+id/card_sound"
+        android:visibility="gone"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintStart_toEndOf="@+id/card_share"
         app:layout_constraintTop_toTopOf="@+id/card_share">
 
         <ImageView
@@ -180,14 +179,14 @@
         android:id="@+id/card_sound"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginEnd="10dp"
-        android:elevation="0dp"
-        app:cardCornerRadius="30dp"
-        android:visibility="gone"
+        android:layout_marginStart="15dp"
         android:clickable="true"
+        android:elevation="0dp"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        app:layout_constraintEnd_toEndOf="@+id/recyclerView_model"
+        android:visibility="gone"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintStart_toEndOf="@+id/card_copy"
         app:layout_constraintTop_toTopOf="@+id/card_share">
 
         <ImageView

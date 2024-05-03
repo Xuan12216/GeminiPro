@@ -3,29 +3,39 @@ package com.example.geminipro.Object;
 import android.content.Context;
 import android.os.Handler;
 import android.view.View;
+import android.widget.TextView;
+import androidx.recyclerview.widget.RecyclerView;
 import com.example.geminipro.R;
-import com.example.geminipro.databinding.ActivityMainBinding;
 
 public class ControlShowSuggestions {
     private Handler handler1;
-    private final ActivityMainBinding binding;
     private final Context context;
+    private RecyclerView recyclerViewFlex;
+    private View welcomeLayout;
+    private TextView welcomeText, textviewTitle;
+    private String suggestionTitle;
 
-    public ControlShowSuggestions(ActivityMainBinding binding, Context context) {
-        this.binding = binding;
+    public ControlShowSuggestions(Context context) {
         this.context = context;
     }
 
+    public void setSuggestionView(RecyclerView rv, View v, TextView tv, String t){
+        this.recyclerViewFlex = rv;
+        this.welcomeLayout = v;
+        this.welcomeText = tv;
+        this.suggestionTitle = t;
+    }
+
     public void showSuggestions(boolean isShow) {
-        binding.recyclerViewFlex.setVisibility((isShow) ? View.VISIBLE : View.GONE);
-        binding.welcomeLayout.setVisibility((isShow) ? View.VISIBLE : View.GONE);
+        if (null != recyclerViewFlex) recyclerViewFlex.setVisibility((isShow) ? View.VISIBLE : View.GONE);
+        if (null != welcomeLayout) welcomeLayout.setVisibility((isShow) ? View.VISIBLE : View.GONE);
 
-        if ((isShow)) {
+        if ((isShow) && null != suggestionTitle && !suggestionTitle.isEmpty()) {
             setTitleView("");
-            binding.recyclerViewFlex.smoothScrollToPosition(0);
-            binding.welcomeText.setText("");
+            if (null != recyclerViewFlex) recyclerViewFlex.smoothScrollToPosition(0);
+            if (null != welcomeText) welcomeText.setText("");
 
-            String text = context.getResources().getString(R.string.welcome_text);
+            String text = suggestionTitle;
             final int[] currentIndex = {0};
 
             if (null != handler1) handler1.removeCallbacksAndMessages(null);
@@ -35,7 +45,7 @@ public class ControlShowSuggestions {
                 @Override
                 public void run() {
                     if (currentIndex[0] < text.length()) {
-                        binding.welcomeText.append(String.valueOf(text.charAt(currentIndex[0])));
+                        if (null != welcomeText) welcomeText.append(String.valueOf(text.charAt(currentIndex[0])));
                         currentIndex[0]++;
                         handler1.postDelayed(this, 50);
                     }
@@ -44,8 +54,12 @@ public class ControlShowSuggestions {
         }
     }
 
+    public void setTitleObject(TextView textView){
+        this.textviewTitle = textView;
+    }
+
     public void setTitleView(String text) {
-        binding.textviewTitle.setText("");
+        if (null != textviewTitle) textviewTitle.setText("");
         final int[] currentIndex = {0};
 
         if (null != handler1) handler1.removeCallbacksAndMessages(null);
@@ -54,7 +68,7 @@ public class ControlShowSuggestions {
             @Override
             public void run() {
                 if (currentIndex[0] < text.length()) {
-                    binding.textviewTitle.append(String.valueOf(text.charAt(currentIndex[0])));
+                    if (null != textviewTitle) textviewTitle.append(String.valueOf(text.charAt(currentIndex[0])));
                     currentIndex[0]++;
                     handler1.postDelayed(this, 50);
                 }

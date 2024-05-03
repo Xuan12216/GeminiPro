@@ -37,8 +37,10 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     private Context context = null;
     private String geminiName, userName, storedImagePath, title = "", date = "";
     private boolean isPin = false;
+    private String funcType = "";
     private TextToSpeech textToSpeech;
     private ModelViewHolder soundHolderTemp;
+    private boolean isShowSoundAndGoogle = false;
 
     public ModelAdapter(Context context) {
         this.context = context;
@@ -74,6 +76,11 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.cardCopy.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
         holder.binding.cardSound.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
         holder.binding.cardGoogle.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
+
+        if (isShowSoundAndGoogle) {
+            holder.binding.cardSound.setVisibility(View.GONE);
+            holder.binding.cardGoogle.setVisibility(View.GONE);
+        }
 
         holder.binding.cardShare.setOnClickListener(shareListener);
         holder.binding.cardShare.setTag(position);
@@ -248,7 +255,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     }
 
     public User saveData(){
-        return new User(title, date, StringUris, userOrGemini, imageHashMap, isPin);
+        return new User(title, date, StringUris, userOrGemini, imageHashMap, isPin, funcType);
     }
 
     public void receiveDataAndShow(User user){
@@ -263,6 +270,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         this.title = user.getTitle();
         this.date = user.getDate();
         this.isPin = user.isPin();
+        this.funcType = user.getFuncType();
         notifyDataSetChanged();
     }
 
@@ -277,9 +285,14 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         }
     }
 
+    public void setIsShowSoundAndGoogle(boolean visible){
+        this.isShowSoundAndGoogle = visible;
+    }
+
     private void resetData() {
         this.title = "";
         this.date = "";
+        this.funcType = "";
         this.isPin = false;
         this.StringUris.clear();
         this.userOrGemini.clear();

@@ -15,17 +15,24 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
     private final Context context;
     private List<User> title = new ArrayList<>();
-    private final HistoryAdapterListener listener;
+    private HistoryAdapterListener listener;
     private static String targetTitle = "";
+    private String currentFuncType = "";
 
-    public HistoryAdapter(Context context, HistoryAdapterListener listener){
+    public HistoryAdapter(Context context, String type, HistoryAdapterListener listener){
         this.context = context;
+        this.listener = listener;
+        this.currentFuncType = type;
+    }
+
+    public void setListener(HistoryAdapterListener listener) {
         this.listener = listener;
     }
 
@@ -67,9 +74,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 holder.binding.historyTitle.setText(user.getTitle());
                 holder.binding.imageViewPin.setImageResource(isPin ? R.drawable.baseline_push_pin_24 : R.drawable.baseline_chat_bubble_24);
 
-                holder.itemView.setOnClickListener(onClickListener);
-                holder.itemView.setOnLongClickListener(onClickListenerMore);
-                holder.itemView.setTag(holder);
+                holder.binding.layout.setOnClickListener(onClickListener);
+                holder.binding.layout.setOnLongClickListener(onClickListenerMore);
+                holder.binding.layout.setTag(holder);
 
                 if (!targetTitle.isEmpty() && targetTitle.equals(user.getTitle())){
                     holder.binding.layout.setBackgroundResource(R.drawable.recycler_item_click);
@@ -113,8 +120,20 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     }
 
     public void setSettingTitle(List<User> title){
+        if (null == title) return;
+        removeDifferentTypes(title);
         this.title = title;
         notifyDataSetChanged();
+    }
+
+    private void removeDifferentTypes(List<User> title) {
+        Iterator<User> iterator = title.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            if (!user.getFuncType().equals(currentFuncType)) {
+                iterator.remove();
+            }
+        }
     }
 
     public List<User> getSettingTitle() {

@@ -44,7 +44,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.Settin
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.binding.cardViewHistory.getLayoutParams();
 
         // 设置边距
-        layoutParams.leftMargin = Utils.convertDpToPixel(0, context);
+        layoutParams.leftMargin = Utils.convertDpToPixel(16, context);
         layoutParams.topMargin = Utils.convertDpToPixel(8, context);
         layoutParams.bottomMargin = Utils.convertDpToPixel(8, context);
 

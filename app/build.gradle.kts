@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.geminipro"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -53,8 +53,9 @@ dependencies {
     implementation("io.coil-kt:coil:1.4.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    implementation("com.google.ai.client.generativeai:generativeai:0.1.1")
-    implementation("com.google.guava:guava:31.0.1-android")
+    //gemini
+    implementation("com.google.ai.client.generativeai:generativeai:0.4.0")
+    implementation("com.google.guava:guava:33.2.0-android")
     implementation("org.reactivestreams:reactive-streams:1.0.4")
 
     val room_version = "2.6.1"
@@ -87,4 +88,10 @@ dependencies {
 
     //Gson
     implementation ("com.google.code.gson:gson:2.10.1")
+
+    //searchSpinner
+    implementation("com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1")
+
+    //top sheet
+    implementation("com.github.nawinkhatiwada:TopSheet:1.0.0-alpha2")
 }

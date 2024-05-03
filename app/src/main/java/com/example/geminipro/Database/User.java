@@ -17,14 +17,16 @@ public class User {
     private String date;
     private String title;
     private boolean pin;
+    private String funcType;
 
-    public User(String title, String date, List<String> stringUris, List<String> userOrGemini, HashMap<Integer, List<Uri>> imageHashMap, boolean pin) {
+    public User(String title, String date, List<String> stringUris, List<String> userOrGemini, HashMap<Integer, List<Uri>> imageHashMap, boolean pin, String funcType) {
         this.title = title;
         this.date = date;
         this.stringUris = stringUris;
         this.userOrGemini = userOrGemini;
         this.imageHashMap = imageHashMap;
         this.pin = pin;
+        this.funcType = funcType;
     }
 
     // Getters and setters
@@ -84,4 +86,13 @@ public class User {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public String getFuncType() {
+        return funcType;
+    }
+
+    public void setFuncType(String funcType) {
+        this.funcType = funcType;
+    }
+
 }

@@ -41,7 +41,8 @@ public class ImageDialog extends Dialog implements ImageFragment.DialogStatusLis
         this.imageUris = imageUris;
     }
 
-    public ImageDialog(@NonNull Context context, List<Uri> imageUris, int position, HashMap<Integer, ImageView> imageViews) {
+    public ImageDialog(@NonNull Context context, List<Uri> imageUris, int position, HashMap<Integer,
+            ImageView> imageViews) {
         super(context, android.R.style.Theme_NoTitleBar);
         this.position = position;
         this.context = context;
@@ -58,7 +59,7 @@ public class ImageDialog extends Dialog implements ImageFragment.DialogStatusLis
 
         imageViewClose.setOnClickListener(v -> dismiss());
 
-        ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter((FragmentActivity) context, imageUris, this);
+        ImagePagerAdapter imagePagerAdapter = new ImagePagerAdapter((FragmentActivity) context , imageUris, this);
         this.viewPager.setAdapter(imagePagerAdapter);
 
         // Set the current item in ViewPager2

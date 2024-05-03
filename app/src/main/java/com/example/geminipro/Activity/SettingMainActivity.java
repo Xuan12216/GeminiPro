@@ -8,10 +8,12 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.geminipro.Page.MoreFuncPage.FuncTranslate;
 import com.example.geminipro.Page.SettingPage.SettingApi;
 import com.example.geminipro.Page.SettingPage.SettingName;
 import com.example.geminipro.Page.SettingPage.SettingParameter;
 import com.example.geminipro.Page.SettingPage.SettingSafe;
+import com.example.geminipro.databinding.MoreFuncTranslateBinding;
 import com.example.geminipro.databinding.SettingApiKeyBinding;
 import com.example.geminipro.databinding.SettingNameBinding;
 import com.example.geminipro.databinding.SettingParameterBinding;
@@ -21,19 +23,21 @@ import java.util.Objects;
 public class SettingMainActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private Context context;
+    private String text;
+    private FuncTranslate translate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = getApplicationContext();
+        context = this;
         initLinearLayout();
 
         setContentView(linearLayout);
 
         Intent intent = getIntent();
         if (intent.hasExtra("id")){
-            String text = intent.getStringExtra("id");
+            text = intent.getStringExtra("id");
 
             switch (Objects.requireNonNull(text)){
                 case "0" :
@@ -47,6 +51,9 @@ public class SettingMainActivity extends AppCompatActivity {
                     break;
                 case "3" :
                     initSetApi();
+                    break;
+                case "4" :
+                    initFuncTranslate();
                     break;
             }
         }
@@ -76,6 +83,13 @@ public class SettingMainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
     }
 
+    private void initFuncTranslate() {
+        translate = new FuncTranslate(this, context,
+                getSupportFragmentManager(), getLifecycle());
+        MoreFuncTranslateBinding binding = translate.startRunPage();
+        setContentView(binding.getRoot());
+    }
+
     private void initLinearLayout(){
         TypedValue value = new TypedValue();
         getTheme().resolveAttribute(com.google.android.material.R.attr.colorSecondary, value, true);
@@ -89,5 +103,52 @@ public class SettingMainActivity extends AppCompatActivity {
         linearLayout.setLayoutParams(layoutParams);
         linearLayout.setBackgroundColor(value.data);
         linearLayout.setGravity(Gravity.CENTER);
+    }
+
+    //=====
+    @Override
+    protected void onResume() {
+        super.onResume();
+        callOnResume();
+    }
+
+    //=====
+    @Override
+    protected void onPause() {
+        super.onPause();
+        callOnPause();
+    }
+
+    //=====
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        callOnDestroy();
+    }
+
+    //=====
+
+    private void callOnResume() {
+        switch (Objects.requireNonNull(text)){
+            case "4" :
+                if (null != translate) translate.onResume();
+                break;
+        }
+    }
+
+    private void callOnPause() {
+        switch (Objects.requireNonNull(text)){
+            case "4" :
+                if (null != translate) translate.onPause();
+                break;
+        }
+    }
+
+    private void callOnDestroy() {
+        switch (Objects.requireNonNull(text)){
+            case "4" :
+                if (null != translate) translate.onDestroy();
+                break;
+        }
     }
 }
