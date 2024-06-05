@@ -70,7 +70,6 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
     private User forDefault;
     private static User forChangeTheme;
     private HistoryAdapter.HistoryAdapterListener historyAdapterListener;
-    private SearchView searchView;
 
     public FuncTranslate(Activity activity, Context context, FragmentManager fragmentManager, Lifecycle lifecycle){
 
@@ -100,14 +99,13 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
                     return;
                 }
 
+                binding.searchView.hide();
                 if (null != suggestions) suggestions.showSuggestions(false);
                 isClear = true;
                 saveDataFunc(false);
                 historyAdapter.setTargetTitle(user.getTitle());
 
                 binding.translateTextInputEditText.setText("");
-                binding.translateRecyclerHistory.setVisibility(View.GONE);
-                searchView.setIconified(true);
                 if (null != modelAdapter){
                     binding.progressBar.setVisibility(View.VISIBLE);
 
@@ -115,6 +113,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
                         modelAdapter.receiveDataAndShow(user);
                         binding.progressBar.setVisibility(View.GONE);
                         if (null != suggestions) suggestions.setTitleView(user.getTitle());
+                        binding.newTranslationBtn.show();
                     }, 1000);
 
                 }
@@ -152,29 +151,31 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
         };
         if (null != historyAdapter) historyAdapter.setListener(historyAdapterListener);
         //=====
-        binding.toolbar.setNavigationOnClickListener(v -> {
+        binding.backBtn.setOnClickListener(v -> {
             if (activity != null) activity.finish();
         });
         //=====
-
-        binding.toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.search) {
-                item.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-                    @Override
-                    public boolean onMenuItemActionExpand(@NonNull MenuItem item) {
-                        binding.translateRecyclerHistory.setVisibility(View.VISIBLE);
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onMenuItemActionCollapse(@NonNull MenuItem item) {
-                        binding.translateRecyclerHistory.setVisibility(View.GONE);
-                        return true;
-                    }
-                });
-                return true;
+        binding.translateRecyclerHistory.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (Utils.isKeyboardOpen((Activity) context)) Utils.hideKeyboard((Activity) context);
             }
-            return false;
+        });
+        //=====
+        binding.searchView.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!usersList.isEmpty()) {
+                    Utils.parallelSearch(context, usersList,false, s.toString().toLowerCase(), filteredUsers -> {
+                        if (historyAdapter != null) historyAdapter.setSettingTitle(filteredUsers);
+                    });
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
         //=====
         binding.spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -222,14 +223,13 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
             isClear = true;
             int index = modelAdapter.getItemCount();
 
-            if (index != 0 && !isWait ) {
-                resetList();
-                if (null != suggestions) suggestions.showSuggestions(true);
-                Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
-                saveDataFunc(false);
-                binding.newTranslationBtn.hide();
-            }
-            else if (index == 0 && !isWait) {
+            if (!isWait ) {
+                if (index != 0) {
+                    resetList();
+                    saveDataFunc(false);
+                    binding.newTranslationBtn.hide();
+                }
+                historyAdapter.setTargetTitle("");
                 if (null != suggestions) suggestions.showSuggestions(true);
                 Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
             }
@@ -338,9 +338,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
         binding.recyclerViewTranslate.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         binding.recyclerViewTranslate.setAdapter(modelAdapter);
         //=====
-        Menu menu = binding.toolbar.getMenu();
-        MenuItem menuItem = menu.findItem(R.id.search);
-        searchView = (SearchView) menuItem.getActionView();
+        binding.searchView.setAutoShowKeyboard(false);
     }
 
     //==============================
@@ -388,8 +386,8 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
         String title1 = context.getString(R.string.spinner1_title);
         String title2 = context.getString(R.string.spinner2_title);
         String translate_context = context.getString(R.string.translate_context1);
-        String finalText = translate_context + title1 + ": " + spinner1Language + " -> " + title2 + "： " + spinner2Language + ", Content : " + text;
-        String modelText = spinner1Language + "->" + spinner2Language + "\n" + title1 + ": " + text;
+        String finalText = translate_context + " " + title1 + ": " + spinner1Language + " \u2192 " + title2 + "： " + spinner2Language + ", Content : " + text;
+        String modelText = spinner1Language + " \u2192 " + spinner2Language + "\n" + title1 + ": " + text;
 
         gotoGeminiBuilder(finalText, !imageUris.isEmpty() && !text.isEmpty());
         setModelAdapter(modelText, "user");//把資料設定到adapter
@@ -422,7 +420,6 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
         if (!forDefault.getStringUris().isEmpty() && !forDefault.getUserOrGemini().isEmpty()){
             if (forDefault.getTitle().isEmpty()) forDefault.setTitle(forDefault.getStringUris().get(0));
             else isClickByHistory = true;//只有新的記錄才會沒有title
-
             if (isPause) {
                 historyAdapter.setTargetTitle(forDefault.getTitle());//如果onPause時執行
                 isClickByHistory = true;
@@ -477,6 +474,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
         if (null != modelAdapter) modelAdapter.checkSharedPreferences();//讀取圖片和名字
         GenerativeModelManager.checkApiKey(context);//檢查有沒有apikey
         getSaveData();
+        if (null != historyAdapter) historyAdapter.setTargetTitle("");
     }
 
     public void onPause() {

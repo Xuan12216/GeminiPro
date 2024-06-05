@@ -11,6 +11,8 @@ import com.example.geminipro.Database.User;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.MyPopupMenu;
 import com.example.geminipro.databinding.RecyclerHistoryItemBinding;
+import com.example.geminipro.enums.FuncType;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,6 +71,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                     holder.binding.divider.setVisibility(View.VISIBLE);
                     holder.binding.textViewDate.setVisibility(View.VISIBLE);
                     holder.binding.textViewDate.setText(formattedDate);
+                }
+
+                if (currentFuncType.equals(FuncType.translate)) {
+                    holder.binding.historyTitle.setSingleLine(false);
+                    holder.binding.historyTitle.setMaxLines(5);
                 }
 
                 holder.binding.historyTitle.setText(user.getTitle());

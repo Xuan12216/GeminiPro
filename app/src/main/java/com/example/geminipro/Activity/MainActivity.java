@@ -201,13 +201,11 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
             flexAdapter.refreshTitle();
             historyAdapter.setTargetTitle("");
 
-            if (index != 0 && !isWait ){
-                resetList();
-                if (null != suggestions) suggestions.showSuggestions(true);
-                Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
-                saveDataFunc(false);
-            }
-            else if (index == 0 && !isWait) {
+            if (!isWait ){
+                if (index != 0) {
+                    resetList();
+                    saveDataFunc(false);
+                }
                 if (null != suggestions) suggestions.showSuggestions(true);
                 Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
             }

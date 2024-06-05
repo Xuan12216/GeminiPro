@@ -8,6 +8,8 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.geminipro.Page.MoreFuncPage.FuncTesting;
 import com.example.geminipro.Page.MoreFuncPage.FuncTranslate;
 import com.example.geminipro.Page.SettingPage.SettingApi;
 import com.example.geminipro.Page.SettingPage.SettingName;
@@ -17,6 +19,7 @@ import com.example.geminipro.databinding.MoreFuncTranslateBinding;
 import com.example.geminipro.databinding.SettingApiKeyBinding;
 import com.example.geminipro.databinding.SettingNameBinding;
 import com.example.geminipro.databinding.SettingParameterBinding;
+import com.example.geminipro.databinding.MoreFuncTestingBinding;
 
 import java.util.Objects;
 
@@ -25,6 +28,7 @@ public class SettingMainActivity extends AppCompatActivity {
     private Context context;
     private String text;
     private FuncTranslate translate;
+    private FuncTesting testing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +58,9 @@ public class SettingMainActivity extends AppCompatActivity {
                     break;
                 case "4" :
                     initFuncTranslate();
+                    break;
+                case "5" :
+                    initFuncTesting();
                     break;
             }
         }
@@ -89,6 +96,14 @@ public class SettingMainActivity extends AppCompatActivity {
         MoreFuncTranslateBinding binding = translate.startRunPage();
         setContentView(binding.getRoot());
     }
+
+    private void initFuncTesting() {
+        testing = new FuncTesting(this, context);
+        MoreFuncTestingBinding binding = testing.startRunPage();
+        setContentView(binding.getRoot());
+    }
+
+    //======
 
     private void initLinearLayout(){
         TypedValue value = new TypedValue();

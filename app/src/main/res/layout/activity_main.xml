@@ -395,7 +395,6 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView_moreFunction"
                     app:layout_constraintStart_toEndOf="@+id/avatarCardView"
                     app:layout_constraintTop_toTopOf="@+id/avatarCardView" />
 
