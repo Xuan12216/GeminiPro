@@ -75,28 +75,15 @@ public class Utils {
                 .collect(Collectors.toList());
     }
 
-    public static void matchTitle(User matchData, User inputData, boolean isHistory,String funcType, onMatchDoneCallback callback) {
+    public static void matchId(User inputData,String funcType, onMatchDoneCallback callback) {
         if (callback == null) return;
 
         Date date = new Date();
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date);
-        String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(date);
-        User user = new User(inputData.getTitle(), today, inputData.getStringUris(), inputData.getUserOrGemini(), inputData.getImageHashMap(), false, funcType);
 
-        if (matchData == null) callback.onMatchDone(DBType.insert, "Insert Complete", user);// 如果用戶不存在，則插入新用戶信息
-        else {
-            if (isHistory) { // 如果是來自歷史點擊，則更新用戶信息
-                user.setId(matchData.getId()); // 設置現有用戶的 ID
-                user.setPin(matchData.isPin());
-                user.setTitle(matchData.getTitle());
-                user.setDate(today);
-                callback.onMatchDone(DBType.update, "saveUpdate for history", user);
-            }
-            else {// 如果是在輸入框輸入的，如果有重複的title則合併新數據到現有的數據
-                user.setTitle(user.getTitle() + " " +timeFormat);
-                callback.onMatchDone(DBType.insert, "Insert Complete_repeat", user);
-            }
-        }
+        User user = new User(inputData.getId(), inputData.getTitle(), today, inputData.getStringUris(), inputData.getUserOrGemini(), inputData.getImageHashMap(), inputData.isPin(), funcType);
+
+        callback.onMatchDone(DBType.insert, "Insert", user);
     }
 
     //====================================================

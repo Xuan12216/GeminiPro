@@ -3,10 +3,7 @@ package com.example.geminipro.Model;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
 import com.example.geminipro.Activity.SettingMainActivity;
-import com.example.geminipro.BuildConfig;
-import com.example.geminipro.R;
 import com.example.geminipro.Util.Secure.SecuritySharedPreference;
 import com.google.ai.client.generativeai.GenerativeModel;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
@@ -15,15 +12,12 @@ import com.google.ai.client.generativeai.type.Content;
 import com.google.ai.client.generativeai.type.GenerationConfig;
 import com.google.ai.client.generativeai.type.HarmCategory;
 import com.google.ai.client.generativeai.type.SafetySetting;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class GenerativeModelManager {
     private static GenerativeModelFutures model;
-    private static GenerativeModelFutures modelVision;
     private static Content userContent, modelContent;
     private static GenerationConfig generationConfig;
     private static List<SafetySetting> safetyList;
@@ -33,26 +27,23 @@ public class GenerativeModelManager {
     private static Integer topK = 3;
     private static Integer maxOutputToken = 2048;
     private static Integer candidateCount = 1;
-    private static List<String> stopSequences = new ArrayList<>();
+    private static final List<String> stopSequences = new ArrayList<>();
     private static SharedPreferences preferences;
-    private static SecuritySharedPreference pres;
-    private static String[] safeList = new String[4];
+    private static final String[] safeList = new String[4];
 
     public static void initializeGenerativeModel(Context context) {
 
         preferences = context.getSharedPreferences("gemini_private_prefs", Context.MODE_PRIVATE);
-        pres = new SecuritySharedPreference(context, "gemini_private_api_prefs", Context.MODE_PRIVATE);
+        SecuritySharedPreference pres = new SecuritySharedPreference(context, "gemini_private_api_prefs", Context.MODE_PRIVATE);
         resetModel();
         generateConfig();
         setSafetySetting();
         // 初始化 Generative Model
         String api = pres.getString("api_key", "");
-        GenerativeModel gm1 = new GenerativeModel("gemini-1.5-pro-latest", api, generationConfig, safetyList);
-        GenerativeModel gm2 = new GenerativeModel("gemini-pro-vision", api, generationConfig, safetyList);
+        GenerativeModel gm1 = new GenerativeModel("gemini-1.5-flash", api, generationConfig, safetyList);
 
         // 使用 GenerativeModelFutures 创建 GenerativeModelFutures 实例
         model = GenerativeModelFutures.from(gm1);
-        modelVision = GenerativeModelFutures.from(gm2);
 
         createHistoryData();
     }
@@ -131,7 +122,6 @@ public class GenerativeModelManager {
 
     private static void resetModel(){
         model = null;
-        modelVision = null;
         userContent = null;
         modelContent = null;
         generationConfig = null;
@@ -149,10 +139,6 @@ public class GenerativeModelManager {
 
     public static GenerativeModelFutures getGenerativeModel() {
         return model;
-    }
-
-    public static GenerativeModelFutures getGenerativeModelVision() {
-        return modelVision;
     }
 
     public static String[] getSafetyList() {

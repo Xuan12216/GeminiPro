@@ -82,6 +82,7 @@ public class InfoActivity extends AppCompatActivity {
         webSettings.setDomStorageEnabled(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
+        webSettings.setBuiltInZoomControls(true);
         currentNightMode = getResources().getConfiguration().uiMode
                 & Configuration.UI_MODE_NIGHT_MASK;
 

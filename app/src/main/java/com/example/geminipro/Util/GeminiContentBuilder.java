@@ -30,8 +30,7 @@ public class GeminiContentBuilder {
     }
 
     public void startGeminiBuilder(String text, boolean isVision, GeminiBuilderCallback callback) {
-        GenerativeModelFutures model = isVision ? GenerativeModelManager.getGenerativeModelVision()
-                : GenerativeModelManager.getGenerativeModel();
+        GenerativeModelFutures model = GenerativeModelManager.getGenerativeModel();
 
         Content.Builder builder = new Content.Builder();
         builder.setRole("user");

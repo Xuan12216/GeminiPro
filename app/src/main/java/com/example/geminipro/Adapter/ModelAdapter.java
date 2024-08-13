@@ -10,6 +10,7 @@ import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import com.example.geminipro.Database.User;
 import com.example.geminipro.R;
 import com.example.geminipro.Util.GeminiContentBuilder;
 import com.example.geminipro.databinding.RecyclerItemBinding;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +36,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     private HashMap<Integer,List<Uri>> imageHashMap = new HashMap<Integer,List<Uri>>();
     private Context context = null;
     private String geminiName, userName, storedImagePath, title = "", date = "";
+    private long id;
     private boolean isPin = false;
     private String funcType = "";
     private TextToSpeech textToSpeech;
@@ -70,12 +71,18 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         String who = userOrGemini.get(position);
         String text = StringUris.get(position);
         holder.binding.messageTextView.setText(text);
-        holder.binding.avatarCardView.setCardBackgroundColor(("user").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
+        holder.binding.avatarCardViewLeft.setCardBackgroundColor(("user").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
+        holder.binding.avatarCardViewRight.setCardBackgroundColor(("user").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
         holder.binding.usernameTextView.setText(("user").equals(who) ? userName : geminiName);
         holder.binding.cardShare.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
         holder.binding.cardCopy.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
         holder.binding.cardSound.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
         holder.binding.cardGoogle.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
+
+        holder.binding.contentContainer.setGravity(("user").equals(who) ? Gravity.END : Gravity.START);
+        holder.binding.messageContainer.setGravity(("user").equals(who) ? Gravity.END : Gravity.START);
+        holder.binding.avatarCardViewLeft.setVisibility(!("user").equals(who) ? View.VISIBLE : View.GONE);
+        holder.binding.avatarCardViewRight.setVisibility(("user").equals(who) ? View.VISIBLE : View.GONE);
 
         if (isShowSoundAndGoogle) {
             holder.binding.cardSound.setVisibility(View.GONE);
@@ -95,12 +102,12 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.cardGoogle.setTag(position);
 
         Glide.with(context)
-                .load((holder.getAdapterPosition() == StringUris.size() - 1 && !("user").equals(who)) ?
+                .load((holder.getAbsoluteAdapterPosition() == StringUris.size() - 1 && !("user").equals(who)) ?
                         R.drawable.sparkle_resting :
                         storedImagePath.isEmpty() ?
                                 (("user").equals(who) ? R.drawable.baseline_person_24 :  R.drawable.sparkle_resting) :
                                 (("user").equals(who) ? storedImagePath :  R.drawable.sparkle_resting))
-                .into(holder.binding.avatarImageView);
+                .into(("user").equals(who) ? holder.binding.avatarImageViewRight : holder.binding.avatarImageViewLeft);
     }
 
     @Override
@@ -255,7 +262,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     }
 
     public User saveData(){
-        return new User(title, date, StringUris, userOrGemini, imageHashMap, isPin, funcType);
+        return new User(id, title, date, StringUris, userOrGemini, imageHashMap, isPin, funcType);
     }
 
     public void receiveDataAndShow(User user){
@@ -264,6 +271,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
             GeminiContentBuilder.resetChatNormal();
             GeminiContentBuilder.setHistoryNormalList(user.getUserOrGemini(), user.getStringUris());
         }
+        this.id = user.getId();
         this.StringUris = new ArrayList<>(user.getStringUris());
         this.userOrGemini = new ArrayList<>(user.getUserOrGemini());
         this.imageHashMap = new HashMap<>(user.getImageHashMap());

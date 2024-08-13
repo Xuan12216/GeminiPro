@@ -3,23 +3,27 @@ package com.example.geminipro.Database;
 import android.net.Uri;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Entity(tableName = "users")
 public class User {
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
 
-    private List<String> stringUris;
-    private List<String> userOrGemini;
-    private HashMap<Integer, List<Uri>> imageHashMap;
-    private String date;
-    private String title;
+    private List<String> stringUris = new ArrayList<>();
+    private List<String> userOrGemini = new ArrayList<>();
+    private HashMap<Integer, List<Uri>> imageHashMap = new HashMap<>();
+    private String date = "";
+    private String title = "";
     private boolean pin;
-    private String funcType;
+    private String funcType = "";
 
-    public User(String title, String date, List<String> stringUris, List<String> userOrGemini, HashMap<Integer, List<Uri>> imageHashMap, boolean pin, String funcType) {
+    public User() {}
+
+    public User(long id, String title, String date, List<String> stringUris, List<String> userOrGemini, HashMap<Integer, List<Uri>> imageHashMap, boolean pin, String funcType) {
+        this.id = id;
         this.title = title;
         this.date = date;
         this.stringUris = stringUris;
@@ -47,11 +51,11 @@ public class User {
         this.title = title;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

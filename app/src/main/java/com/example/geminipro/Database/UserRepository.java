@@ -3,14 +3,12 @@ package com.example.geminipro.Database;
 import android.content.Context;
 import androidx.lifecycle.Lifecycle;
 import androidx.room.Room;
-
 import com.example.geminipro.enums.DBType;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -36,20 +34,8 @@ public class UserRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Completable updateUser(User user) {
-        return Completable.fromAction(() -> userDao.updateUser(user))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
     private Completable deleteUser(User user) {
         return Completable.fromAction(() -> userDao.deleteUser(user))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Single<User> getUserByTitle(String title) {
-        return userDao.getUserByTitle(title)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -70,12 +56,6 @@ public class UserRepository {
 
             if (type.equals(DBType.insert)){
                 disposable.add(insertUser(user).subscribe(() -> {
-                    System.out.println("TestXuan: "+printText);
-                    callback.onDone();
-                }, Throwable::printStackTrace));
-            }
-            else if (type.equals(DBType.update)){
-                disposable.add(updateUser(user).subscribe(() -> {
                     System.out.println("TestXuan: "+printText);
                     callback.onDone();
                 }, Throwable::printStackTrace));

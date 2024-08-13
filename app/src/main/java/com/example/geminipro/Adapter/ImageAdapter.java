@@ -60,11 +60,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                         holder.binding.imageView.setOnClickListener(onZoomListener);
                         holder.binding.imageView.setTag(holder.getAdapterPosition());
 
-                        int targetHeight = holder.binding.imageView.getLayoutParams().height;
-                        int imageWidth = resource.getIntrinsicWidth();
-                        int imageHeight = resource.getIntrinsicHeight();
-                        holder.binding.imageView.getLayoutParams().width = Math.round((float) imageWidth / (float) imageHeight * targetHeight);
-
                         return false;
                     }
                 })

@@ -12,7 +12,6 @@ import com.example.geminipro.R;
 import com.example.geminipro.Util.MyPopupMenu;
 import com.example.geminipro.databinding.RecyclerHistoryItemBinding;
 import com.example.geminipro.enums.FuncType;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

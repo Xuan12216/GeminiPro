@@ -37,7 +37,6 @@ import com.example.geminipro.databinding.ActivityMainBinding;
 import com.example.geminipro.enums.DBType;
 import com.example.geminipro.enums.FuncType;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -261,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
 
         switch (status) {
             case "pin":
-                saveDatabase(DBType.update, user, "PinUpdate");
+                saveDatabase(DBType.insert, user, "PinUpdate");
                 break;
             case "rename":
                 currentTarget = historyAdapter.getTargetTitle();
@@ -270,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                     isClear = true;
                     if (null != suggestions) suggestions.showSuggestions(true);
                 }
-                saveDatabase(DBType.update, user, "RenameUpdate");
+                saveDatabase(DBType.insert, user, "RenameUpdate");
                 break;
             case "delete":
                 currentTarget = historyAdapter.getTargetTitle();
@@ -345,24 +344,13 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
                 isClickByHistory = true;
             }
 
-            Utils.parallelSearch(context, usersList,true, forDefault.getTitle().toLowerCase(), filteredUsers -> {
-                boolean isMatch = false;
-                for (User user : filteredUsers){
-                    String title = user.getTitle();
-                    if (!title.isEmpty() && title.equals(forDefault.getTitle())) {
-                        isMatch = true;
-                        matchTitle(user);
-                        break;
-                    }
-                }
-                if (!isMatch) matchTitle(null);
-            });
+            nextStep();
         }
         else clearDataIfNecessary(true);
     }
     //=====
-    private void matchTitle(User matchData) {
-        Utils.matchTitle(matchData, forDefault, isClickByHistory, funcType, (type, printText, user)
+    private void nextStep() {
+        Utils.matchId(forDefault, funcType, (type, printText, user)
                 -> saveDatabase(type, user, printText));
 
         if (isClickByHistory) isClickByHistory = false;
@@ -376,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements ImageAdapter.Imag
     private void clearDataIfNecessary(boolean clear) {
         if (clear){
             resetList();
-            User user = new User("", "", new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false, funcType);
+            User user = new User();
             modelAdapter.receiveDataAndShow(user);
             isClear = false;
         }

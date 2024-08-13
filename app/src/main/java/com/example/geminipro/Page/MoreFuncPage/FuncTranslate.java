@@ -7,8 +7,6 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,7 +14,6 @@ import android.widget.Toast;
 import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -42,7 +39,6 @@ import com.example.geminipro.enums.DBType;
 import com.example.geminipro.enums.FuncType;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -125,7 +121,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
 
                 switch (status) {
                     case "pin":
-                        saveDatabase(DBType.update, user, "PinUpdate");
+                        saveDatabase(DBType.insert, user, "PinUpdate");
                         break;
                     case "rename":
                         currentTarget = historyAdapter.getTargetTitle();
@@ -134,7 +130,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
                             isClear = true;
                             if (null != suggestions) suggestions.showSuggestions(true);
                         }
-                        saveDatabase(DBType.update, user, "RenameUpdate");
+                        saveDatabase(DBType.insert, user, "RenameUpdate");
                         break;
                     case "delete":
                         currentTarget = historyAdapter.getTargetTitle();
@@ -442,7 +438,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
     }
 
     private void matchTitle(User matchData) {
-        Utils.matchTitle(matchData, forDefault, isClickByHistory, funcType, (type, printText, user)
+        Utils.matchId(forDefault, funcType, (type, printText, user)
                 -> saveDatabase(type, user, printText));
 
         if (isClickByHistory) isClickByHistory = false;
@@ -460,7 +456,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
     private void clearDataIfNecessary(boolean clear) {
         if (clear){
             resetList();
-            User user = new User("", "", new ArrayList<>(), new ArrayList<>(), new HashMap<>(), false, funcType);
+            User user = new User();
             modelAdapter.receiveDataAndShow(user);
             isClear = false;
         }
