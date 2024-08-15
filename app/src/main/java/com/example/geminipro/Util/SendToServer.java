@@ -49,16 +49,16 @@ public class SendToServer {
                     public void onSuccess(GenerateContentResponse result) {
                         e.onSuccess(result);
                         String resultText = result.getText();
-                        callback.onResult(resultText);
+                        callback.onResult(resultText, true);
                     }
 
                     @Override
                     public void onFailure(@NonNull Throwable throwable) {
                         e.onError(throwable);
                         if (throwable.toString().contains("PromptBlockedException")) {
-                            callback.onResult(throwable.toString());
+                            callback.onResult(throwable.toString(), true);
                         }
-                        else tryToUseStreamSendToServer(contentUser, callback, isVision);
+                        //else useStreamSendToServer(isVision, contentUser, callback);
                     }
                 }, context.getMainExecutor()));
 
@@ -68,7 +68,7 @@ public class SendToServer {
                 .subscribe(result -> {}, throwable -> {});
     }
 
-    private void tryToUseStreamSendToServer(Content contentUser, ResultCallback callback, boolean isVision) {
+    public void useStreamSendToServer(boolean isVision, Content contentUser, ResultCallback callback) {
         Publisher<GenerateContentResponse> response = isVision ? modelVision.generateContentStream(contentUser) : chatNormal.sendMessageStream(contentUser);
         final String[] fullResponse = {""};
         Single<GenerateContentResponse> single = Single.create(
@@ -77,21 +77,22 @@ public class SendToServer {
                     public void onNext(GenerateContentResponse generateContentResponse) {
                         String chunk = generateContentResponse.getText();
                         fullResponse[0] += chunk;
+                        callback.onResult(fullResponse[0], false);
                     }
 
                     @Override
                     public void onComplete() {
-                        callback.onResult(fullResponse[0]);
+                        callback.onResult(fullResponse[0], true);
                     }
 
                     @Override
                     public void onError(Throwable t) {
                         t.printStackTrace();
-                        callback.onResult(t.toString());
+                        callback.onResult(t.toString(), true);
                     }
 
                     @Override
-                    public void onSubscribe(Subscription s) { s.request(10);}
+                    public void onSubscribe(Subscription s) { s.request(Long.MAX_VALUE);}
                 })
         );
 
@@ -102,6 +103,6 @@ public class SendToServer {
     }
 
     public interface ResultCallback {
-        void onResult(String result);
+        void onResult(String result, boolean isFinish);
     }
 }

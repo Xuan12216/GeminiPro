@@ -99,7 +99,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
                 if (null != suggestions) suggestions.showSuggestions(false);
                 isClear = true;
                 saveDataFunc(false);
-                historyAdapter.setTargetTitle(user.getTitle());
+                historyAdapter.setTargeId(user.getId());
 
                 binding.translateTextInputEditText.setText("");
                 if (null != modelAdapter){
@@ -225,7 +225,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
                     saveDataFunc(false);
                     binding.newTranslationBtn.hide();
                 }
-                historyAdapter.setTargetTitle("");
+                historyAdapter.setTargeId(-1);
                 if (null != suggestions) suggestions.showSuggestions(true);
                 Toast.makeText(context, R.string.add_notes_toast,Toast.LENGTH_SHORT).show();
             }
@@ -352,7 +352,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
     public void setModelAdapter(String resultText, String who){
         activity.runOnUiThread(() -> {
             binding.newTranslationBtn.show();
-            modelAdapter.addData(resultText,imageUris, who, modelAdapter.getItemCount());
+            modelAdapter.addDataWithStreaming(resultText,imageUris, who, modelAdapter.getItemCount(), true);
             binding.progressBar.setVisibility(View.GONE);
             binding.recyclerViewTranslate.smoothScrollToPosition(modelAdapter.getItemCount());
             if ("model".equals(who)){
@@ -398,7 +398,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
 
     private void gotoGeminiBuilder(String text, boolean isVision){
         GeminiContentBuilder builder = new GeminiContentBuilder(imageUris,context, lifecycle);
-        builder.startGeminiBuilder(text, isVision, result -> setModelAdapter(result, "model"));
+        builder.startGeminiBuilder(text, isVision, (result, isFinish) -> setModelAdapter(result, "model"));
     }
 
     //database========================
@@ -417,7 +417,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
             if (forDefault.getTitle().isEmpty()) forDefault.setTitle(forDefault.getStringUris().get(0));
             else isClickByHistory = true;//只有新的記錄才會沒有title
             if (isPause) {
-                historyAdapter.setTargetTitle(forDefault.getTitle());//如果onPause時執行
+                historyAdapter.setTargeId(forDefault.getId());//如果onPause時執行
                 isClickByHistory = true;
             }
 
@@ -438,7 +438,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
     }
 
     private void matchTitle(User matchData) {
-        Utils.matchId(forDefault, funcType, (type, printText, user)
+        Utils.setUserData(forDefault, funcType, (type, printText, user)
                 -> saveDatabase(type, user, printText));
 
         if (isClickByHistory) isClickByHistory = false;
@@ -470,7 +470,7 @@ public class FuncTranslate implements ImageAdapter.ImageAdapterListener{
         if (null != modelAdapter) modelAdapter.checkSharedPreferences();//讀取圖片和名字
         GenerativeModelManager.checkApiKey(context);//檢查有沒有apikey
         getSaveData();
-        if (null != historyAdapter) historyAdapter.setTargetTitle("");
+        if (null != historyAdapter) historyAdapter.setTargeId(-1);
     }
 
     public void onPause() {

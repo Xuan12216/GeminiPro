@@ -36,17 +36,15 @@
                     android:layout_marginTop="20dp"
                     android:src="@drawable/baseline_arrow_back_24"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="?colorPrimary" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/textviewTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:text="設定名字，圖片"
                     android:textSize="24sp"
-                    android:textColor="?colorPrimary"
                     app:layout_constraintBottom_toBottomOf="@+id/backBtn"
                     app:layout_constraintStart_toEndOf="@+id/backBtn"
                     app:layout_constraintTop_toTopOf="@+id/backBtn" />
@@ -72,8 +70,7 @@
                 android:id="@+id/translateRecyclerHistory"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
-                android:background="?colorSecondary"/>
+                android:padding="10dp" />
 
         </com.google.android.material.search.SearchView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

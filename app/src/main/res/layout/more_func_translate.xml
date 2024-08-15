@@ -3,8 +3,7 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="?colorSecondary">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -29,8 +28,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?colorSecondary">
+                    android:layout_height="match_parent">
 
                     <ImageView
                         android:id="@+id/backBtn"
@@ -40,16 +38,14 @@
                         android:layout_marginTop="20dp"
                         android:src="@drawable/baseline_arrow_back_24"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?colorPrimary" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/textviewTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="@string/translate_title"
-                        android:textColor="?colorPrimary"
                         android:textSize="20sp"
                         app:layout_constraintBottom_toBottomOf="@+id/backBtn"
                         app:layout_constraintStart_toEndOf="@+id/backBtn"
@@ -57,10 +53,9 @@
 
                     <com.google.android.material.search.SearchBar
                         android:id="@+id/search_bar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
+                        android:layout_width="135dp"
+                        android:layout_height="35dp"
                         android:layout_marginEnd="20dp"
-                        app:backgroundTint="?colorSecondary"
                         android:hint="@string/navigation_history"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -69,15 +64,15 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/spinnerCard1"
                 android:layout_width="0dp"
                 android:layout_height="55dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="5dp"
-                app:cardBackgroundColor="?background"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
+                style="?attr/materialCardViewFilledStyle"
                 app:layout_constraintEnd_toStartOf="@+id/ChangeLan1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/appBarLayout2">
@@ -88,17 +83,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/spinnerCard2"
                 android:layout_width="0dp"
                 android:layout_height="55dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="10dp"
-                app:cardBackgroundColor="?background"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
+                style="?attr/materialCardViewFilledStyle"
                 app:layout_constraintBottom_toBottomOf="@+id/spinnerCard1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ChangeLan1"
@@ -109,7 +104,7 @@
                     style="@style/MySpinnerStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <ImageView
                 android:id="@+id/ChangeLan1"
@@ -136,24 +131,19 @@
                 android:id="@+id/newTranslationBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?colorPrimary"
                 android:text="@string/new_translation"
-                android:textColor="?colorSecondary"
                 app:cornerRadius="20dp"
                 app:icon="@drawable/baseline_add_24"
-                app:iconTint="?colorSecondary"
                 app:layout_constraintBottom_toBottomOf="@+id/recyclerViewTranslate"
-                app:layout_constraintEnd_toEndOf="@+id/spinnerCard2"
-                app:tint="?colorSecondary" />
+                app:layout_constraintEnd_toEndOf="@+id/spinnerCard2" />
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/imageCardView"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
                 android:layout_marginStart="15dp"
-                app:cardBackgroundColor="?colorPrimary"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
                 app:layout_constraintBottom_toBottomOf="@+id/translateTextInputLayout"
@@ -166,23 +156,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="center"
-                    android:src="@drawable/baseline_image_24"
-                    app:tint="?colorSecondary" />
+                    android:src="@drawable/baseline_image_24" />
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabScrollToBottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?colorPrimary"
                 android:src="@drawable/baseline_keyboard_arrow_down_24"
                 android:visibility="gone"
                 app:fabCustomSize="40dp"
                 app:layout_constraintBottom_toBottomOf="@+id/recyclerViewTranslate"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/recyclerViewTranslate"
-                app:tint="?colorSecondary" />
+                app:layout_constraintStart_toStartOf="@+id/recyclerViewTranslate" />
 
             <pl.droidsonroids.gif.GifImageView
                 android:id="@+id/progressBar"
@@ -217,12 +204,11 @@
                     app:layout_constraintEnd_toEndOf="@+id/welcomeText"
                     app:layout_constraintStart_toStartOf="@+id/welcomeText" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/welcomeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:textColor="?colorPrimary"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -240,18 +226,13 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="10dp"
-                app:boxBackgroundColor="?background"
                 app:boxCornerRadiusBottomEnd="25dp"
                 app:boxCornerRadiusBottomStart="25dp"
                 app:boxCornerRadiusTopEnd="25dp"
                 app:boxCornerRadiusTopStart="25dp"
-                app:boxStrokeColor="?colorPrimary"
-                app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="1dp"
                 app:endIconDrawable="@drawable/baseline_keyboard_voice_24"
                 app:endIconMode="custom"
-                app:endIconTint="?colorPrimary"
-                app:hintTextColor="?colorPrimary"
                 app:layout_constraintBottom_toTopOf="@+id/recyclerViewImage"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageCardView">
@@ -261,9 +242,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/EditText_hint"
-                    android:maxLines="10"
-                    android:textColor="?colorPrimary"
-                    android:textColorHint="?colorPrimary" />
+                    android:maxLines="10" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -288,15 +267,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="@string/searchEditText"
-            app:layout_anchor="@id/search_bar"
-            app:backgroundTint="?colorSecondary">
+            app:layout_anchor="@id/search_bar">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/translateRecyclerHistory"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
-                android:background="?colorSecondary"/>
+                android:padding="10dp" />
         </com.google.android.material.search.SearchView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

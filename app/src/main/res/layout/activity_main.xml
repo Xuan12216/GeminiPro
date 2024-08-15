@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activity.MainActivity"
-    android:background="?colorSecondary"
     android:id="@+id/drawerLayout">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,25 +19,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?colorSecondary"
                 app:layout_scrollFlags="scroll|enterAlways">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <androidx.cardview.widget.CardView
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardView2"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_alignParentStart="true"
-                        app:cardBackgroundColor="?colorSecondary"
                         app:cardCornerRadius="28dp"
-                        app:cardElevation="0dp"
+                        style="?attr/materialCardViewFilledStyle"
+                        app:cardBackgroundColor="@color/transparent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -49,9 +47,9 @@
                             android:layout_height="match_parent"
                             android:onClick="openNavigationDrawer"
                             android:scaleType="centerCrop" />
-                    </androidx.cardview.widget.CardView>
+                    </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/textviewTitle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -61,7 +59,6 @@
                         android:textSize="17sp"
                         android:textStyle="bold"
                         android:gravity="center"
-                        android:textColor="?colorPrimary"
                         app:layout_constraintWidth_percent="0.5"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/addNote"
@@ -76,11 +73,10 @@
                         android:src="@drawable/baseline_edit_note_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?colorPrimary" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.appcompat.widget.Toolbar>
+            </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -125,11 +121,10 @@
                 app:layout_constraintEnd_toEndOf="@+id/welcomeText"
                 app:layout_constraintStart_toStartOf="@+id/welcomeText" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/welcomeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?colorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textAlignment="center"
@@ -140,16 +135,16 @@
                 app:layout_constraintVertical_bias="0.35" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/imageCardView"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_marginStart="15dp"
-            app:cardBackgroundColor="?colorPrimary"
             app:cardCornerRadius="28dp"
             app:cardElevation="0dp"
+            style="?attr/materialCardViewFilledStyle"
             app:layout_constraintBottom_toBottomOf="@+id/textInputLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textInputLayout"
@@ -161,10 +156,9 @@
                 android:layout_height="match_parent"
                 android:onClick="AddImage"
                 android:scaleType="center"
-                android:src="@drawable/baseline_image_24"
-                app:tint="?colorSecondary"/>
+                android:src="@drawable/baseline_image_24" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
@@ -173,18 +167,13 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="10dp"
-            app:boxBackgroundColor="?background"
             app:boxCornerRadiusBottomEnd="25dp"
             app:boxCornerRadiusBottomStart="25dp"
             app:boxCornerRadiusTopEnd="25dp"
             app:boxCornerRadiusTopStart="25dp"
-            app:boxStrokeColor="?colorPrimary"
-            app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="1dp"
             app:endIconDrawable="@drawable/baseline_keyboard_voice_24"
             app:endIconMode="custom"
-            app:endIconTint="?colorPrimary"
-            app:hintTextColor="?colorPrimary"
             app:layout_constraintBottom_toTopOf="@+id/recyclerViewDown"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageCardView">
@@ -195,8 +184,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/EditText_hint"
                 android:maxLines="10"
-                android:textColor="?colorPrimary"
-                android:textColorHint="?colorPrimary" />
+                 />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -224,9 +212,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_keyboard_arrow_down_24"
             app:fabCustomSize="40dp"
-            app:tint="?colorSecondary"
             android:visibility="gone"
-            android:backgroundTint="?colorPrimary"
             app:layout_constraintBottom_toBottomOf="@+id/recyclerView"
             app:layout_constraintEnd_toEndOf="@+id/recyclerView"
             app:layout_constraintStart_toStartOf="@+id/recyclerView" />
@@ -238,11 +224,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="?colorSecondary"
         app:drawerLayoutCornerSize="20dp"
         app:itemVerticalPadding="20dp"
-        app:itemIconTint="?colorPrimary"
-        app:itemTextColor="?colorPrimary"
         android:elevation="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -256,37 +239,29 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
-                app:boxBackgroundColor="?background"
                 app:boxCornerRadiusBottomEnd="25dp"
                 app:boxCornerRadiusBottomStart="25dp"
                 app:boxCornerRadiusTopEnd="25dp"
                 app:boxCornerRadiusTopStart="25dp"
-                app:boxStrokeColor="?colorPrimary"
-                app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="1dp"
-                app:hintTextColor="?colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:startIconDrawable="@drawable/baseline_search_24"
-                app:startIconTint="?colorPrimary">
+                app:startIconDrawable="@drawable/baseline_search_24">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/searchEdittext"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="@string/searchEditText"
-                    android:maxLines="1"
-                    android:textColor="?colorPrimary"
-                    android:textColorHint="?colorPrimary" />
+                    android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardView_moreFunc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="?colorPrimary"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintEnd_toEndOf="@+id/searchEdittextLayout"
                 app:layout_constraintStart_toStartOf="@+id/searchEdittextLayout"
@@ -308,31 +283,28 @@
                         android:src="@drawable/outline_apps_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="?colorSecondary" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:text="@string/moreFuncTitle"
-                        android:textColor="?colorSecondary"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="@+id/imageView3"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/imageView3"
                         app:layout_constraintTop_toTopOf="@+id/imageView3" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="20dp"
                 android:text="@string/navigation_history"
-                android:textColor="@color/gray"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/searchEdittextLayout"
                 app:layout_constraintTop_toBottomOf="@id/cardView_moreFunc" />
@@ -362,14 +334,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/avatarCardView"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
                     android:layout_marginStart="3dp"
-                    app:cardBackgroundColor="?colorSecondary"
                     app:cardCornerRadius="28dp"
                     app:cardElevation="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -381,9 +352,9 @@
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/baseline_person_24" />
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/navUserName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -391,7 +362,6 @@
                     android:layout_marginEnd="10dp"
                     android:maxLines="1"
                     android:text="User"
-                    android:textColor="?colorPrimary"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"

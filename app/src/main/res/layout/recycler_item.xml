@@ -8,10 +8,12 @@
     android:background="?android:attr/selectableItemBackground">
 
     <!-- 左侧头像 -->
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/avatarCardView_left"
         android:layout_width="25dp"
         android:layout_height="25dp"
+        style="?attr/materialCardViewFilledStyle"
+        android:background="@color/transparent"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         app:cardCornerRadius="28dp"
@@ -26,9 +28,9 @@
             android:layout_height="match_parent"
             android:src="@drawable/baseline_person_robot_24"
             android:scaleType="centerCrop" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/avatarCardView_right"
         android:layout_width="25dp"
         android:layout_height="25dp"
@@ -47,7 +49,7 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/baseline_person_robot_24" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- 消息容器 -->
     <LinearLayout
@@ -63,7 +65,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- 用户名 -->
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/usernameTextView"
             style="@style/FlexTitle"
             android:layout_width="wrap_content"
@@ -73,13 +75,12 @@
             android:paddingEnd="5dp"
             android:paddingBottom="5dp"
             android:text="Gemini Pro"
-            android:textColor="?colorPrimary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/content_cardView"
-            style="@style/FlexCardView"
+            style="?attr/materialCardViewFilledStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:elevation="0dp"
@@ -100,14 +101,13 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <!-- 聊天消息内容 -->
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/messageTextView"
                         style="@style/FlexTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="10dp"
                         android:text="Hello, how are you?"
-                        android:textColor="?colorPrimary"
                         android:textIsSelectable="true"
                         android:textSize="16sp" />
 
@@ -118,101 +118,100 @@
                         android:layout_marginTop="5dp"/>
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_google"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="15dp"
-        android:clickable="true"
-        android:elevation="0dp"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:visibility="gone"
-        app:cardCornerRadius="30dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/content_container"
         app:layout_constraintTop_toBottomOf="@+id/content_container">
 
-        <ImageView
-            android:id="@+id/imageView_google"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:src="@mipmap/google" />
-    </androidx.cardview.widget.CardView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_google"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_share"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="15dp"
-        android:clickable="true"
-        android:elevation="0dp"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:visibility="gone"
-        app:cardCornerRadius="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/card_google"
-        app:layout_constraintTop_toBottomOf="@+id/content_container">
+            <ImageView
+                android:id="@+id/imageView_google"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/google" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <ImageView
-            android:id="@+id/imageView_share"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:src="@drawable/baseline_share_24" />
-    </androidx.cardview.widget.CardView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_share"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="10dp"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="30dp"
+            app:layout_constraintStart_toEndOf="@+id/card_google"
+            app:layout_constraintTop_toTopOf="@+id/card_google">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_copy"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="15dp"
-        android:clickable="true"
-        android:elevation="0dp"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:visibility="gone"
-        app:cardCornerRadius="30dp"
-        app:layout_constraintStart_toEndOf="@+id/card_share"
-        app:layout_constraintTop_toTopOf="@+id/card_share">
+            <ImageView
+                android:id="@+id/imageView_share"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/baseline_share_24" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <ImageView
-            android:id="@+id/imageView_copy"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:src="@drawable/baseline_content_copy_24" />
-    </androidx.cardview.widget.CardView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_copy"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="10dp"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="30dp"
+            app:layout_constraintStart_toEndOf="@+id/card_share"
+            app:layout_constraintTop_toTopOf="@+id/card_share">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_sound"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="15dp"
-        android:clickable="true"
-        android:elevation="0dp"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:visibility="gone"
-        app:cardCornerRadius="30dp"
-        app:layout_constraintStart_toEndOf="@+id/card_copy"
-        app:layout_constraintTop_toTopOf="@+id/card_share">
+            <ImageView
+                android:id="@+id/imageView_copy"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/baseline_content_copy_24" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <ImageView
-            android:id="@+id/imageView_sound"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:src="@drawable/baseline_volume_up_24"
-            app:tint="?colorPrimary" />
-    </androidx.cardview.widget.CardView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_sound"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="10dp"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="30dp"
+            app:layout_constraintStart_toEndOf="@+id/card_copy"
+            app:layout_constraintTop_toTopOf="@+id/card_share">
+
+            <ImageView
+                android:id="@+id/imageView_sound"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/baseline_volume_up_24" />
+        </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

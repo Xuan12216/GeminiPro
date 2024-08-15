@@ -10,7 +10,6 @@
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:tint="?colorPrimary"
         android:layout_marginBottom="10dp"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,13 +18,12 @@
         android:layout_height="60dp"
         android:background="?android:attr/selectableItemBackground">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardView"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginStart="30dp"
             android:elevation="0dp"
-            app:cardBackgroundColor="?colorPrimary"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,16 +36,14 @@
                 android:layout_gravity="center"
                 android:src="@drawable/baseline_camera_alt_24"
                 app:layout_constraintBottom_toBottomOf="@+id/history_title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="?colorSecondary" />
-        </androidx.cardview.widget.CardView>
+                app:layout_constraintStart_toStartOf="parent" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:text="@string/useCameraPickImage"
-            android:textColor="?colorPrimary"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/cardView"
             app:layout_constraintStart_toEndOf="@+id/cardView"
@@ -62,13 +58,12 @@
         android:layout_marginBottom="70dp"
         android:background="?android:attr/selectableItemBackground">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardViewImage"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginStart="30dp"
             android:elevation="0dp"
-            app:cardBackgroundColor="?colorPrimary"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -81,16 +76,14 @@
                 android:layout_gravity="center"
                 android:src="@drawable/baseline_image_24"
                 app:layout_constraintBottom_toBottomOf="@+id/history_title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="?colorSecondary" />
-        </androidx.cardview.widget.CardView>
+                app:layout_constraintStart_toStartOf="parent" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:text="@string/useGalleryPickImage"
-            android:textColor="?colorPrimary"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/cardViewImage"
             app:layout_constraintStart_toEndOf="@+id/cardViewImage"

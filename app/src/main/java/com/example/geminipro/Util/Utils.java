@@ -75,7 +75,7 @@ public class Utils {
                 .collect(Collectors.toList());
     }
 
-    public static void matchId(User inputData,String funcType, onMatchDoneCallback callback) {
+    public static void setUserData(User inputData,String funcType, onMatchDoneCallback callback) {
         if (callback == null) return;
 
         Date date = new Date();
@@ -83,7 +83,7 @@ public class Utils {
 
         User user = new User(inputData.getId(), inputData.getTitle(), today, inputData.getStringUris(), inputData.getUserOrGemini(), inputData.getImageHashMap(), inputData.isPin(), funcType);
 
-        callback.onMatchDone(DBType.insert, "Insert", user);
+        callback.onMatchDone(DBType.insert, "Insert_setUserData", user);
     }
 
     //====================================================

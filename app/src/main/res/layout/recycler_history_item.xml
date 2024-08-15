@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="@+id/textViewDate"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/textViewDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,13 +39,12 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewDate"
         android:foreground="?android:attr/selectableItemBackground">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardViewHistory"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginStart="10dp"
             android:elevation="0dp"
-            app:cardBackgroundColor="?colorPrimary"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,11 +57,10 @@
                 android:layout_gravity="center"
                 android:src="@drawable/baseline_push_pin_24"
                 app:layout_constraintBottom_toBottomOf="@+id/history_title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="?colorSecondary" />
-        </androidx.cardview.widget.CardView>
+                app:layout_constraintStart_toStartOf="parent" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/history_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -70,7 +68,6 @@
             android:layout_marginEnd="5dp"
             android:maxLines="1"
             android:singleLine="true"
-            android:textColor="?colorPrimary"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/cardViewHistory"
             app:layout_constraintEnd_toEndOf="parent"

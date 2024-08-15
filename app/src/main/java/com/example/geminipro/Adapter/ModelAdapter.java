@@ -42,6 +42,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     private TextToSpeech textToSpeech;
     private ModelViewHolder soundHolderTemp;
     private boolean isShowSoundAndGoogle = false;
+    private boolean isFinish = false;
 
     public ModelAdapter(Context context) {
         this.context = context;
@@ -74,10 +75,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         holder.binding.avatarCardViewLeft.setCardBackgroundColor(("user").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
         holder.binding.avatarCardViewRight.setCardBackgroundColor(("user").equals(who) ? context.getResources().getColor(R.color.navy_blue,null) : context.getResources().getColor(R.color.transparent,null));
         holder.binding.usernameTextView.setText(("user").equals(who) ? userName : geminiName);
-        holder.binding.cardShare.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
-        holder.binding.cardCopy.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
-        holder.binding.cardSound.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
-        holder.binding.cardGoogle.setVisibility(("user").equals(who) ? View.GONE : View.VISIBLE);
+        holder.binding.layoutBottom.setVisibility(("user").equals(who) || !isFinish ? View.GONE : View.VISIBLE);
 
         holder.binding.contentContainer.setGravity(("user").equals(who) ? Gravity.END : Gravity.START);
         holder.binding.messageContainer.setGravity(("user").equals(who) ? Gravity.END : Gravity.START);
@@ -253,12 +251,26 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         return count;
     }
 
-    public void addData(String resultText,List<Uri> imageUris, String who, int index) {
+    public void addDataWithStreaming(String resultText,List<Uri> imageUris, String who, int index, boolean isFinish) {
+        this.isFinish = isFinish;
+        if (StringUris.size() > index) {
+            StringUris.set(index, resultText);
+            userOrGemini.set(index, who);
+        }
+        else {
+            StringUris.add(resultText);
+            userOrGemini.add(who);
+        }
+        if (!imageUris.isEmpty() && !"model".equals(who)) imageHashMap.put(index, new ArrayList<>(imageUris));
+        notifyItemChanged(index);
+    }
+
+    public void addDataWithNormal(String resultText,List<Uri> imageUris, String who, int index) {
         StringUris.add(resultText);
         userOrGemini.add(who);
         List<Uri> newImageUris = new ArrayList<>(imageUris);
-        if (newImageUris.size() > 0 && !"model".equals(who)) imageHashMap.put(index,newImageUris);
-        notifyDataSetChanged();
+        if (!newImageUris.isEmpty() && !"model".equals(who)) imageHashMap.put(index,newImageUris);
+        notifyItemChanged(StringUris.size() - 1);
     }
 
     public User saveData(){
@@ -298,6 +310,7 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     }
 
     private void resetData() {
+        this.id = 0;
         this.title = "";
         this.date = "";
         this.funcType = "";

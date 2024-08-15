@@ -24,8 +24,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     private final Context context;
     private List<User> title = new ArrayList<>();
     private HistoryAdapterListener listener;
-    private static String targetTitle = "";
+    private static long targetId = -1;
     private String currentFuncType = "";
+    private boolean isWait = false;
 
     public HistoryAdapter(Context context, String type, HistoryAdapterListener listener){
         this.context = context;
@@ -84,7 +85,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 holder.binding.layout.setOnLongClickListener(onClickListenerMore);
                 holder.binding.layout.setTag(holder);
 
-                if (!targetTitle.isEmpty() && targetTitle.equals(user.getTitle())){
+                if (targetId != -1 && targetId != 0 && targetId == user.getId()){
                     holder.binding.layout.setBackgroundResource(R.drawable.recycler_item_click);
                 }
                 else holder.binding.layout.setBackgroundColor(context.getResources().getColor(R.color.transparent, null));
@@ -146,13 +147,22 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         return title;
     }
 
-    public void setTargetTitle(String title){
-        targetTitle = title;
+    public void setTargeId(long id){
+        targetId = id;
         notifyDataSetChanged();
     }
 
+    public long getTargetId() {
+        return targetId;
+    }
+
     public String getTargetTitle() {
-        return targetTitle;
+        for (User user : title) {
+            if (user.getId() == targetId) {
+                return user.getTitle();
+            }
+        }
+        return "";
     }
     
     private final View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -171,16 +181,22 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     private final View.OnLongClickListener onClickListenerMore = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
-            v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
-            HistoryViewHolder holder = (HistoryViewHolder) v.getTag();
-            int position = holder.getAdapterPosition();
-            User user = title.get(position);
+            if (!isWait) {
+                v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                HistoryViewHolder holder = (HistoryViewHolder) v.getTag();
+                int position = holder.getAdapterPosition();
+                User user = title.get(position);
 
-            MyPopupMenu popupMenu = new MyPopupMenu(context, R.menu.menu_more_item, v, title, listener, user);
-            popupMenu.startPopUp();
+                MyPopupMenu popupMenu = new MyPopupMenu(context, R.menu.menu_more_item, v, title, listener, user);
+                popupMenu.startPopUp();
+            }
             return false;
         }
     };
+
+    public void setIsWait(boolean isWait) {
+        this.isWait = isWait;
+    }
 
     public static class HistoryViewHolder extends RecyclerView.ViewHolder {
         public final RecyclerHistoryItemBinding binding;

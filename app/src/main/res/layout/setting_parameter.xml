@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?colorSecondary">
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/backBtn"
@@ -13,17 +12,15 @@
         android:layout_marginTop="20dp"
         android:src="@drawable/baseline_arrow_back_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="?colorPrimary" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/textviewTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:text="設定模型參數"
         android:textSize="24sp"
-        android:textColor="?colorPrimary"
         app:layout_constraintBottom_toBottomOf="@+id/backBtn"
         app:layout_constraintStart_toEndOf="@+id/backBtn"
         app:layout_constraintTop_toTopOf="@+id/backBtn" />
@@ -42,7 +39,7 @@
             android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/temperature"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -50,7 +47,6 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="35dp"
                 android:text="Temperature"
-                android:textColor="?android:colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -73,7 +69,7 @@
                 app:trackColorInactive="@color/gray2"
                 app:trackHeight="15dp" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/contentTemperature"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -81,12 +77,11 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="15dp"
                 android:text="@string/temperature_content"
-                android:textColor="?android:colorPrimary"
                 app:layout_constraintEnd_toEndOf="@+id/sliderTemperature"
                 app:layout_constraintStart_toStartOf="@+id/sliderTemperature"
                 app:layout_constraintTop_toBottomOf="@id/sliderTemperature" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/contentTopK"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -94,12 +89,11 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="35dp"
                 android:text="@string/topK_content"
-                android:textColor="?android:colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sliderTopK" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topK"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -107,7 +101,6 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="35dp"
                 android:text="TopK"
-                android:textColor="?android:colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -130,7 +123,7 @@
                 app:trackColorInactive="@color/gray2"
                 app:trackHeight="15dp" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topP"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -138,7 +131,6 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="35dp"
                 android:text="TopP"
-                android:textColor="?android:colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -161,7 +153,7 @@
                 app:trackColorInactive="@color/gray2"
                 app:trackHeight="15dp" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/maxOutToken"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -169,14 +161,13 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="35dp"
                 android:text="Max Output Tokens"
-                android:textColor="?android:colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/contentTopP" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/contentTopP"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -184,7 +175,6 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="35dp"
                 android:text="@string/topP_content"
-                android:textColor="?android:colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sliderTopP" />
@@ -205,7 +195,7 @@
                 app:trackColorInactive="@color/gray2"
                 app:trackHeight="15dp" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/stopSequences"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -214,14 +204,13 @@
                 android:layout_marginEnd="35dp"
                 android:maxLines="2"
                 android:text="Stop Sequences"
-                android:textColor="?android:colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/contentMaxOutputTokens" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/contentMaxOutputTokens"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -229,7 +218,6 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="35dp"
                 android:text="@string/max_output_token_content"
-                android:textColor="?android:colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sliderMaxOutTokken" />
@@ -240,15 +228,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="35dp"
-                app:boxBackgroundColor="?background"
                 app:boxCornerRadiusBottomEnd="25dp"
                 app:boxCornerRadiusBottomStart="25dp"
                 app:boxCornerRadiusTopEnd="25dp"
                 app:boxCornerRadiusTopStart="25dp"
-                app:boxStrokeColor="?colorPrimary"
-                app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="1dp"
-                app:hintTextColor="?colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/stopSequences"
                 app:layout_constraintTop_toBottomOf="@+id/stopSequences">
@@ -258,12 +242,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Enter Sequences"
-                    android:maxLines="5"
-                    android:textColor="?colorPrimary"
-                    android:textColorHint="?colorPrimary" />
+                    android:maxLines="5" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/contentStop"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -271,12 +253,11 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="35dp"
                 android:text="@string/stop_sequences_content"
-                android:textColor="?android:colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/candidateCount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -284,7 +265,6 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="35dp"
                 android:text="Candidate Count"
-                android:textColor="?android:colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -307,7 +287,7 @@
                 app:trackColorInactive="@color/gray2"
                 app:trackHeight="15dp" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textCandidateCount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -315,18 +295,16 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="35dp"
                 android:text="@string/candidate_count_content"
-                android:textColor="?android:colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sliderCandidateCOunt" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="35dp"
                 android:layout_marginEnd="20dp"
                 android:text="@string/accept_btn_content"
-                android:textColor="?colorPrimary"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/btnAccept"
                 app:layout_constraintEnd_toStartOf="@+id/btnAccept"
@@ -340,12 +318,10 @@
                 android:layout_marginTop="50dp"
                 android:layout_marginEnd="30dp"
                 android:layout_marginBottom="30dp"
-                android:backgroundTint="?colorPrimary"
                 android:src="@drawable/baseline_done_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textCandidateCount"
-                app:tint="?colorSecondary" />
+                app:layout_constraintTop_toBottomOf="@+id/textCandidateCount" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

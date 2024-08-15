@@ -55,7 +55,7 @@ public class GeminiContentBuilder {
         Content contentUser = builder.build();
 
         SendToServer sendToServer = isVision ? new SendToServer(model, context, lifecycle) : new SendToServer(chatNormal, context, lifecycle);
-        sendToServer.sendToServerFunc(isVision, contentUser, callback::callBackResult);
+        sendToServer.useStreamSendToServer(isVision, contentUser, callback::callBackResult);
     }
 
     public static void resetChatNormal() {
@@ -91,6 +91,6 @@ public class GeminiContentBuilder {
     }
 
     public interface GeminiBuilderCallback{
-        void callBackResult(String text);
+        void callBackResult(String text, boolean isFinish);
     }
 }

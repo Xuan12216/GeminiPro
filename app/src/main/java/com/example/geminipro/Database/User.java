@@ -20,7 +20,14 @@ public class User {
     private boolean pin;
     private String funcType = "";
 
-    public User() {}
+    public User() {
+        this.stringUris = new ArrayList<>();
+        this.userOrGemini = new ArrayList<>();
+        this.imageHashMap = new HashMap<>();
+        this.date = "";
+        this.title = "";
+        this.funcType = "";
+    }
 
     public User(long id, String title, String date, List<String> stringUris, List<String> userOrGemini, HashMap<Integer, List<Uri>> imageHashMap, boolean pin, String funcType) {
         this.id = id;

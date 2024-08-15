@@ -1,49 +1,32 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.GeminiPro" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/white</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
-
-        <item name="colorPrimary">@color/black</item>
-        <item name="colorSecondary">@color/white</item>
-        <item name="background">@color/gray1</item>
-        <item name="colorAccent">@color/Pewter</item>
-
-        <item name="android:textColorPrimary">@color/black</item>
+        <item name="colorControlNormal">@color/black</item>
     </style>
 
     <style name="Theme.GeminiPro" parent="Base.Theme.GeminiPro" />
 
     <style name="MyPopupMenuStyle" parent="@style/Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@drawable/custom_popup_background</item>
-        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="MySpinnerStyle" >
-        <item name="android:popupBackground">@drawable/custom_popup_background_gray</item>
-        <item name="android:background">@drawable/custom_popup_background_gray</item>
-        <item name="android:textColor">@color/black</item>
+
     </style>
 
     <style name="CustomDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:popupBackground">@drawable/custom_popup_background_gray</item>
-        <item name="android:background">@drawable/custom_popup_background_gray</item>
+
     </style>
 
     <style name="MyTextViewStyle" >
-        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="FlexTitle">
-        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="FlexBelow">
-        <item name="android:textColor">@color/gray</item>
     </style>
 
     <style name="FlexCardView">
-        <item name="cardBackgroundColor">@color/gray1</item>
     </style>
 </resources>
