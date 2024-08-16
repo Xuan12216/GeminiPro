@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
             layout.modelAdapter.addDataWithStreaming(resultText,imageUris, who, index, isFinish);
             if (isFinish) index++;
             layout.toggleProgressBar(false);
-            if (isFinish) layout.setRecyclerViewScrollToPosition(layout.modelAdapter.getItemCount() - 1);
+            layout.setRecyclerViewScrollToBottom();
             if ("model".equals(who) && isFinish){
                 layout.isWait = false;
                 layout.historyAdapter.setIsWait(false);

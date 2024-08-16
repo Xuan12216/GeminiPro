@@ -12,13 +12,13 @@ public class User {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
-    private List<String> stringUris = new ArrayList<>();
-    private List<String> userOrGemini = new ArrayList<>();
-    private HashMap<Integer, List<Uri>> imageHashMap = new HashMap<>();
-    private String date = "";
-    private String title = "";
+    private List<String> stringUris;
+    private List<String> userOrGemini;
+    private HashMap<Integer, List<Uri>> imageHashMap;
+    private String date;
+    private String title;
     private boolean pin;
-    private String funcType = "";
+    private String funcType;
 
     public User() {
         this.stringUris = new ArrayList<>();

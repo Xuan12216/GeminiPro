@@ -97,6 +97,25 @@ public class MainLayout {
         binding.recyclerView.smoothScrollToPosition(pos);
     }
 
+    public void setRecyclerViewScrollToBottom() {
+        binding.recyclerView.post(() -> {
+            int itemCount = modelAdapter.getItemCount();
+            if (itemCount > 0) {
+                int lastItemPosition = itemCount - 1;
+                RecyclerView.LayoutManager layoutManager = binding.recyclerView.getLayoutManager();
+                assert layoutManager != null;
+                View lastItemView = layoutManager.findViewByPosition(lastItemPosition);
+
+                if (lastItemView != null) {
+                    int scrollOffset = lastItemView.getBottom() - binding.recyclerView.getHeight();
+                    if (scrollOffset > 0) {
+                        binding.recyclerView.smoothScrollBy(0, scrollOffset);
+                    }
+                }
+            }
+        });
+    }
+
     public void setRecyclerViewListener() {
         binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
